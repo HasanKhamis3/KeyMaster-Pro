@@ -1,0 +1,864 @@
+// نظام تخزين البيانات
+class DataStorage {
+    constructor() {
+        this.USERS_KEY = 'password_generator_users';
+        this.LOGS_KEY = 'password_generator_logs';
+        this.CURRENT_USER_KEY = 'current_user';
+        this.init();
+    }
+    
+    init() {
+        // تهيئة التخزين إذا كان فارغًا
+        if (!this.getUsers().length) {
+            this.initDemoData();
+        }
+    }
+    
+    // بيانات تجريبية أولية
+    initDemoData() {
+        const demoUsers = [
+            {
+                id: 1,
+                firstName: 'مدير',
+                lastName: 'النظام',
+                email: 'admin@example.com',
+                phone: '+966500000001',
+                idNumber: '1000000001',
+                password: 'admin123',
+                role: 'admin',
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: 2,
+                firstName: 'مستخدم',
+                lastName: 'تجريبي',
+                email: 'user@example.com',
+                phone: '+966500000002',
+                idNumber: '1000000002',
+                password: 'password123',
+                role: 'user',
+                createdAt: new Date().toISOString()
+            }
+        ];
+        
+        const demoLogs = [
+            {
+                id: 1,
+                userId: 2,
+                userName: 'مستخدم تجريبي',
+                data: { firstName: 'مستخدم', lastName: 'تجريبي' },
+                passwords: ['Test@12345', 'Secure#2024'],
+                purpose: 'email',
+                timestamp: new Date().toISOString()
+            }
+        ];
+        
+        localStorage.setItem(this.USERS_KEY, JSON.stringify(demoUsers));
+        localStorage.setItem(this.LOGS_KEY, JSON.stringify(demoLogs));
+    }
+    
+    // إدارة المستخدمين
+    getUsers() {
+        return JSON.parse(localStorage.getItem(this.USERS_KEY) || '[]');
+    }
+    
+    saveUsers(users) {
+        localStorage.setItem(this.USERS_KEY, JSON.stringify(users));
+    }
+    
+    addUser(user) {
+        const users = this.getUsers();
+        user.id = Date.now();
+        user.createdAt = new Date().toISOString();
+        user.role = user.role || 'user';
+        users.push(user);
+        this.saveUsers(users);
+        return user;
+    }
+    
+    findUserByEmail(email) {
+        const users = this.getUsers();
+        return users.find(user => user.email === email);
+    }
+    
+    authenticate(email, password) {
+        const user = this.findUserByEmail(email);
+        if (user && user.password === password) {
+            return user;
+        }
+        return null;
+    }
+    
+    // إدارة السجلات
+    getLogs() {
+        return JSON.parse(localStorage.getItem(this.LOGS_KEY) || '[]');
+    }
+    
+    saveLogs(logs) {
+        localStorage.setItem(this.LOGS_KEY, JSON.stringify(logs));
+    }
+    
+    addLog(log) {
+        const logs = this.getLogs();
+        log.id = Date.now();
+        log.timestamp = new Date().toISOString();
+        logs.push(log);
+        this.saveLogs(logs);
+        return log;
+    }
+    
+    clearLogs() {
+        localStorage.setItem(this.LOGS_KEY, '[]');
+    }
+    
+    // إدارة المستخدم الحالي
+    setCurrentUser(user) {
+        if (user) {
+            // إزالة كلمة المرور قبل التخزين
+            const { password, ...userWithoutPassword } = user;
+            localStorage.setItem(this.CURRENT_USER_KEY, JSON.stringify(userWithoutPassword));
+        } else {
+            localStorage.removeItem(this.CURRENT_USER_KEY);
+        }
+    }
+    
+    getCurrentUser() {
+        return JSON.parse(localStorage.getItem(this.CURRENT_USER_KEY) || 'null');
+    }
+    
+    logout() {
+        this.setCurrentUser(null);
+    }
+    
+    // إحصائيات
+    getStatistics() {
+        const users = this.getUsers();
+        const logs = this.getLogs();
+        const today = new Date().toDateString();
+        
+        const todayLogs = logs.filter(log => 
+            new Date(log.timestamp).toDateString() === today
+        );
+        
+        return {
+            totalUsers: users.length,
+            totalLogs: logs.length,
+            todayGenerations: todayLogs.length,
+            activeUsers: users.filter(u => u.lastLogin).length
+        };
+    }
+    
+    // التصدير
+    exportData() {
+        return {
+            users: this.getUsers(),
+            logs: this.getLogs(),
+            exportedAt: new Date().toISOString()
+        };
+    }
+    
+    // الحذف الكامل
+    clearAllData() {
+        localStorage.removeItem(this.USERS_KEY);
+        localStorage.removeItem(this.LOGS_KEY);
+        localStorage.removeItem(this.CURRENT_USER_KEY);
+        this.initDemoData();
+    }
+}
+
+// نظام توليد كلمات المرور
+class PasswordGenerator {
+    constructor() {
+        this.uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        this.lowercase = 'abcdefghijklmnopqrstuvwxyz';
+        this.numbers = '0123456789';
+        this.symbols = '!@#$%^&*()_+-=[]{}|;:,.<>?';
+    }
+    
+    // توليد كلمة مرور عشوائية
+    generateRandom(length = 12, options = {
+        uppercase: true,
+        lowercase: true,
+        numbers: true,
+        symbols: true
+    }) {
+        let charset = '';
+        let password = '';
+        
+        if (options.uppercase) charset += this.uppercase;
+        if (options.lowercase) charset += this.lowercase;
+        if (options.numbers) charset += this.numbers;
+        if (options.symbols) charset += this.symbols;
+        
+        if (!charset) charset = this.lowercase + this.numbers;
+        
+        for (let i = 0; i < length; i++) {
+            const randomIndex = Math.floor(Math.random() * charset.length);
+            password += charset[randomIndex];
+        }
+        
+        return password;
+    }
+    
+    // توليد كلمات مرور مقترحة بناءً على البيانات
+    generateFromData(data) {
+        const suggestions = [];
+        
+        // طريقة 1: مزج الأحرف الأولى مع أرقام ورموز
+        if (data.firstName && data.lastName) {
+            const firstInitial = data.firstName.charAt(0).toUpperCase();
+            const lastInitial = data.lastName.charAt(0).toUpperCase();
+            const numbers = Math.floor(Math.random() * 9000) + 1000;
+            const symbol = this.symbols.charAt(Math.floor(Math.random() * this.symbols.length));
+            suggestions.push(`${firstInitial}${lastInitial}${numbers}${symbol}`);
+        }
+        
+        // طريقة 2: استخدام أجزاء من البيانات مع تحويلات
+        if (data.idNumber) {
+            const idPart = data.idNumber.slice(-4);
+            const randomChars = this.lowercase.slice(0, 4).split('').map(c => 
+                Math.random() > 0.5 ? c.toUpperCase() : c
+            ).join('');
+            suggestions.push(`${randomChars}@${idPart}`);
+        }
+        
+        // طريقة 3: كلمة مرور عشوائية قوية
+        suggestions.push(this.generateRandom(16, {
+            uppercase: true,
+            lowercase: true,
+            numbers: true,
+            symbols: true
+        }));
+        
+        // طريقة 4: نمط متقطع
+        if (data.phone) {
+            const phonePart = data.phone.replace(/\D/g, '').slice(-4);
+            const word = this.generateRandomWord(3);
+            suggestions.push(`${word}#${phonePart}!`);
+        }
+        
+        // طريقة 5: كلمة مرور طويلة
+        suggestions.push(this.generateRandom(20, {
+            uppercase: true,
+            lowercase: true,
+            numbers: true,
+            symbols: false
+        }));
+        
+        return suggestions.slice(0, 5); // إرجاع 5 اقتراحات كحد أقصى
+    }
+    
+    // توليد كلمة عشوائية
+    generateRandomWord(length) {
+        const vowels = 'aeiou';
+        const consonants = 'bcdfghjklmnpqrstvwxyz';
+        let word = '';
+        
+        for (let i = 0; i < length; i++) {
+            if (i % 2 === 0) {
+                word += consonants.charAt(Math.floor(Math.random() * consonants.length));
+            } else {
+                word += vowels.charAt(Math.floor(Math.random() * vowels.length));
+            }
+        }
+        
+        return word;
+    }
+    
+    // تقييم قوة كلمة المرور
+    evaluateStrength(password) {
+        let score = 0;
+        
+        if (password.length >= 8) score++;
+        if (password.length >= 12) score++;
+        if (/[A-Z]/.test(password)) score++;
+        if (/[a-z]/.test(password)) score++;
+        if (/[0-9]/.test(password)) score++;
+        if (/[^A-Za-z0-9]/.test(password)) score++;
+        
+        if (score >= 5) return 'strong';
+        if (score >= 3) return 'medium';
+        return 'weak';
+    }
+}
+
+// نظام واجهة المستخدم
+class UI {
+    constructor() {
+        this.storage = new DataStorage();
+        this.generator = new PasswordGenerator();
+        this.translator = window.translator;
+    }
+    
+    // إظهار التنبيه
+    showAlert(message, type = 'success', duration = 3000) {
+        const alert = document.createElement('div');
+        alert.className = `alert alert-${type}`;
+        alert.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+            <span>${message}</span>
+        `;
+        
+        document.body.appendChild(alert);
+        
+        setTimeout(() => {
+            alert.remove();
+        }, duration);
+    }
+    
+    // نسخ النص إلى الحافظة
+    copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            this.showAlert(this.translator.get('passwordGenerated'), 'success');
+        }).catch(err => {
+            console.error('Failed to copy:', err);
+        });
+    }
+    
+    // تنسيق التاريخ
+    formatDate(dateString) {
+        const date = new Date(dateString);
+        const lang = this.translator.currentLang;
+        
+        if (lang === 'ar') {
+            return date.toLocaleDateString('ar-SA', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        } else {
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+    }
+}
+
+// تهيئة الصفحة
+function initPage() {
+    const path = window.location.pathname;
+    const page = path.split('/').pop();
+    
+    switch(page) {
+        case 'index.html':
+        case '':
+            initLoginPage();
+            break;
+        case 'register.html':
+            initRegisterPage();
+            break;
+        case 'generator.html':
+            initGeneratorPage();
+            break;
+        case 'admin.html':
+            initAdminPage();
+            break;
+    }
+}
+
+// صفحة تسجيل الدخول
+function initLoginPage() {
+    const storage = new DataStorage();
+    const ui = new UI();
+    
+    const loginForm = document.getElementById('loginForm');
+    const togglePassword = document.getElementById('togglePassword');
+    
+    if (loginForm) {
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            
+            // التحقق من البيانات
+            if (!username || !password) {
+                ui.showAlert(ui.translator.get('requiredField'), 'error');
+                return;
+            }
+            
+            // المصادقة
+            const user = storage.authenticate(username, password);
+            
+            if (user) {
+                storage.setCurrentUser(user);
+                ui.showAlert(ui.translator.get('loginSuccess'), 'success');
+                
+                // إعادة التوجيه بناءً على الدور
+                setTimeout(() => {
+                    if (user.role === 'admin') {
+                        window.location.href = 'admin.html';
+                    } else {
+                        window.location.href = 'generator.html';
+                    }
+                }, 1000);
+            } else {
+                ui.showAlert(ui.translator.get('errorLogin'), 'error');
+            }
+        });
+    }
+    
+    if (togglePassword) {
+        togglePassword.addEventListener('click', () => {
+            const passwordInput = document.getElementById('password');
+            const icon = togglePassword.querySelector('i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.className = 'far fa-eye-slash';
+            } else {
+                passwordInput.type = 'password';
+                icon.className = 'far fa-eye';
+            }
+        });
+    }
+}
+
+// صفحة التسجيل
+function initRegisterPage() {
+    const storage = new DataStorage();
+    const ui = new UI();
+    const generator = new PasswordGenerator();
+    
+    const registerForm = document.getElementById('registerForm');
+    const passwordInput = document.getElementById('regPassword');
+    const strengthMeter = document.querySelector('.strength-meter');
+    const strengthText = document.querySelector('.strength-text');
+    
+    // التحقق من قوة كلمة المرور
+    if (passwordInput) {
+        passwordInput.addEventListener('input', () => {
+            const password = passwordInput.value;
+            const strength = generator.evaluateStrength(password);
+            
+            strengthMeter.className = 'strength-meter ' + strength;
+            strengthText.textContent = ui.translator.get(`${strength}Password`);
+        });
+    }
+    
+    // إظهار/إخفاء كلمة المرور
+    ['toggleRegPassword', 'toggleConfirmPassword'].forEach(id => {
+        const toggle = document.getElementById(id);
+        if (toggle) {
+            toggle.addEventListener('click', () => {
+                const targetId = id === 'toggleRegPassword' ? 'regPassword' : 'confirmPassword';
+                const passwordInput = document.getElementById(targetId);
+                const icon = toggle.querySelector('i');
+                
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    icon.className = 'far fa-eye-slash';
+                } else {
+                    passwordInput.type = 'password';
+                    icon.className = 'far fa-eye';
+                }
+            });
+        }
+    });
+    
+    if (registerForm) {
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // جمع البيانات
+            const user = {
+                firstName: document.getElementById('firstName').value.trim(),
+                middleName: document.getElementById('middleName').value.trim(),
+                lastName: document.getElementById('lastName').value.trim(),
+                countryCode: document.getElementById('countryCode').value,
+                phone: document.getElementById('phone').value.trim(),
+                idNumber: document.getElementById('idNumber').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                password: document.getElementById('regPassword').value,
+                confirmPassword: document.getElementById('confirmPassword').value,
+                terms: document.getElementById('terms').checked
+            };
+            
+            // التحقق من البيانات
+            if (!user.terms) {
+                ui.showAlert(ui.translator.get('acceptTerms'), 'error');
+                return;
+            }
+            
+            if (user.password !== user.confirmPassword) {
+                ui.showAlert(ui.translator.get('passwordMismatch'), 'error');
+                return;
+            }
+            
+            // التحقق من وجود المستخدم
+            if (storage.findUserByEmail(user.email)) {
+                ui.showAlert(ui.translator.get('errorUserExists'), 'error');
+                return;
+            }
+            
+            // إضافة المستخدم
+            storage.addUser(user);
+            ui.showAlert(ui.translator.get('registerSuccess'), 'success');
+            
+            // إعادة التوجيه إلى صفحة تسجيل الدخول
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1500);
+        });
+    }
+}
+
+// صفحة توليد كلمات المرور
+function initGeneratorPage() {
+    const storage = new DataStorage();
+    const ui = new UI();
+    const generator = new PasswordGenerator();
+    
+    const currentUser = storage.getCurrentUser();
+    
+    // التحقق من تسجيل الدخول
+    if (!currentUser) {
+        window.location.href = 'index.html';
+        return;
+    }
+    
+    // تحديث واجهة المستخدم
+    const lengthSlider = document.getElementById('passwordLength');
+    const lengthValue = document.getElementById('lengthValue');
+    
+    if (lengthSlider && lengthValue) {
+        lengthSlider.addEventListener('input', () => {
+            lengthValue.textContent = lengthSlider.value;
+        });
+    }
+    
+    // توليد كلمات مرور مقترحة
+    const generateFromDataBtn = document.getElementById('generateFromData');
+    if (generateFromDataBtn) {
+        generateFromDataBtn.addEventListener('click', () => {
+            const data = {
+                firstName: document.getElementById('genFirstName').value.trim() || currentUser.firstName,
+                lastName: document.getElementById('genLastName').value.trim() || currentUser.lastName,
+                middleName: document.getElementById('genMiddleName').value.trim() || currentUser.middleName,
+                phone: document.getElementById('genPhone').value.trim() || currentUser.phone,
+                idNumber: document.getElementById('genIdNumber').value.trim() || currentUser.idNumber
+            };
+            
+            const purpose = document.getElementById('purpose').value;
+            
+            if (!purpose) {
+                ui.showAlert(ui.translator.get('selectPurpose'), 'error');
+                return;
+            }
+            
+            const passwords = generator.generateFromData(data);
+            displayPasswords(passwords, purpose, data);
+            
+            // حفظ السجل
+            storage.addLog({
+                userId: currentUser.id,
+                userName: `${currentUser.firstName} ${currentUser.lastName}`,
+                data: data,
+                passwords: passwords,
+                purpose: purpose
+            });
+        });
+    }
+    
+    // توليد كلمة مرور عشوائية
+    const generateRandomBtn = document.getElementById('generateRandom');
+    if (generateRandomBtn) {
+        generateRandomBtn.addEventListener('click', () => {
+            const length = parseInt(document.getElementById('passwordLength').value);
+            const options = {
+                uppercase: document.getElementById('includeUppercase').checked,
+                lowercase: document.getElementById('includeLowercase').checked,
+                numbers: document.getElementById('includeNumbers').checked,
+                symbols: document.getElementById('includeSymbols').checked
+            };
+            
+            const purpose = document.getElementById('purpose').value;
+            
+            if (!purpose) {
+                ui.showAlert(ui.translator.get('selectPurpose'), 'error');
+                return;
+            }
+            
+            const password = generator.generateRandom(length, options);
+            displayPasswords([password], purpose, {});
+            
+            // حفظ السجل
+            storage.addLog({
+                userId: currentUser.id,
+                userName: `${currentUser.firstName} ${currentUser.lastName}`,
+                data: { random: true, length: length, options: options },
+                passwords: [password],
+                purpose: purpose
+            });
+        });
+    }
+    
+    // تسجيل الخروج
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (confirm(ui.translator.get('confirmLogout'))) {
+                storage.logout();
+                window.location.href = 'index.html';
+            }
+        });
+    }
+    
+    // عرض كلمات المرور
+    function displayPasswords(passwords, purpose, data) {
+        const passwordsList = document.getElementById('passwordsList');
+        if (!passwordsList) return;
+        
+        passwordsList.innerHTML = '';
+        
+        passwords.forEach(password => {
+            const passwordItem = document.createElement('div');
+            passwordItem.className = 'password-item';
+            passwordItem.innerHTML = `
+                <div>
+                    <div class="password-text">${password}</div>
+                    <small>${purpose} • ${generator.evaluateStrength(password)}</small>
+                </div>
+                <button class="copy-btn" title="${ui.translator.get('copyBtn')}">
+                    <i class="fas fa-copy"></i>
+                </button>
+            `;
+            
+            const copyBtn = passwordItem.querySelector('.copy-btn');
+            copyBtn.addEventListener('click', () => {
+                ui.copyToClipboard(password);
+                copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+                copyBtn.style.background = '#4CAF50';
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+                    copyBtn.style.background = '';
+                }, 2000);
+            });
+            
+            passwordsList.appendChild(passwordItem);
+        });
+        
+        ui.showAlert(ui.translator.get('passwordGenerated'), 'success');
+    }
+}
+
+// صفحة لوحة تحكم المدير
+function initAdminPage() {
+    const storage = new DataStorage();
+    const ui = new UI();
+    
+    const currentUser = storage.getCurrentUser();
+    
+    // التحقق من صلاحيات المدير
+    if (!currentUser || currentUser.role !== 'admin') {
+        window.location.href = 'index.html';
+        return;
+    }
+    
+    // تحديث الجداول
+    function updateUsersTable() {
+        const users = storage.getUsers();
+        const tbody = document.getElementById('usersTableBody');
+        
+        if (!tbody) return;
+        
+        tbody.innerHTML = '';
+        
+        users.forEach(user => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${user.firstName} ${user.lastName}</td>
+                <td>${user.email}</td>
+                <td>${user.phone}</td>
+                <td>${user.idNumber}</td>
+                <td><span class="role-badge ${user.role}">${ui.translator.get(`role${user.role.charAt(0).toUpperCase() + user.role.slice(1)}`)}</span></td>
+                <td>
+                    <button class="btn btn-secondary btn-sm" onclick="viewUser(${user.id})">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+        
+        // تحديث العداد
+        const usersCount = document.getElementById('usersCount');
+        if (usersCount) {
+            usersCount.textContent = `${ui.translator.get('totalUsers')}: ${users.length}`;
+        }
+    }
+    
+    function updateLogsTable() {
+        const logs = storage.getLogs();
+        const tbody = document.getElementById('logsTableBody');
+        
+        if (!tbody) return;
+        
+        tbody.innerHTML = '';
+        
+        logs.forEach(log => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${ui.formatDate(log.timestamp)}</td>
+                <td>${log.userName}</td>
+                <td>${Object.values(log.data).filter(Boolean).join(', ') || 'N/A'}</td>
+                <td>${log.passwords.slice(0, 2).join(', ')}${log.passwords.length > 2 ? '...' : ''}</td>
+                <td>${log.purpose}</td>
+            `;
+            tbody.appendChild(row);
+        });
+        
+        // تحديث العداد
+        const logsCount = document.getElementById('logsCount');
+        if (logsCount) {
+            logsCount.textContent = `${ui.translator.get('totalLogs')}: ${logs.length}`;
+        }
+    }
+    
+    function updateStatistics() {
+        const stats = storage.getStatistics();
+        
+        document.getElementById('storageUsers').textContent = stats.totalUsers;
+        document.getElementById('storageLogs').textContent = stats.totalLogs;
+        document.getElementById('totalGenerations').textContent = stats.totalLogs;
+        document.getElementById('todayGenerations').textContent = stats.todayGenerations;
+        document.getElementById('activeUsers').textContent = stats.activeUsers;
+    }
+    
+    // تجديد البيانات
+    const refreshButtons = ['refreshUsers', 'refreshLogs'];
+    refreshButtons.forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) {
+            btn.addEventListener('click', () => {
+                updateUsersTable();
+                updateLogsTable();
+                updateStatistics();
+                ui.showAlert(ui.translator.get('dataRefreshed'), 'success');
+            });
+        }
+    });
+    
+    // تصدير البيانات
+    const exportBtn = document.getElementById('exportLogs');
+    if (exportBtn) {
+        exportBtn.addEventListener('click', () => {
+            const data = storage.exportData();
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `password-system-backup-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            ui.showAlert(ui.translator.get('dataExported'), 'success');
+        });
+    }
+    
+    // حذف السجلات
+    const clearLogsBtn = document.getElementById('clearLogs');
+    if (clearLogsBtn) {
+        clearLogsBtn.addEventListener('click', () => {
+            if (confirm(ui.translator.get('confirmClear'))) {
+                storage.clearLogs();
+                updateLogsTable();
+                updateStatistics();
+                ui.showAlert(ui.translator.get('dataCleared'), 'success');
+            }
+        });
+    }
+    
+    // حذف جميع البيانات
+    const clearAllDataBtn = document.getElementById('clearAllData');
+    if (clearAllDataBtn) {
+        clearAllDataBtn.addEventListener('click', () => {
+            if (confirm(ui.translator.get('confirmClear'))) {
+                storage.clearAllData();
+                updateUsersTable();
+                updateLogsTable();
+                updateStatistics();
+                ui.showAlert(ui.translator.get('dataCleared'), 'success');
+            }
+        });
+    }
+    
+    // التنقل بين الأقسام
+    const navLinks = document.querySelectorAll('.nav-links a');
+    const sections = document.querySelectorAll('.admin-section');
+    
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = link.getAttribute('href').substring(1);
+            
+            // تحديث الروابط النشطة
+            navLinks.forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+            
+            // إظهار القسم المحدد
+            sections.forEach(section => {
+                section.classList.remove('active');
+                if (section.id === targetId) {
+                    section.classList.add('active');
+                }
+            });
+        });
+    });
+    
+    // تسجيل الخروج
+    const logoutBtn = document.getElementById('adminLogoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (confirm(ui.translator.get('confirmLogout'))) {
+                storage.logout();
+                window.location.href = 'index.html';
+            }
+        });
+    }
+    
+    // دالة عرض تفاصيل المستخدم
+    window.viewUser = function(userId) {
+        const users = storage.getUsers();
+        const user = users.find(u => u.id === userId);
+        
+        if (user) {
+            alert(`
+                ${ui.translator.get('userName')}: ${user.firstName} ${user.lastName}
+                ${ui.translator.get('userEmail')}: ${user.email}
+                ${ui.translator.get('userPhone')}: ${user.phone}
+                ${ui.translator.get('userId')}: ${user.idNumber}
+                ${ui.translator.get('userRole')}: ${ui.translator.get(`role${user.role.charAt(0).toUpperCase() + user.role.slice(1)}`)}
+                ${ui.translator.get('registeredOn')}: ${ui.formatDate(user.createdAt)}
+            `);
+        }
+    };
+    
+    // التهيئة الأولية
+    updateUsersTable();
+    updateLogsTable();
+    updateStatistics();
+}
+
+// تهيئة النظام عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', () => {
+    // تعيين نظام الترجمة في النطاق العام
+    window.translator = translator;
+    
+    // تهيئة الصفحة الحالية
+    initPage();
+    
+    // إضافة مستمع لتحديث الترجمات عند تغيير اللغة
+    document.addEventListener('languageChanged', initPage);
+});
