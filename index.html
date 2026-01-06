@@ -208,7 +208,7 @@
     <div id="addUserModal" class="modal-overlay">
         <div class="modal-box">
             <div class="modal-header">
-                <div class="modal-title">إضافة القيادة العليا جديد</div>
+                <div class="modal-title">إضافة مستخدم جديد</div>
                 <div class="close-modal" onclick="closeModal('addUserModal')">&times;</div>
             </div>
             <div class="modal-body">
@@ -238,6 +238,29 @@
             <div class="modal-footer">
                 <button class="btn btn-primary" onclick="submitNewUser()">حفظ</button>
                 <button class="btn btn-success" onclick="closeModal('addUserModal')">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="addTeacherModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div class="modal-title">إضافة معلمة جديدة</div>
+                <div class="close-modal" onclick="closeModal('addTeacherModal')">&times;</div>
+            </div>
+            <div class="modal-body">
+                <form id="addTeacherForm">
+                    <label>الاسم الكامل</label>
+                    <input type="text" id="newTeacherName" class="form-control" placeholder="أدخل اسم المعلمة">
+                    
+                    <label>القسم</label>
+                    <select id="newTeacherDept" class="form-control">
+                        </select>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="submitNewTeacher()">حفظ</button>
+                <button class="btn btn-success" onclick="closeModal('addTeacherModal')">إلغاء</button>
             </div>
         </div>
     </div>
@@ -325,7 +348,7 @@
                 
                 <div class="user-tabs">
                     <div class="user-tab active" onclick="switchUserTab('senior', this)">القيادة العليا</div>
-                    <div class="user-tab" onclick="switchUserTab('middle', this)">القيادة</div>
+                    <div class="user-tab" onclick="switchUserTab('middle', this)">القيادة الوسطى</div>
                     <div class="user-tab" onclick="switchUserTab('teachers', this)">المعلمات</div>
                     <div class="user-tab" onclick="switchUserTab('departments', this)">أقسام المواد</div>
                 </div>
@@ -333,7 +356,7 @@
                 <div id="users-table-container">
                     <div class="toolbar">
                         <div class="btn-group">
-                            <button class="btn btn-primary" style="background:#2c5aa0;" onclick="openAddUserModal()">إضافة اسم جديد</button>
+                            <button class="btn btn-primary" style="background:#2c5aa0;" id="addUserBtn" onclick="handleAddUserClick()">إضافة اسم جديد</button>
                             <button class="btn btn-success" onclick="exportCSV()">تصدير CSV</button>
                             <button class="btn btn-success" style="opacity:0.9" onclick="document.getElementById('csvInput').click()">استيراد CSV</button>
                             <input type="file" id="csvInput" style="display:none" onchange="alert('تم استيراد الملف بنجاح')">
@@ -351,7 +374,7 @@
                     </div>
 
                     <table class="custom-table" id="usersTable">
-                        <thead>
+                        <thead id="usersTableHead">
                             <tr>
                                 <th width="50">الترتيب</th>
                                 <th>الاسم</th>
@@ -487,7 +510,7 @@
                 {id: 3, name: 'سارة أحمد', job: 'معلم أول', phone: '33333333', status: 'active'}
             ],
             teachers: [
-                {id: 4, name: 'نورة عبدالله', job: 'معلمة', phone: '34444444', status: 'inactive'}
+                {id: 4, name: 'نورة عبدالله', dept: 'اللغة العربية', status: 'active'} // المعلمة لا تحتاج هاتف ووظيفة هنا بل قسم
             ],
             departments: [
                 {id: 1, name: 'اللغة العربية', order: 1, status: 'active'},
@@ -549,10 +572,21 @@
                 document.getElementById('departments-table-container').style.display = 'none';
                 
                 let title = 'إدارة ';
-                if(tab === 'senior') title += 'القيادة العليا';
-                else if(tab === 'middle') title += 'القيادة';
-                else title += 'المعلمات';
+                let thHtml = '';
+                
+                if(tab === 'senior') {
+                    title += 'القيادة العليا';
+                    thHtml = `<th width="50">الترتيب</th><th>الاسم</th><th>الوظيفة</th><th>رقم الهاتف</th><th width="300">الإجراءات</th>`;
+                } else if(tab === 'middle') {
+                    title += 'القيادة الوسطى';
+                    thHtml = `<th width="50">الترتيب</th><th>الاسم</th><th>الوظيفة</th><th>رقم الهاتف</th><th width="300">الإجراءات</th>`;
+                } else {
+                    title += 'المعلمات';
+                    thHtml = `<th width="50">الترتيب</th><th>الاسم</th><th>القسم</th><th width="300">الإجراءات</th>`;
+                }
+                
                 document.getElementById('table-heading').innerText = title;
+                document.getElementById('usersTableHead').innerHTML = `<tr>${thHtml}</tr>`;
                 renderUserTable();
             }
         }
@@ -564,24 +598,46 @@
             
             data.forEach((user, index) => {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td style="text-align:center;">
-                        <input type="checkbox" class="user-checkbox" value="${user.id}" style="margin-left:5px;"> ${index + 1}
-                    </td>
-                    <td>${user.name}</td>
-                    <td>${user.job}</td>
-                    <td>${user.phone}</td>
-                    <td>
-                        <div class="action-btns">
-                            <button class="btn-xs view" onclick="alert('معاينة: ${user.name}')">معاينة</button>
-                            <button class="btn-xs edit" onclick="editUser(${user.id})">تعديل</button>
-                            <button class="btn-xs delete" onclick="deleteUser(${user.id})">حذف</button>
-                            <button class="btn-xs status" onclick="toggleStatus(${user.id})">
-                                ${user.status === 'active' ? 'إلغاء التفعيل' : 'تفعيل'}
-                            </button>
-                        </div>
-                    </td>
-                `;
+                
+                // عرض مختلف للمعلمات (القسم بدلاً من الوظيفة والهاتف)
+                if(currentTab === 'teachers') {
+                    tr.innerHTML = `
+                        <td style="text-align:center;">
+                            <input type="checkbox" class="user-checkbox" value="${user.id}" style="margin-left:5px;"> ${index + 1}
+                        </td>
+                        <td>${user.name}</td>
+                        <td>${user.dept}</td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="btn-xs view" onclick="alert('معاينة: ${user.name}')">معاينة</button>
+                                <button class="btn-xs edit" onclick="editUser(${user.id})">تعديل</button>
+                                <button class="btn-xs delete" onclick="deleteUser(${user.id})">حذف</button>
+                                <button class="btn-xs status" onclick="toggleStatus(${user.id})">
+                                    ${user.status === 'active' ? 'إلغاء التفعيل' : 'تفعيل'}
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                } else {
+                    tr.innerHTML = `
+                        <td style="text-align:center;">
+                            <input type="checkbox" class="user-checkbox" value="${user.id}" style="margin-left:5px;"> ${index + 1}
+                        </td>
+                        <td>${user.name}</td>
+                        <td>${user.job}</td>
+                        <td>${user.phone}</td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="btn-xs view" onclick="alert('معاينة: ${user.name}')">معاينة</button>
+                                <button class="btn-xs edit" onclick="editUser(${user.id})">تعديل</button>
+                                <button class="btn-xs delete" onclick="deleteUser(${user.id})">حذف</button>
+                                <button class="btn-xs status" onclick="toggleStatus(${user.id})">
+                                    ${user.status === 'active' ? 'إلغاء التفعيل' : 'تفعيل'}
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                }
                 tbody.appendChild(tr);
             });
         }
@@ -591,7 +647,6 @@
             tbody.innerHTML = '';
             usersData.departments.forEach(dept => {
                 const tr = document.createElement('tr');
-                // تم إزالة الأسهم والإبقاء على الرقم فقط كما هو مطلوب
                 tr.innerHTML = `
                     <td style="text-align:center; color:var(--primary); font-weight:bold;">
                         ${dept.order}
@@ -612,12 +667,42 @@
             });
         }
 
-        // Modals
+        // Modals & Handlers
+        function handleAddUserClick() {
+            if(currentTab === 'teachers') {
+                openAddTeacherModal();
+            } else {
+                openAddUserModal();
+            }
+        }
+
         function openAddUserModal() {
-            document.querySelector('.modal-title').innerText = 'إضافة ' + document.getElementById('table-heading').innerText.replace('إدارة ', '') + ' جديد';
+            let title = 'إضافة مستخدم جديد';
+            if (currentTab === 'senior') title = 'إضافة قيادة عليا جديدة';
+            if (currentTab === 'middle') title = 'إضافة قيادة وسطى جديدة';
+            
+            document.querySelector('#addUserModal .modal-title').innerText = title;
             document.getElementById('newUserName').value = '';
             document.getElementById('addUserModal').style.display = 'flex';
         }
+
+        function openAddTeacherModal() {
+            // ملء قائمة الأقسام من بيانات الأقسام الموجودة
+            const deptSelect = document.getElementById('newTeacherDept');
+            deptSelect.innerHTML = '';
+            usersData.departments.forEach(dept => {
+                if(dept.status === 'active') {
+                    const option = document.createElement('option');
+                    option.value = dept.name;
+                    option.innerText = dept.name;
+                    deptSelect.appendChild(option);
+                }
+            });
+            
+            document.getElementById('newTeacherName').value = '';
+            document.getElementById('addTeacherModal').style.display = 'flex';
+        }
+
         function openAddDeptModal() {
             document.getElementById('newDeptName').value = '';
             document.getElementById('newDeptOrder').value = usersData.departments.length + 1;
@@ -627,7 +712,7 @@
             document.getElementById(id).style.display = 'none';
         }
 
-        // Logic Actions
+        // Submit Logic
         function submitNewUser() {
             const name = document.getElementById('newUserName').value;
             if(name) {
@@ -640,6 +725,21 @@
                 });
                 renderUserTable();
                 closeModal('addUserModal');
+            }
+        }
+
+        function submitNewTeacher() {
+            const name = document.getElementById('newTeacherName').value;
+            const dept = document.getElementById('newTeacherDept').value;
+            if(name && dept) {
+                usersData.teachers.push({
+                    id: Date.now(),
+                    name: name,
+                    dept: dept,
+                    status: 'active'
+                });
+                renderUserTable();
+                closeModal('addTeacherModal');
             }
         }
 
@@ -718,9 +818,10 @@
 
         function exportCSV() {
             const data = usersData[currentTab];
-            let csvContent = "data:text/csv;charset=utf-8,ID,Name,Job,Phone,Status\n";
+            let csvContent = "data:text/csv;charset=utf-8,ID,Name,Info,Status\n";
             data.forEach(row => {
-                csvContent += `${row.id},${row.name},${row.job},${row.phone},${row.status}\n`;
+                let info = row.job ? row.job : row.dept;
+                csvContent += `${row.id},${row.name},${info},${row.status}\n`;
             });
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
