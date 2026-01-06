@@ -3,1257 +3,719 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تقرير متابعة جودة التعليم والتعلم للقيادة العليا والوسطى</title>
+    <title>نظام جودة التعليم المتطور | الإصدار 2.0</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
-        /* إعدادات أساسية للصفحة */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --primary: #1e40af;
+            --primary-dark: #1e3a8a;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --bg-light: #f3f4f6;
+            --surface: #ffffff;
+            --text-main: #1f2937;
+            --text-light: #6b7280;
+            --danger: #ef4444;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
         }
 
-        body {
-            font-family: 'Arial', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f5f5;
-            color: #000000;
-            font-size: 12pt;
-            line-height: 1.5;
-            padding: 20px;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Tajawal', sans-serif; }
+        
+        body { background-color: var(--bg-light); color: var(--text-main); line-height: 1.6; }
 
-        /* إعدادات الطباعة وصفحات A4 */
-        @page {
-            size: A4;
-            margin: 0;
-        }
-
-        @media print {
-            body {
-                width: 210mm;
-                height: 297mm;
-                margin: 0;
-                padding: 0;
-                background: white;
-            }
-            
-            .page {
-                width: 210mm;
-                height: 297mm;
-                page-break-after: always;
-                position: relative;
-                overflow: hidden;
-            }
-            
-            .no-print {
-                display: none !important;
-            }
-        }
-
-        @media screen {
-            .page {
-                width: 210mm;
-                min-height: 297mm;
-                background: white;
-                margin: 0 auto 20px auto;
-                box-shadow: 0 0 20px rgba(0,0,0,0.1);
-                position: relative;
-                padding: 25mm 20mm;
-            }
-            
-            body {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                padding: 20px;
-            }
-        }
-
-        /* تنسيقات الصفحة الأولى */
-        .page-header {
-            text-align: center;
-            margin-bottom: 25mm;
-        }
-
-        .logo-container {
-            width: 100%;
-            height: 33mm;
-            margin-bottom: 15mm;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(45deg, #f0f0f0 25%, #e0e0e0 25%, #e0e0e0 50%, #f0f0f0 50%, #f0f0f0 75%, #e0e0e0 75%);
-            background-size: 40px 40px;
-            border: 1px dashed #999;
-        }
-
-        .logo-placeholder {
-            color: #666;
-            font-size: 14pt;
-            font-style: italic;
-        }
-
-        .main-title {
-            font-size: 22pt;
-            font-weight: bold;
-            text-decoration: underline;
-            margin: 10mm 0;
-            text-align: center;
-            line-height: 1.4;
-        }
-
-        .school-name {
-            font-size: 18pt;
-            font-weight: bold;
-            text-decoration: underline;
-            margin: 8mm 0;
-            text-align: center;
-        }
-
-        .month-info {
-            font-size: 14pt;
-            margin: 5mm 0;
-            text-align: center;
-        }
-
-        .underline-space {
-            display: inline-block;
-            min-width: 50mm;
-            border-bottom: 1px solid #000;
-            margin: 0 2mm;
-            text-align: center;
-        }
-
-        .academic-year {
-            font-size: 14pt;
-            margin: 5mm 0 15mm 0;
-            text-align: center;
-        }
-
-        .preparer-info {
-            text-align: left;
-            font-size: 12pt;
-            margin-top: 10mm;
-            padding-left: 10mm;
-        }
-
-        /* تنسيقات الأقسام والعناوين */
-        .section-title {
-            font-size: 16pt;
-            font-weight: bold;
-            text-decoration: underline;
-            margin: 8mm 0 4mm 0;
-            text-align: right;
-        }
-
-        .subsection-title {
-            font-size: 14pt;
-            font-weight: bold;
-            margin: 6mm 0 3mm 0;
-            text-align: right;
-        }
-
-        /* تنسيقات الجداول */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 4mm 0;
-            font-size: 10pt;
-            text-align: center;
-            table-layout: fixed;
-        }
-
-        th, td {
-            border: 1px solid #000000;
-            padding: 3mm 1mm;
-            vertical-align: middle;
-            word-wrap: break-word;
-        }
-
-        th {
-            background-color: #e6e6e6;
-            font-weight: bold;
-            font-size: 10pt;
-        }
-
-        .table-header {
-            background-color: #f0f0f0;
-            font-weight: bold;
-        }
-
-        .section-cell {
-            background-color: #f5f5f5;
-            font-weight: bold;
-            text-align: right;
-            padding-right: 2mm;
-        }
-
-        .total-row {
-            background-color: #e8e8e8;
-            font-weight: bold;
-        }
-
-        /* تنسيقات حقول الإدخال */
-        input, select, textarea {
-            width: 100%;
-            border: 1px solid #ccc;
-            border-radius: 2px;
-            font-size: 10pt;
-            text-align: right;
-            background: transparent;
-            padding: 1mm;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            outline: 1px solid #4a90e2;
-            background-color: #fff;
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 25mm;
-            font-family: inherit;
-        }
-
-        .empty-field {
-            display: inline-block;
-            min-width: 40mm;
-            border-bottom: 1px dotted #666;
-            margin: 0 1mm;
-            text-align: center;
-        }
-
-        /* تنسيقات الملاحظات */
-        .notes {
-            font-size: 10pt;
-            text-align: right;
-            margin: 3mm 0;
-            font-style: italic;
-            color: #333;
-        }
-
-        .preparer-signature {
-            text-align: left;
-            font-size: 11pt;
-            margin-top: 10mm;
-        }
-
-        /* تنسيقات الرسم البياني */
-        .chart-container {
-            width: 100%;
-            height: 70mm;
-            margin: 5mm 0;
-            border: 1px solid #ccc;
-            background-color: #f9f9f9;
-        }
-
-        .chart-placeholder {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #666;
-            font-style: italic;
-        }
-
-        /* تنسيقات التوقيعات */
-        .signature-section {
-            margin-top: 20mm;
-            padding-top: 10mm;
-            border-top: 1px dashed #666;
-        }
-
-        .signature-box {
-            display: inline-block;
-            width: 48%;
-            text-align: center;
-            vertical-align: top;
-        }
-
-        .signature-line {
-            margin-top: 15mm;
-            border-bottom: 1px solid #000;
-            padding-bottom: 2mm;
-            min-height: 8mm;
-        }
-
-        .signature-info {
-            margin-top: 3mm;
-            font-size: 10pt;
-        }
-
-        /* تنسيقات ترقيم الصفحات */
-        .page-number {
-            position: absolute;
-            bottom: 10mm;
-            left: 20mm;
-            font-size: 10pt;
-            color: #666;
-        }
-
-        /* أزرار التحكم */
-        .controls {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
+        /* --- التحسينات الجمالية العامة --- */
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 20px; }
+        
+        /* Header */
+        header {
             background: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.2);
-            z-index: 1000;
+            padding: 1rem 0;
+            box-shadow: var(--shadow-sm);
+            position: sticky; top: 0; z-index: 100;
+            border-bottom: 1px solid #e5e7eb;
         }
+        .header-content { display: flex; justify-content: space-between; align-items: center; }
+        .logo { display: flex; align-items: center; gap: 12px; color: var(--primary); }
+        .logo i { font-size: 2rem; }
+        .logo h1 { font-size: 1.5rem; font-weight: 800; color: var(--primary-dark); }
+        
+        .user-profile { display: flex; align-items: center; gap: 12px; background: var(--bg-light); padding: 5px 15px; border-radius: 50px; }
+        .avatar { width: 35px; height: 35px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
 
+        /* Navigation */
+        nav { background: white; padding: 10px 0; margin-bottom: 20px; box-shadow: var(--shadow-sm); overflow-x: auto; }
+        .nav-tabs { display: flex; list-style: none; gap: 5px; min-width: max-content; }
+        .nav-tabs a {
+            padding: 10px 20px; text-decoration: none; color: var(--text-light);
+            border-radius: var(--radius); font-weight: 600; transition: all 0.3s;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .nav-tabs a:hover { background-color: var(--bg-light); color: var(--primary); }
+        .nav-tabs a.active { background-color: var(--primary); color: white; box-shadow: var(--shadow-md); }
+
+        /* Cards & Sections */
+        .section { display: none; animation: fadeIn 0.4s ease-in-out; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 20px; margin-bottom: 20px; border: 1px solid #e5e7eb; }
+        
+        /* Dashboard Stats */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 25px; }
+        .stat-card {
+            background: white; padding: 20px; border-radius: var(--radius);
+            box-shadow: var(--shadow-md); display: flex; align-items: center; justify-content: space-between;
+            transition: transform 0.3s; border-right: 4px solid var(--primary);
+        }
+        .stat-card:hover { transform: translateY(-5px); }
+        .stat-info h3 { font-size: 2rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 5px; }
+        .stat-info p { color: var(--text-light); font-size: 0.9rem; }
+        .stat-icon { width: 50px; height: 50px; background: #eff6ff; color: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+
+        /* Tables */
+        .table-container { overflow-x: auto; border-radius: var(--radius); box-shadow: var(--shadow-sm); background: white; }
+        table { width: 100%; border-collapse: collapse; white-space: nowrap; }
+        th { background-color: #f8fafc; color: var(--text-main); font-weight: 700; padding: 15px; text-align: right; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 12px 15px; border-bottom: 1px solid #f1f5f9; color: var(--text-light); }
+        tr:hover { background-color: #f8fafc; }
+        
+        /* Search Bar */
+        .search-box { position: relative; margin-bottom: 15px; max-width: 400px; }
+        .search-box input { width: 100%; padding: 10px 40px 10px 15px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 0.95rem; }
+        .search-box i { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #9ca3af; }
+
+        /* Buttons */
         .btn {
-            display: inline-block;
-            padding: 10px 15px;
-            margin: 5px;
-            background-color: #4a90e2;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12pt;
-            text-decoration: none;
+            padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer;
+            font-weight: 600; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-secondary { background: white; border: 1px solid #d1d5db; color: var(--text-main); }
+        .btn-secondary:hover { background: #f9fafb; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-success { background: var(--secondary); color: white; }
+        .btn-sm { padding: 6px 12px; font-size: 0.85rem; }
+
+        /* Forms */
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-main); }
+        .form-control { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; transition: border-color 0.2s; }
+        .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1); }
+
+        /* Login */
+        .login-wrapper {
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+        }
+        .login-card {
+            background: white; padding: 40px; border-radius: 20px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            width: 100%; max-width: 420px; text-align: center;
         }
 
-        .btn:hover {
-            background-color: #357ae8;
-        }
-
-        .btn-print {
-            background-color: #34a853;
-        }
-
-        .btn-print:hover {
-            background-color: #2d8c47;
-        }
-
-        .btn-clear {
-            background-color: #ea4335;
-        }
-
-        .btn-clear:hover {
-            background-color: #d33426;
-        }
-
-        /* تنسيقات خاصة للطباعة */
-        .page-break {
-            page-break-before: always;
-        }
-
-        .keep-together {
-            page-break-inside: avoid;
-        }
-
-        /* محاذاة النصوص */
-        .text-center {
-            text-align: center;
-        }
-
-        .text-right {
-            text-align: right;
-        }
-
-        .text-left {
-            text-align: left;
-        }
-
-        /* مسافات */
-        .spacer-5mm {
-            height: 5mm;
-        }
-
-        .spacer-10mm {
-            height: 10mm;
-        }
-
-        .spacer-15mm {
-            height: 15mm;
-        }
-
-        /* استجابة للشاشات الصغيرة */
-        @media (max-width: 220mm) {
-            .page {
-                width: 100%;
-                min-height: auto;
-                padding: 15mm;
+        /* الطباعة A4 */
+        @media print {
+            body { background: white; margin: 0; padding: 0; }
+            header, nav, .btn, .search-box, .no-print { display: none !important; }
+            .container { max-width: 100%; padding: 0; margin: 0; }
+            .card { box-shadow: none; border: none; padding: 0; margin: 0; }
+            .a4-page {
+                width: 21cm; height: 29.7cm; margin: 0 auto; padding: 1.5cm;
+                border: none; box-shadow: none; page-break-after: always;
             }
-            
-            .controls {
-                position: static;
-                margin-top: 20px;
-                text-align: center;
-            }
+            /* تحسين الجدول للطباعة */
+            table { font-size: 12pt; border: 1px solid #000; }
+            th, td { border: 1px solid #000; padding: 5px; color: black; }
+            th { background-color: #eee !important; -webkit-print-color-adjust: exact; }
         }
+
+        /* تحسينات A4 في العرض */
+        .a4-preview-container { background: #525659; padding: 40px; overflow-x: auto; text-align: center; border-radius: var(--radius); }
+        .a4-page {
+            background: white; width: 21cm; min-height: 29.7cm; margin: 0 auto 30px auto;
+            padding: 2cm; text-align: right; box-shadow: 0 0 15px rgba(0,0,0,0.2); position: relative;
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            display: none; justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-content {
+            background: white; width: 90%; max-width: 600px; padding: 25px;
+            border-radius: 16px; box-shadow: var(--shadow-lg); animation: slideUp 0.3s;
+        }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
     </style>
 </head>
 <body>
-    <!-- الصفحة الأولى -->
-    <div class="page" id="page1">
-        <div class="page-header">
-            <div class="logo-container">
-                <div class="logo-placeholder">[شعار المدرسة أو الوزارة]</div>
+
+    <div id="loginPage" class="login-wrapper">
+        <div class="login-card">
+            <div style="font-size: 3rem; color: var(--primary); margin-bottom: 20px;">
+                <i class="fas fa-graduation-cap"></i>
             </div>
-            
-            <div class="main-title">
-                تقرير متابعة جودة التعليم والتعلم للقيادة العليا والوسطى
-            </div>
-            
-            <div class="school-name">
-                لمدرسة <span class="empty-field"></span>
-            </div>
-            
-            <div class="month-info">
-                <span style="text-decoration: underline;">شهر</span> <span class="empty-field"></span>
-            </div>
-            
-            <div class="academic-year">
-                العام الدراسي 2025 / 2026م
-            </div>
-            
-            <div class="preparer-info">
-                إعداد المدير/ة المساعد/ة /يعتمد، مدير/ة المدرسة
-            </div>
+            <h2 style="margin-bottom: 10px; color: var(--primary-dark);">مرحباً بك مجدداً</h2>
+            <p style="color: var(--text-light); margin-bottom: 30px;">نظام متابعة جودة التعليم والتعلم</p>
+            <form id="loginForm">
+                <div class="form-group" style="text-align: right;">
+                    <label>اسم المستخدم</label>
+                    <input type="text" id="username" class="form-control" placeholder="admin" required>
+                </div>
+                <div class="form-group" style="text-align: right;">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="password" class="form-control" placeholder="admin123" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;">تسجيل الدخول</button>
+            </form>
         </div>
-        
-        <div class="spacer-10mm"></div>
-        
-        <div class="section-title">
-            أولاً: متابعة تسليم القيادة الوسطى (الزيارات/محاضر الاجتماعات /الخطة الأسبوعية) للمواد الدراسية الى المدير/ة المساعد/ة في المدرسة
-        </div>
-        
-        <table class="keep-together">
-            <thead>
-                <tr>
-                    <th style="width: 25%;">القسم</th>
-                    <th colspan="4">متابعة القيادة العليا للقيادة الوسطى</th>
-                </tr>
-                <tr class="table-header">
-                    <th></th>
-                    <th style="width: 20%;">عدد استمارات الزيارات الصفية التي نفذت من قبل المعلم الأول أو المنسق خلال الشهر</th>
-                    <th style="width: 20%;">يوجد محضر اجتماع المعلم الأول أو المنسق مع المعلمين</th>
-                    <th style="width: 20%;">توجد خطة أسبوعية للمعلم الأول<br>أو المنسق</th>
-                    <th style="width: 15%;">أسباب عدم التسليم</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- القسم الأول: اللغة العربية -->
-                <tr>
-                    <td class="section-cell">معلم أول / منسق اللغة العربية</td>
-                    <td><input type="text" class="form-input"></td>
-                    <td><input type="text" class="form-input"></td>
-                    <td><input type="text" class="form-input"></td>
-                    <td><input type="text" class="form-input"></td>
-                </tr>
-                
-                <!-- القسم الثاني: رياضيات وعلوم -->
-                <tr>
-                    <td class="section-cell">معلم أول/منسق رياضيات وعلوم</td>
-                    <td><input type="text" class="form-input"></td>
-                    <td><input type="text" class="form-input"></td>
-                    <td><input type="text" class="form-input"></td>
-                    <td><input type="text" class="form-input"></td>
-                </tr>
-                
-                <!-- القسم الثالث: اللغة الإنجليزية -->
-                <tr>
-                    <td class="section-cell">معلم اول/منسق اللغة الإنجليزية</td>
-                    <td><input type="text" class="form-input"></td>
-                    <td><input type="text" class="form-input"></td>
-                    <td><input type="text" class="form-input"></td>
-                    <td><input type="text" class="form-input"></td>
-                </tr>
-                
-                <!-- القسم الرابع: التربية الإسلامية -->
-                <tr>
-                    <td class="section-cell">معلم أول/منسق تربية اسلامية</td>
-                    <td><input type="text" class="form-input"></td>
-                    <td><input type="text" class="form-input"></td>
-                    <td><input type="text" class="form-input"></td>
-                    <td><input type="text" class="form-input"></td>
-                </tr>
-                
-                <!-- القسم الخامس: المواد الاجتماعية -->
-                <tr>
-                    <td class="section-cell">معلم اول/منسق المواد الاجتماعية</td>
-                    <td><input type="text" class="form-input"></td>
-                    <td><input type="text" class="form-input"></td>
-                    <td><input type="text" class="form-input"></td>
-                    <td><input type="text" class="form-input"></td>
-                </tr>
-                
-                <!-- القسم السادس: نظام الفصل -->
-                <tr>
-                    <td class="section-cell">معلم أول/منسق نظام فصل</td>
-                    <td><input type="text" class="form-input"></td>
-                    <td><input type="text" class="form-input"></td>
-                    <td><input type="text" class="form-input"></td>
-                    <td><input type="text" class="form-input"></td>
-                </tr>
-                
-                <!-- القسم السابع: المواد الإثرائية -->
-                <tr>
-                    <td class="section-cell">منسق المواد الإثرائية</td>
-                    <td><input type="text" class="form-input"></td>
-                    <td><input type="text" class="form-input"></td>
-                    <td><input type="text" class="form-input"></td>
-                    <td><input type="text" class="form-input"></td>
-                </tr>
-                
-                <!-- القسم الثامن: التربية الرياضية -->
-                <tr>
-                    <td class="section-cell">منسق التربية الرياضية</td>
-                    <td><input type="text" class="form-input"></td>
-                    <td><input type="text" class="form-input"></td>
-                    <td><input type="text" class="form-input"></td>
-                    <td><input type="text" class="form-input"></td>
-                </tr>
-            </tbody>
-        </table>
-        
-        <div class="notes">
-            ملاحظات عامة: يتم التنسيق مع القيادة الوسطى لتنفيذ الزيارات الصفية بحسب ما يتناسب مع ظروف الجداول والنصاب المسند لهم.
-        </div>
-        
-        <div class="preparer-signature">
-            أعده: <span class="empty-field" style="width: 50mm;"></span>
-        </div>
-        
-        <div class="page-number">صفحة 1</div>
     </div>
 
-    <!-- الصفحة الثانية -->
-    <div class="page page-break" id="page2">
-        <div class="text-center" style="margin-bottom: 10mm;">
-            <div style="font-size: 18pt; font-weight: bold; margin-bottom: 5mm;">
-                تقرير متابعة جودة التعليم والتعلم للقيادة العليا والوسطى
-            </div>
-            <div style="font-size: 14pt;">تابع - الصفحة الثانية</div>
-        </div>
-        
-        <div class="section-title">
-            ثانياً: عدد الزيارات التي نُفذت خلال شهر <span class="empty-field" style="width: 30mm;"></span> من قبل:
-        </div>
-        
-        <div class="spacer-5mm"></div>
-        
-        <div style="margin-right: 15mm;">
-            <div style="margin-bottom: 5mm;">
-                <span style="font-size: 12pt; font-weight: bold;">1- القيادة العليا =</span>
-                <input type="text" style="width: 25mm; display: inline-block; margin-right: 5mm;">
-            </div>
-            
-            <div>
-                <span style="font-size: 12pt; font-weight: bold;">2- القيادة الوسطى =</span>
-                <input type="text" style="width: 25mm; display: inline-block; margin-right: 5mm;">
-            </div>
-        </div>
-        
-        <div class="spacer-10mm"></div>
-        
-        <div class="section-title">
-            ثالثاً: بيان أسماء المعلمين المُزارين من قبل القيادة العليا والوسطى خلال شهر <span class="empty-field" style="width: 30mm;"></span>
-        </div>
-        
-        <!-- جدول زيارات مدير المدرسة -->
-        <div class="subsection-title" style="font-size: 12pt; margin-top: 5mm;">
-            مدير المدرسة
-        </div>
-        
-        <table style="font-size: 9pt;">
-            <thead>
-                <tr>
-                    <th style="width: 5%;">ت</th>
-                    <th style="width: 20%;">اسم المعلم</th>
-                    <th style="width: 15%;">القسم</th>
-                    <th style="width: 15%;">تاريخ الزيارة</th>
-                    <th style="width: 15%;">تقييم الزيارة</th>
-                    <th style="width: 30%;">اسم الزائر</th>
-                </tr>
-            </thead>
-            <tbody id="principalVisits">
-                <!-- الصفوف ستضاف ديناميكياً -->
-            </tbody>
-            <tfoot>
-                <tr class="total-row">
-                    <td colspan="6" style="text-align: right; padding-right: 10mm;">
-                        مجموع الزيارات = <span id="principalTotal">0</span>
-                    </td>
-                </tr>
-            </tfoot>
-        </table>
-        
-        <!-- جدول زيارات المدير المساعد -->
-        <div class="subsection-title" style="font-size: 12pt; margin-top: 5mm;">
-            المدير المساعد
-        </div>
-        
-        <table style="font-size: 9pt;">
-            <thead>
-                <tr>
-                    <th style="width: 5%;">ت</th>
-                    <th style="width: 20%;">اسم المعلم</th>
-                    <th style="width: 15%;">القسم</th>
-                    <th style="width: 15%;">تاريخ الزيارة</th>
-                    <th style="width: 15%;">تقييم الزيارة</th>
-                    <th style="width: 30%;">اسم الزائر</th>
-                </tr>
-            </thead>
-            <tbody id="assistantVisits">
-                <!-- الصفوف ستضاف ديناميكياً -->
-            </tbody>
-            <tfoot>
-                <tr class="total-row">
-                    <td colspan="6" style="text-align: right; padding-right: 10mm;">
-                        مجموع الزيارات = <span id="assistantTotal">0</span>
-                    </td>
-                </tr>
-            </tfoot>
-        </table>
-        
-        <div class="page-number">صفحة 2</div>
-    </div>
-
-    <!-- الصفحة الثالثة -->
-    <div class="page page-break" id="page3">
-        <div class="text-center" style="margin-bottom: 10mm;">
-            <div style="font-size: 18pt; font-weight: bold; margin-bottom: 5mm;">
-                تقرير متابعة جودة التعليم والتعلم للقيادة العليا والوسطى
-            </div>
-            <div style="font-size: 14pt;">تابع - الصفحة الثالثة</div>
-        </div>
-        
-        <!-- جدول زيارات معلم الرياضيات -->
-        <div class="subsection-title" style="font-size: 12pt;">
-            معلم أول/منسق رياضيات وعلوم
-        </div>
-        
-        <table style="font-size: 9pt;">
-            <thead>
-                <tr>
-                    <th style="width: 5%;">ت</th>
-                    <th style="width: 20%;">اسم المعلم</th>
-                    <th style="width: 15%;">القسم</th>
-                    <th style="width: 15%;">تاريخ الزيارة</th>
-                    <th style="width: 15%;">تقييم الزيارة</th>
-                    <th style="width: 30%;">اسم الزائر</th>
-                </tr>
-            </thead>
-            <tbody id="mathVisits">
-                <!-- الصفوف ستضاف ديناميكياً -->
-            </tbody>
-            <tfoot>
-                <tr class="total-row">
-                    <td colspan="6" style="text-align: right; padding-right: 10mm;">
-                        مجموع الزيارات = <span id="mathTotal">0</span>
-                    </td>
-                </tr>
-            </tfoot>
-        </table>
-        
-        <!-- جدول زيارات معلم اللغة العربية -->
-        <div class="subsection-title" style="font-size: 12pt; margin-top: 5mm;">
-            معلم أول/منسق اللغة العربية
-        </div>
-        
-        <table style="font-size: 9pt;">
-            <thead>
-                <tr>
-                    <th style="width: 5%;">ت</th>
-                    <th style="width: 20%;">اسم المعلم</th>
-                    <th style="width: 15%;">القسم</th>
-                    <th style="width: 15%;">تاريخ الزيارة</th>
-                    <th style="width: 15%;">تقييم الزيارة</th>
-                    <th style="width: 30%;">اسم الزائر</th>
-                </tr>
-            </thead>
-            <tbody id="arabicVisits">
-                <!-- الصفوف ستضاف ديناميكياً -->
-            </tbody>
-            <tfoot>
-                <tr class="total-row">
-                    <td colspan="6" style="text-align: right; padding-right: 10mm;">
-                        مجموع الزيارات = <span id="arabicTotal">0</span>
-                    </td>
-                </tr>
-            </tfoot>
-        </table>
-        
-        <div class="text-center" style="margin-top: 20mm; color: #666; font-style: italic; font-size: 10pt;">
-            [يتبع في الصفحة التالية...]
-        </div>
-        
-        <div class="page-number">صفحة 3</div>
-    </div>
-
-    <!-- الصفحة الرابعة -->
-    <div class="page page-break" id="page4">
-        <div class="text-center" style="margin-bottom: 10mm;">
-            <div style="font-size: 18pt; font-weight: bold; margin-bottom: 5mm;">
-                تقرير متابعة جودة التعليم والتعلم للقيادة العليا والوسطى
-            </div>
-            <div style="font-size: 14pt;">تابع - الصفحة الرابعة</div>
-        </div>
-        
-        <div class="section-title">
-            رابعاً: عدد الزيارات الصفية وتقييم الأداء الصفي
-        </div>
-        
-        <table style="font-size: 9pt;">
-            <thead>
-                <tr>
-                    <th rowspan="2" style="width: 5%;">ت</th>
-                    <th rowspan="2" style="width: 25%;">الأقسام الأكاديمية</th>
-                    <th rowspan="2" style="width: 15%;">مجموع عدد الزيارات للقسم</th>
-                    <th colspan="4">مستويات الأداء</th>
-                </tr>
-                <tr>
-                    <th style="width: 15%;">يفوق التوقعات بكثير</th>
-                    <th style="width: 15%;">يفوق التوقعات</th>
-                    <th style="width: 15%;">يفي بالتوقعات</th>
-                    <th style="width: 15%;">يفي بالتوقعات جزئياً</th>
-                </tr>
-            </thead>
-            <tbody id="performanceTable">
-                <!-- الصفوف ستضاف ديناميكياً -->
-            </tbody>
-            <tfoot>
-                <tr class="total-row">
-                    <td colspan="2">مجموع عدد الزيارات الصفية للقيادة العليا والوسطى</td>
-                    <td id="totalVisitsAll">0</td>
-                    <td id="totalExceedsGreatly">0</td>
-                    <td id="totalExceeds">0</td>
-                    <td id="totalMeets">0</td>
-                    <td id="totalPartiallyMeets">0</td>
-                </tr>
-            </tfoot>
-        </table>
-        
-        <div class="subsection-title" style="margin-top: 8mm;">
-            رسم بياني يوضح مجموع عدد الزيارات الصفية للقيادة العليا والوسطى
-        </div>
-        
-        <div class="chart-container">
-            <div class="chart-placeholder">
-                سيتم عرض رسم بياني هنا بعد إدخال البيانات
-            </div>
-        </div>
-        
-        <div class="page-number">صفحة 4</div>
-    </div>
-
-    <!-- الصفحة الخامسة -->
-    <div class="page page-break" id="page5">
-        <div class="text-center" style="margin-bottom: 10mm;">
-            <div style="font-size: 18pt; font-weight: bold; margin-bottom: 5mm;">
-                تقرير متابعة جودة التعليم والتعلم للقيادة العليا والوسطى
-            </div>
-            <div style="font-size: 14pt;">تابع - الصفحة الخامسة</div>
-        </div>
-        
-        <div class="section-title">
-            سادساً: حصر أسماء المعلمين المتميزين في الأقسام الأكاديمية
-        </div>
-        
-        <table style="font-size: 10pt;">
-            <thead>
-                <tr>
-                    <th style="width: 8%;">الرقم</th>
-                    <th style="width: 20%;">اسم المعلم</th>
-                    <th style="width: 15%;">التقدير</th>
-                    <th style="width: 32%;">المبررات</th>
-                    <th style="width: 25%;">القسم الأكاديمي</th>
-                </tr>
-            </thead>
-            <tbody id="distinguishedTeachers">
-                <!-- الصفوف ستضاف ديناميكياً -->
-            </tbody>
-        </table>
-        
-        <div class="spacer-10mm"></div>
-        
-        <!-- المعلمين الأولى بالرعاية -->
-        <div class="subsection-title">
-            حصر أسماء المعلمين الأولى بالرعاية في الأقسام الأكاديمية
-        </div>
-        
-        <table style="font-size: 10pt;">
-            <thead>
-                <tr>
-                    <th style="width: 8%;">الرقم</th>
-                    <th style="width: 20%;">اسم المعلم</th>
-                    <th style="width: 15%;">التقدير</th>
-                    <th style="width: 32%;">المبررات</th>
-                    <th style="width: 25%;">القسم الأكاديمي</th>
-                </tr>
-            </thead>
-            <tbody id="needsCareTeachers">
-                <!-- الصفوف ستضاف ديناميكياً -->
-            </tbody>
-        </table>
-        
-        <div class="page-number">صفحة 5</div>
-    </div>
-
-    <!-- الصفحة السادسة -->
-    <div class="page page-break" id="page6">
-        <div class="text-center" style="margin-bottom: 10mm;">
-            <div style="font-size: 18pt; font-weight: bold; margin-bottom: 5mm;">
-                تقرير متابعة جودة التعليم والتعلم للقيادة العليا والوسطى
-            </div>
-            <div style="font-size: 14pt;">تابع - الصفحة السادسة</div>
-        </div>
-        
-        <div class="section-title">
-            سابعاً: التقرير النوعي
-        </div>
-        
-        <div class="subsection-title">
-            جوانب القوة والتطوير لأداء المعلمين خلال الزيارات الصفية في الأقسام الأكاديمية
-        </div>
-        
-        <table style="font-size: 10pt;">
-            <thead>
-                <tr>
-                    <th style="width: 30%;">الأقسام الأكاديمية</th>
-                    <th style="width: 35%;">جوانب القوة</th>
-                    <th style="width: 35%;">جوانب بحاجة إلى تطوير</th>
-                </tr>
-            </thead>
-            <tbody id="qualitativeReport">
-                <!-- الصفوف ستضاف ديناميكياً -->
-            </tbody>
-        </table>
-        
-        <!-- قسم التوقيعات -->
-        <div class="signature-section">
-            <div style="display: flex; justify-content: space-between; margin-top: 15mm;">
-                <div class="signature-box">
-                    <div style="font-size: 12pt; font-weight: bold; margin-bottom: 5mm;">
-                        توقيع المدير/ة المساعد/ة
-                    </div>
-                    <div class="signature-line"></div>
-                    <div class="signature-info">
-                        الاسم: <span class="empty-field" style="width: 40mm;"></span>
-                    </div>
-                    <div class="signature-info">
-                        التاريخ: <span class="empty-field" style="width: 30mm;"></span>
+    <div id="app" style="display: none;">
+        <header>
+            <div class="container header-content">
+                <div class="logo">
+                    <i class="fas fa-layer-group"></i>
+                    <div>
+                        <h1 id="headerSchoolName">نظام الجودة</h1>
+                        <small style="color: var(--text-light); font-weight: 600;">العام الدراسي 2025 / 2026</small>
                     </div>
                 </div>
-                
-                <div class="signature-box">
-                    <div style="font-size: 12pt; font-weight: bold; margin-bottom: 5mm;">
-                        توقيع مدير/ة المدرسة
-                    </div>
-                    <div class="signature-line"></div>
-                    <div class="signature-info">
-                        الاسم: <span class="empty-field" style="width: 40mm;"></span>
-                    </div>
-                    <div class="signature-info">
-                        التاريخ: <span class="empty-field" style="width: 30mm;"></span>
+                <div class="user-profile">
+                    <div class="avatar" id="userAvatar">م</div>
+                    <div>
+                        <div id="userName" style="font-weight: 700; font-size: 0.9rem;">مستخدم</div>
+                        <div style="font-size: 0.75rem; color: var(--text-light); cursor: pointer;" id="logoutBtn">تسجيل خروج</div>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="page-number">صفحة 6</div>
+        </header>
+
+        <nav>
+            <div class="container">
+                <ul class="nav-tabs">
+                    <li><a href="#" data-target="dashboard" class="active"><i class="fas fa-home"></i> لوحة التحكم</a></li>
+                    <li><a href="#" data-target="visits"><i class="fas fa-eye"></i> الزيارات الصفية</a></li>
+                    <li><a href="#" data-target="performance"><i class="fas fa-chart-bar"></i> تقييم الأداء</a></li>
+                    <li><a href="#" data-target="teachers"><i class="fas fa-chalkboard-teacher"></i> المعلمين</a></li>
+                    <li><a href="#" data-target="quality"><i class="fas fa-file-contract"></i> التقارير</a></li>
+                    <li><a href="#" data-target="settings"><i class="fas fa-cog"></i> الإعدادات</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <main class="container">
+            
+            <section id="dashboard" class="section active">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 class="text-2xl font-bold">نظرة عامة</h2>
+                    <select class="form-control" style="width: auto;" id="dashboardFilter">
+                        <option value="all">جميع الأشهر</option>
+                        <option value="سبتمبر">سبتمبر</option>
+                        <option value="أكتوبر">أكتوبر</option>
+                        </select>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <h3 id="totalVisits">0</h3>
+                            <p>إجمالي الزيارات</p>
+                        </div>
+                        <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+                    </div>
+                    <div class="stat-card" style="border-color: var(--secondary);">
+                        <div class="stat-info">
+                            <h3 id="distinguishedCount" style="color: var(--secondary);">0</h3>
+                            <p>معلم متميز</p>
+                        </div>
+                        <div class="stat-icon" style="color: var(--secondary); background: #ecfdf5;"><i class="fas fa-star"></i></div>
+                    </div>
+                    <div class="stat-card" style="border-color: var(--accent);">
+                        <div class="stat-info">
+                            <h3 id="needsCareCount" style="color: var(--accent);">0</h3>
+                            <p>أولى بالرعاية</p>
+                        </div>
+                        <div class="stat-icon" style="color: var(--accent); background: #fffbeb;"><i class="fas fa-hand-holding-heart"></i></div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px;">
+                    <div class="card">
+                        <h3 style="margin-bottom: 15px;">الأداء حسب القسم</h3>
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                    <div class="card">
+                        <h3 style="margin-bottom: 15px;">تطور الأداء الشهري</h3>
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section id="visits" class="section">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                        <h2>سجل الزيارات الصفية</h2>
+                        <button class="btn btn-primary" onclick="openModal('visitModal')"><i class="fas fa-plus"></i> زيارة جديدة</button>
+                    </div>
+                    
+                    <div class="search-box">
+                        <input type="text" onkeyup="searchTable(this, 'visitsTable')" placeholder="بحث باسم المعلم أو الزائر...">
+                        <i class="fas fa-search"></i>
+                    </div>
+
+                    <div class="table-container">
+                        <table id="visitsTable">
+                            <thead>
+                                <tr>
+                                    <th>المعلم</th>
+                                    <th>القسم</th>
+                                    <th>التاريخ</th>
+                                    <th>التقييم</th>
+                                    <th>الزائر</th>
+                                    <th>إجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="visitsTableBody">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="performance" class="section">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                        <h2>إدخال بيانات الأداء للأقسام</h2>
+                        <button class="btn btn-success" onclick="savePerformanceData()"><i class="fas fa-save"></i> حفظ البيانات</button>
+                    </div>
+                    <div class="table-container">
+                        <table id="inputPerformanceTable">
+                            <thead>
+                                <tr>
+                                    <th>القسم</th>
+                                    <th>الزيارات</th>
+                                    <th>يفوق التوقعات</th>
+                                    <th>يفي بالتوقعات</th>
+                                    <th>يفي جزئياً</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="teachers" class="section">
+                <div class="card">
+                    <h2>قوائم المعلمين (المتميزين / رعاية)</h2>
+                    <div style="margin: 20px 0; display: flex; gap: 10px;">
+                        <button class="btn btn-secondary active" onclick="switchTeacherView('distinguished')">المتميزين</button>
+                        <button class="btn btn-secondary" onclick="switchTeacherView('care')">الأولى بالرعاية</button>
+                    </div>
+                    <div class="table-container">
+                        <table id="teachersTable">
+                            <thead>
+                                <tr>
+                                    <th>الاسم</th>
+                                    <th>القسم</th>
+                                    <th>التقدير</th>
+                                    <th>المبررات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="teachersTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="quality" class="section">
+                <div class="card no-print" style="margin-bottom: 20px;">
+                    <h2>إصدار التقارير</h2>
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print"></i> طباعة التقرير (A4)</button>
+                        <button class="btn btn-success" onclick="exportToExcel()"><i class="fas fa-file-excel"></i> تصدير Excel</button>
+                    </div>
+                </div>
+
+                <div class="a4-preview-container">
+                    <div class="a4-page">
+                        <div style="text-align: center; margin-top: 50px;">
+                            <h2 style="margin-bottom: 40px;">وزارة التربية والتعليم</h2>
+                            <div style="border: 2px solid #000; padding: 40px; margin: 50px; border-radius: 15px;">
+                                <h1 style="font-size: 24pt; margin-bottom: 20px;">تقرير متابعة جودة التعليم والتعلم</h1>
+                                <h2 id="reportSchoolTitle">لمدرسة ...</h2>
+                                <h3 id="reportMonthTitle">شهر ...</h3>
+                                <h3>العام الدراسي 2025 / 2026</h3>
+                            </div>
+                            <div style="margin-top: 100px; display: flex; justify-content: space-around;">
+                                <div>
+                                    <p>إعداد المدير المساعد</p>
+                                    <p style="margin-top: 30px;">.......................</p>
+                                </div>
+                                <div>
+                                    <p>يعتمد، مدير المدرسة</p>
+                                    <p style="margin-top: 30px;">.......................</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="a4-page">
+                        <h3 style="border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px;">رابعاً: نسب نتائج الزيارات الصفية للأقسام</h3>
+                        <table id="printPerformanceTable">
+                            </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="settings" class="section">
+                <div class="card">
+                    <h2>إعدادات النظام</h2>
+                    <div class="form-group">
+                        <label>اسم المدرسة</label>
+                        <input type="text" id="schoolNameInput" class="form-control" placeholder="أدخل اسم المدرسة">
+                    </div>
+                    <button class="btn btn-primary" onclick="saveSettings()">حفظ الإعدادات</button>
+                    <hr style="margin: 20px 0;">
+                    <button class="btn btn-danger" onclick="clearAllData()">حذف جميع البيانات (تهيئة)</button>
+                </div>
+            </section>
+
+        </main>
     </div>
 
-    <!-- أزرار التحكم -->
-    <div class="controls no-print">
-        <button class="btn btn-print" onclick="printReport()">🖨️ طباعة التقرير</button>
-        <button class="btn" onclick="loadSampleData()">📊 تحميل بيانات تجريبية</button>
-        <button class="btn btn-clear" onclick="clearAllData()">🗑️ مسح النموذج</button>
-        <button class="btn" onclick="addVisitRow('principal')">➕ إضافة زيارة مدير</button>
-        <button class="btn" onclick="addDistinguishedTeacher()">⭐ إضافة معلم متميز</button>
+    <div id="visitModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 20px;">إضافة زيارة صفية</h3>
+            <form id="visitForm">
+                <div class="form-group">
+                    <label>اسم المعلم</label>
+                    <input type="text" name="teacher" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>القسم</label>
+                    <select name="department" class="form-control">
+                        <option>اللغة العربية</option>
+                        <option>الرياضيات</option>
+                        <option>العلوم</option>
+                        <option>اللغة الإنجليزية</option>
+                        <option>التربية الإسلامية</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>تاريخ الزيارة</label>
+                    <input type="date" name="date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>التقييم</label>
+                    <select name="evaluation" class="form-control">
+                        <option>ممتاز</option>
+                        <option>جيد جداً</option>
+                        <option>جيد</option>
+                        <option>مقبول</option>
+                        <option>ضعيف</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>الزائر</label>
+                    <input type="text" name="visitor" class="form-control" required>
+                </div>
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('visitModal')">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">حفظ</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <script>
-        // بيانات التقرير
-        const academicDepartments = [
-            "قسم الرياضيات",
-            "قسم العلوم", 
-            "قسم اللغة العربية",
-            "قسم اللغة الانجليزية",
-            "قسم التربية الاسلامية",
-            "قسم المواد الاجتماعية",
-            "قسم المواد الاثرائية",
-            "قسم التربية الرياضية",
-            "قسم نظام فصل"
-        ];
-        
-        const qualitativeSections = [
-            "الرياضيات والعلوم",
-            "اللغة العربية",
-            "اللغة الانجليزية",
-            "التربية الإسلامية",
-            "المواد الاجتماعية",
-            "المواد الاثرائية",
-            "التربية الرياضية",
-            "نظام الفصل"
-        ];
-        
-        const performanceLevels = [
-            "يفوق التوقعات بكثير",
-            "يفوق التوقعات",
-            "يفي بالتوقعات",
-            "يفي بالتوقعات جزئياً"
-        ];
-        
-        // تهيئة الصفحة عند التحميل
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeVisitTables();
-            initializePerformanceTable();
-            initializeDistinguishedTeachers();
-            initializeNeedsCareTeachers();
-            initializeQualitativeReport();
+        // --- تهيئة البيانات ---
+        const initialData = {
+            schoolName: "مدرسة المستقبل",
+            visits: [],
+            performance: [
+                { dept: 'اللغة العربية', visits: 0, exc: 0, good: 0, part: 0 },
+                { dept: 'الرياضيات', visits: 0, exc: 0, good: 0, part: 0 },
+                { dept: 'العلوم', visits: 0, exc: 0, good: 0, part: 0 }
+            ],
+            teachers: [] // {name, dept, type: 'distinguished'|'care', rating, reasons}
+        };
+
+        let appData = JSON.parse(localStorage.getItem('eduSystemData')) || initialData;
+
+        // --- Logic ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // التحقق من تسجيل الدخول (محاكاة بسيطة)
+            if(sessionStorage.getItem('isLoggedIn')) {
+                showApp();
+            }
+
+            // تفعيل التبويبات
+            document.querySelectorAll('.nav-tabs a').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    document.querySelectorAll('.nav-tabs a').forEach(l => l.classList.remove('active'));
+                    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                    
+                    e.target.closest('a').classList.add('active');
+                    const target = e.target.closest('a').dataset.target;
+                    document.getElementById(target).classList.add('active');
+                    
+                    if(target === 'performance') renderPerformanceInputs();
+                    if(target === 'quality') prepareReport();
+                });
+            });
+
+            // تسجيل الدخول
+            document.getElementById('loginForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const u = document.getElementById('username').value;
+                const p = document.getElementById('password').value;
+                if(u === 'admin' && p === 'admin123') {
+                    sessionStorage.setItem('isLoggedIn', true);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'تم تسجيل الدخول',
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => showApp());
+                } else {
+                    Swal.fire('خطأ', 'بيانات الدخول غير صحيحة', 'error');
+                }
+            });
+
+            // تسجيل الخروج
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                sessionStorage.removeItem('isLoggedIn');
+                location.reload();
+            });
+
+            // إضافة زيارة
+            document.getElementById('visitForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const visit = Object.fromEntries(formData.entries());
+                
+                appData.visits.push(visit);
+                saveData();
+                renderVisitsTable();
+                updateDashboard();
+                closeModal('visitModal');
+                e.target.reset();
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: 'تم الحفظ',
+                    text: 'تم إضافة الزيارة بنجاح',
+                    toast: true, position: 'top-end', showConfirmButton: false, timer: 3000
+                });
+            });
+
+            // تحميل البيانات الأولية
+            updateDashboard();
+            renderVisitsTable();
+            document.getElementById('schoolNameInput').value = appData.schoolName;
+            document.getElementById('headerSchoolName').innerText = appData.schoolName;
         });
-        
-        // تهيئة جداول الزيارات
-        function initializeVisitTables() {
-            // جدول مدير المدرسة (6 صفوف)
-            initVisitTable('principalVisits', 'مدير المدرسة', 6, 'principalTotal');
-            
-            // جدول المدير المساعد (6 صفوف)
-            initVisitTable('assistantVisits', 'المدير المساعد', 6, 'assistantTotal');
-            
-            // جدول معلم الرياضيات (6 صفوف)
-            initVisitTable('mathVisits', 'معلم أول/منسق رياضيات وعلوم', 6, 'mathTotal');
-            
-            // جدول معلم اللغة العربية (6 صفوف)
-            initVisitTable('arabicVisits', 'معلم أول/منسق اللغة العربية', 6, 'arabicTotal');
+
+        function showApp() {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+            updateDashboard();
         }
-        
-        function initVisitTable(tableId, visitorName, rowCount, totalId) {
-            const tableBody = document.getElementById(tableId);
-            tableBody.innerHTML = '';
-            
-            for (let i = 1; i <= rowCount; i++) {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${i}</td>
-                    <td><input type="text" style="width: 95%;" placeholder="اسم المعلم"></td>
-                    <td>
-                        <select style="width: 95%;">
-                            <option value="">اختر القسم</option>
-                            ${academicDepartments.map(dept => `<option value="${dept}">${dept}</option>`).join('')}
-                        </select>
-                    </td>
-                    <td><input type="date" style="width: 95%;"></td>
-                    <td>
-                        <select style="width: 95%;">
-                            <option value="">اختر التقييم</option>
-                            ${performanceLevels.map(level => `<option value="${level}">${level}</option>`).join('')}
-                        </select>
-                    </td>
-                    <td>${visitorName}</td>
-                `;
-                tableBody.appendChild(row);
-            }
-            
-            // تحديث المجموع
-            document.getElementById(totalId).textContent = rowCount;
+
+        function saveData() {
+            localStorage.setItem('eduSystemData', JSON.stringify(appData));
         }
-        
-        // إضافة صف زيارة جديد
-        function addVisitRow(type) {
-            let tableId, visitorName, totalId, currentCount;
+
+        // --- Dashboard Logic ---
+        let perfChartInstance = null;
+        let trendChartInstance = null;
+
+        function updateDashboard() {
+            document.getElementById('totalVisits').innerText = appData.visits.length;
+            // يمكن إضافة منطق لحساب المتميزين والأولى بالرعاية بناء على التقييمات
             
-            switch(type) {
-                case 'principal':
-                    tableId = 'principalVisits';
-                    visitorName = 'مدير المدرسة';
-                    totalId = 'principalTotal';
-                    break;
-                case 'assistant':
-                    tableId = 'assistantVisits';
-                    visitorName = 'المدير المساعد';
-                    totalId = 'assistantTotal';
-                    break;
-                case 'math':
-                    tableId = 'mathVisits';
-                    visitorName = 'معلم أول/منسق رياضيات وعلوم';
-                    totalId = 'mathTotal';
-                    break;
-                case 'arabic':
-                    tableId = 'arabicVisits';
-                    visitorName = 'معلم أول/منسق اللغة العربية';
-                    totalId = 'arabicTotal';
-                    break;
-            }
+            // Chart 1: Performance (Sample Data Logic)
+            const ctx1 = document.getElementById('performanceChart').getContext('2d');
+            if(perfChartInstance) perfChartInstance.destroy();
             
-            const tableBody = document.getElementById(tableId);
-            const rowCount = tableBody.querySelectorAll('tr').length + 1;
-            
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${rowCount}</td>
-                <td><input type="text" style="width: 95%;" placeholder="اسم المعلم"></td>
-                <td>
-                    <select style="width: 95%;">
-                        <option value="">اختر القسم</option>
-                        ${academicDepartments.map(dept => `<option value="${dept}">${dept}</option>`).join('')}
-                    </select>
-                </td>
-                <td><input type="date" style="width: 95%;"></td>
-                <td>
-                    <select style="width: 95%;">
-                        <option value="">اختر التقييم</option>
-                        ${performanceLevels.map(level => `<option value="${level}">${level}</option>`).join('')}
-                    </select>
-                </td>
-                <td>${visitorName}</td>
-            `;
-            tableBody.appendChild(row);
-            
-            // تحديث المجموع
-            document.getElementById(totalId).textContent = rowCount;
-        }
-        
-        // تهيئة جدول تقييم الأداء
-        function initializePerformanceTable() {
-            const tableBody = document.getElementById('performanceTable');
-            tableBody.innerHTML = '';
-            
-            academicDepartments.forEach((dept, index) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td>${dept}</td>
-                    <td><input type="number" min="0" style="width: 90%;" class="dept-visits" onchange="updatePerformanceTotals()"></td>
-                    <td><input type="number" min="0" style="width: 90%;" class="exceeds-greatly" onchange="updatePerformanceTotals()"></td>
-                    <td><input type="number" min="0" style="width: 90%;" class="exceeds" onchange="updatePerformanceTotals()"></td>
-                    <td><input type="number" min="0" style="width: 90%;" class="meets" onchange="updatePerformanceTotals()"></td>
-                    <td><input type="number" min="0" style="width: 90%;" class="partially-meets" onchange="updatePerformanceTotals()"></td>
-                `;
-                tableBody.appendChild(row);
+            perfChartInstance = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: appData.performance.map(p => p.dept),
+                    datasets: [{
+                        label: 'عدد الزيارات',
+                        data: appData.performance.map(p => p.visits),
+                        backgroundColor: '#1e40af',
+                        borderRadius: 5
+                    }]
+                },
+                options: { responsive: true }
             });
-            
-            updatePerformanceTotals();
-        }
-        
-        // تحديث مجاميع تقييم الأداء
-        function updatePerformanceTotals() {
-            let totalVisits = 0;
-            let totalExceedsGreatly = 0;
-            let totalExceeds = 0;
-            let totalMeets = 0;
-            let totalPartiallyMeets = 0;
-            
-            document.querySelectorAll('.dept-visits').forEach(input => {
-                totalVisits += parseInt(input.value) || 0;
-            });
-            
-            document.querySelectorAll('.exceeds-greatly').forEach(input => {
-                totalExceedsGreatly += parseInt(input.value) || 0;
-            });
-            
-            document.querySelectorAll('.exceeds').forEach(input => {
-                totalExceeds += parseInt(input.value) || 0;
-            });
-            
-            document.querySelectorAll('.meets').forEach(input => {
-                totalMeets += parseInt(input.value) || 0;
-            });
-            
-            document.querySelectorAll('.partially-meets').forEach(input => {
-                totalPartiallyMeets += parseInt(input.value) || 0;
-            });
-            
-            document.getElementById('totalVisitsAll').textContent = totalVisits;
-            document.getElementById('totalExceedsGreatly').textContent = totalExceedsGreatly;
-            document.getElementById('totalExceeds').textContent = totalExceeds;
-            document.getElementById('totalMeets').textContent = totalMeets;
-            document.getElementById('totalPartiallyMeets').textContent = totalPartiallyMeets;
-        }
-        
-        // تهيئة جدول المعلمين المتميزين
-        function initializeDistinguishedTeachers() {
-            const tableBody = document.getElementById('distinguishedTeachers');
-            tableBody.innerHTML = '';
-            
-            for (let i = 1; i <= 3; i++) {
-                addDistinguishedTeacherRow();
-            }
-        }
-        
-        function addDistinguishedTeacherRow() {
-            const tableBody = document.getElementById('distinguishedTeachers');
-            const rowCount = tableBody.querySelectorAll('tr').length;
-            
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${rowCount + 1}</td>
-                <td><input type="text" style="width: 95%;" placeholder="اسم المعلم"></td>
-                <td>
-                    <select style="width: 95%;">
-                        <option value="">اختر التقدير</option>
-                        <option value="ممتاز">ممتاز</option>
-                        <option value="جيد جداً">جيد جداً</option>
-                        <option value="جيد">جيد</option>
-                    </select>
-                </td>
-                <td><textarea style="width: 95%; height: 40px;" placeholder="أسباب التميز"></textarea></td>
-                <td>
-                    <select style="width: 95%;">
-                        <option value="">اختر القسم</option>
-                        ${academicDepartments.map(dept => `<option value="${dept}">${dept}</option>`).join('')}
-                    </select>
-                </td>
-            `;
-            tableBody.appendChild(row);
-        }
-        
-        function addDistinguishedTeacher() {
-            addDistinguishedTeacherRow();
-        }
-        
-        // تهيئة جدول المعلمين الأولى بالرعاية
-        function initializeNeedsCareTeachers() {
-            const tableBody = document.getElementById('needsCareTeachers');
-            tableBody.innerHTML = '';
-            
-            for (let i = 1; i <= 3; i++) {
-                addNeedsCareTeacherRow();
-            }
-        }
-        
-        function addNeedsCareTeacherRow() {
-            const tableBody = document.getElementById('needsCareTeachers');
-            const rowCount = tableBody.querySelectorAll('tr').length;
-            
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${rowCount + 1}</td>
-                <td><input type="text" style="width: 95%;" placeholder="اسم المعلم"></td>
-                <td>
-                    <select style="width: 95%;">
-                        <option value="">اختر التقدير</option>
-                        <option value="مقبول">مقبول</option>
-                        <option value="بحاجة لتحسين">بحاجة لتحسين</option>
-                        <option value="ضعيف">ضعيف</option>
-                    </select>
-                </td>
-                <td><textarea style="width: 95%; height: 40px;" placeholder="أسباب الحاجة للرعاية"></textarea></td>
-                <td>
-                    <select style="width: 95%;">
-                        <option value="">اختر القسم</option>
-                        ${academicDepartments.map(dept => `<option value="${dept}">${dept}</option>`).join('')}
-                    </select>
-                </td>
-            `;
-            tableBody.appendChild(row);
-        }
-        
-        // تهيئة التقرير النوعي
-        function initializeQualitativeReport() {
-            const tableBody = document.getElementById('qualitativeReport');
-            tableBody.innerHTML = '';
-            
-            qualitativeSections.forEach(section => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${section}</td>
-                    <td><textarea style="width: 95%; height: 60px;" placeholder="جوانب القوة"></textarea></td>
-                    <td><textarea style="width: 95%; height: 60px;" placeholder="جوانب بحاجة إلى تطوير"></textarea></td>
-                `;
-                tableBody.appendChild(row);
-            });
-        }
-        
-        // تحميل بيانات تجريبية
-        function loadSampleData() {
-            if (confirm('هل تريد تحميل بيانات تجريبية؟ سيتم استبدال البيانات الحالية.')) {
-                // تعبئة معلومات المدرسة
-                const schoolField = document.querySelector('.school-name .empty-field');
-                if (schoolField) {
-                    schoolField.parentNode.innerHTML = 'لمدرسة <span style="border-bottom: 1px solid #000; padding: 0 5px;">النموذجية الثانوية</span>';
+
+            // Chart 2: Trends (Mock Data for Demo)
+            const ctx2 = document.getElementById('trendChart').getContext('2d');
+            if(trendChartInstance) trendChartInstance.destroy();
+            trendChartInstance = new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: ['سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'],
+                    datasets: [{
+                        label: 'مؤشر الأداء',
+                        data: [65, 70, 75, 80],
+                        borderColor: '#10b981',
+                        tension: 0.3
+                    }]
                 }
-                
-                // تعبئة الشهر
-                const monthField = document.querySelector('.month-info .empty-field');
-                if (monthField) {
-                    monthField.parentNode.innerHTML = '<span style="text-decoration: underline;">شهر</span> <span style="border-bottom: 1px solid #000; padding: 0 5px;">أكتوبر</span>';
-                }
-                
-                // تعبئة بعض الزيارات
-                const firstTeacherInput = document.querySelector('#principalVisits input[type="text"]');
-                if (firstTeacherInput) firstTeacherInput.value = 'أحمد محمد علي';
-                
-                // تعبئة تقييم الأداء
-                const firstDeptVisits = document.querySelector('.dept-visits');
-                if (firstDeptVisits) firstDeptVisits.value = '8';
-                
-                const firstExceeds = document.querySelector('.exceeds');
-                if (firstExceeds) firstExceeds.value = '3';
-                
-                alert('تم تحميل البيانات التجريبية بنجاح!');
-            }
+            });
         }
+
+        // --- Visits Logic ---
+        function renderVisitsTable() {
+            const tbody = document.getElementById('visitsTableBody');
+            tbody.innerHTML = '';
+            appData.visits.forEach((v, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${v.teacher}</td>
+                    <td>${v.department}</td>
+                    <td>${v.date}</td>
+                    <td><span class="status-badge">${v.evaluation}</span></td>
+                    <td>${v.visitor}</td>
+                    <td><button class="btn btn-sm btn-danger" onclick="deleteVisit(${index})"><i class="fas fa-trash"></i></button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function deleteVisit(index) {
+            Swal.fire({
+                title: 'هل أنت متأكد؟',
+                text: "لن تتمكن من استعادة هذا السجل!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'نعم، احذفه!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    appData.visits.splice(index, 1);
+                    saveData();
+                    renderVisitsTable();
+                    updateDashboard();
+                    Swal.fire('تم الحذف!', 'تم حذف الزيارة.', 'success');
+                }
+            })
+        }
+
+        // --- Performance Logic ---
+        function renderPerformanceInputs() {
+            const tbody = document.getElementById('inputPerformanceTable').querySelector('tbody');
+            tbody.innerHTML = '';
+            appData.performance.forEach((item, idx) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${item.dept}</td>
+                        <td><input type="number" class="form-control" value="${item.visits}" onchange="updatePerfData(${idx}, 'visits', this.value)"></td>
+                        <td><input type="number" class="form-control" value="${item.exc}" onchange="updatePerfData(${idx}, 'exc', this.value)"></td>
+                        <td><input type="number" class="form-control" value="${item.good}" onchange="updatePerfData(${idx}, 'good', this.value)"></td>
+                        <td><input type="number" class="form-control" value="${item.part}" onchange="updatePerfData(${idx}, 'part', this.value)"></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function updatePerfData(idx, key, val) {
+            appData.performance[idx][key] = parseInt(val);
+        }
+
+        function savePerformanceData() {
+            saveData();
+            Swal.fire('تم الحفظ', 'تم تحديث بيانات الأداء بنجاح', 'success');
+            updateDashboard();
+        }
+
+        // --- Reports Logic ---
+        function prepareReport() {
+            document.getElementById('reportSchoolTitle').innerText = 'لمدرسة ' + appData.schoolName;
+            // نسخ جدول الأداء للعرض في التقرير
+            const printTable = document.getElementById('printPerformanceTable');
+            printTable.innerHTML = `
+                <thead>
+                    <tr><th>القسم</th><th>العدد</th><th>ممتاز</th><th>جيد</th><th>مقبول</th></tr>
+                </thead>
+                <tbody>
+                    ${appData.performance.map(p => `
+                        <tr><td>${p.dept}</td><td>${p.visits}</td><td>${p.exc}</td><td>${p.good}</td><td>${p.part}</td></tr>
+                    `).join('')}
+                </tbody>
+            `;
+        }
+
+        function exportToExcel() {
+            const wb = XLSX.utils.book_new();
+            
+            // تحويل بيانات الزيارات
+            const ws_visits = XLSX.utils.json_to_sheet(appData.visits);
+            XLSX.utils.book_append_sheet(wb, ws_visits, "الزيارات");
+            
+            // تحويل بيانات الأداء
+            const ws_perf = XLSX.utils.json_to_sheet(appData.performance);
+            XLSX.utils.book_append_sheet(wb, ws_perf, "الأداء");
+
+            XLSX.writeFile(wb, "تقرير_الجودة.xlsx");
+        }
+
+        // --- Utilities ---
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
         
-        // مسح جميع البيانات
+        function searchTable(input, tableId) {
+            const filter = input.value.toLowerCase();
+            const rows = document.querySelectorAll(`#${tableId} tbody tr`);
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(filter) ? '' : 'none';
+            });
+        }
+
+        function saveSettings() {
+            appData.schoolName = document.getElementById('schoolNameInput').value;
+            saveData();
+            document.getElementById('headerSchoolName').innerText = appData.schoolName;
+            Swal.fire('تم', 'تم حفظ الإعدادات', 'success');
+        }
+
         function clearAllData() {
-            if (confirm('هل أنت متأكد من مسح جميع البيانات في التقرير؟')) {
-                // إعادة تعيين جميع الحقول
-                document.querySelectorAll('input:not([type="button"]), select, textarea').forEach(element => {
-                    element.value = '';
-                });
-                
-                // إعادة تعيين المجاميع
-                document.querySelectorAll('[id$="Total"], [id$="All"]').forEach(element => {
-                    if (element.id.includes('Total') || element.id.includes('All')) {
-                        element.textContent = '0';
-                    }
-                });
-                
-                // إعادة تعيين النصوص الفارغة
-                document.querySelectorAll('.empty-field').forEach(element => {
-                    element.style.display = 'inline-block';
-                });
-                
-                alert('تم مسح جميع البيانات بنجاح.');
-            }
-        }
-        
-        // دالة الطباعة
-        function printReport() {
-            window.print();
-        }
-        
-        // حفظ البيانات في التخزين المحلي
-        function saveReportData() {
-            const reportData = {
-                schoolName: document.querySelector('.school-name').innerText,
-                month: document.querySelector('.month-info').innerText,
-                timestamp: new Date().toISOString()
-            };
-            
-            localStorage.setItem('educationQualityReport', JSON.stringify(reportData));
-            console.log('تم حفظ بيانات التقرير.');
-        }
-        
-        // تحميل البيانات المحفوظة
-        function loadSavedData() {
-            const savedData = localStorage.getItem('educationQualityReport');
-            if (savedData) {
-                try {
-                    const data = JSON.parse(savedData);
-                    console.log('بيانات التقرير المحفوظة:', data);
-                } catch (e) {
-                    console.error('خطأ في تحميل البيانات المحفوظة:', e);
+            Swal.fire({
+                title: 'تحذير شديد!',
+                text: "سيتم مسح كافة البيانات والعودة للوضع الافتراضي.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'نعم، فورمات!'
+            }).then((result) => {
+                if(result.isConfirmed) {
+                    localStorage.removeItem('eduSystemData');
+                    location.reload();
                 }
-            }
+            });
         }
-        
-        // تحميل البيانات المحفوظة عند بدء التشغيل
-        window.onload = function() {
-            loadSavedData();
-        };
-        
-        // حفظ البيانات عند إغلاق الصفحة
-        window.onbeforeunload = function() {
-            saveReportData();
-        };
     </script>
 </body>
 </html>
