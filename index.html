@@ -1,12 +1,1257 @@
-<!-- عناصر مطابقة لملف Word -->
-<div class="underline-text" style="text-decoration: underline;">
-    <!-- نصوص تحت خط -->
-</div>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تقرير متابعة جودة التعليم والتعلم للقيادة العليا والوسطى</title>
+    <style>
+        /* إعدادات أساسية */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        /* إعدادات الطباعة والصفحات A4 */
+        @page {
+            size: A4;
+            margin: 20mm 15mm 20mm 15mm;
+        }
+        
+        @media print {
+            body {
+                width: 210mm;
+                height: 297mm;
+                margin: 0;
+                padding: 0;
+                background: white;
+                font-size: 12pt;
+            }
+            
+            .page {
+                width: 100%;
+                height: 100%;
+                padding: 0;
+                margin: 0;
+                page-break-after: always;
+                break-after: page;
+            }
+            
+            .no-print {
+                display: none !important;
+            }
+            
+            /* تجنب قطع الجداول بين الصفحات */
+            table {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+            
+            /* تجنب قطع الأسطر */
+            tr {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+            
+            /* الحفاظ على الصف معاً */
+            .keep-together {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+        }
+        
+        @media screen {
+            body {
+                background-color: #f0f0f0;
+                padding: 20px;
+                display: flex;
+                justify-content: center;
+                align-items: flex-start;
+                min-height: 100vh;
+            }
+            
+            .page {
+                width: 210mm;
+                min-height: 297mm;
+                background: white;
+                padding: 20mm 15mm;
+                margin: 0 auto 20px;
+                box-shadow: 0 0 20px rgba(0,0,0,0.1);
+                box-sizing: border-box;
+                position: relative;
+            }
+            
+            .page:last-child {
+                margin-bottom: 0;
+            }
+        }
+        
+        /* تنسيقات النصوص */
+        .header-logo {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .logo-placeholder {
+            width: 5.7639in;
+            height: 1.158in;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #f5f5f5 25%, #e0e0e0 25%, #e0e0e0 50%, #f5f5f5 50%, #f5f5f5 75%, #e0e0e0 75%);
+            background-size: 40px 40px;
+            border: 1px dashed #999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-style: italic;
+            position: relative;
+        }
+        
+        .logo-placeholder:before {
+            content: 'media/image1.png';
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            font-size: 9px;
+            color: #999;
+        }
+        
+        .document-title {
+            text-align: center;
+            font-size: 22pt;
+            font-weight: bold;
+            margin: 15mm 0 10mm 0;
+            text-decoration: underline;
+            line-height: 1.3;
+            color: #000;
+        }
+        
+        .school-name {
+            text-align: center;
+            font-size: 18pt;
+            font-weight: bold;
+            margin: 8mm 0;
+            text-decoration: underline;
+            color: #000;
+        }
+        
+        .month-info {
+            text-align: center;
+            font-size: 14pt;
+            margin: 5mm 0;
+            color: #000;
+        }
+        
+        .underline {
+            text-decoration: underline;
+        }
+        
+        .academic-year {
+            text-align: center;
+            font-size: 14pt;
+            margin: 5mm 0 10mm 0;
+            color: #000;
+        }
+        
+        .preparer-info {
+            text-align: left;
+            font-size: 12pt;
+            margin-top: 15mm;
+            color: #000;
+        }
+        
+        .section-title {
+            font-size: 16pt;
+            font-weight: bold;
+            margin: 8mm 0 4mm 0;
+            text-decoration: underline;
+            text-align: right;
+            color: #000;
+        }
+        
+        .subsection-title {
+            font-size: 14pt;
+            font-weight: bold;
+            margin: 6mm 0 3mm 0;
+            text-align: right;
+            color: #000;
+        }
+        
+        .notes {
+            font-size: 10pt;
+            text-align: right;
+            margin: 2mm 0;
+            font-style: italic;
+            color: #333;
+        }
+        
+        .preparer-signature {
+            text-align: left;
+            font-size: 11pt;
+            margin-top: 10mm;
+            color: #000;
+        }
+        
+        /* تنسيقات الجداول */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 4mm 0;
+            font-size: 10pt;
+            text-align: center;
+            table-layout: fixed;
+        }
+        
+        th, td {
+            border: 1px solid #000000;
+            padding: 3mm 1mm;
+            vertical-align: middle;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        th {
+            background-color: #e6e6e6;
+            font-weight: bold;
+            color: #000;
+        }
+        
+        .table-header-row {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+        
+        .section-cell {
+            background-color: #f5f5f5;
+            font-weight: bold;
+            text-align: right;
+            padding-right: 2mm;
+        }
+        
+        .total-row {
+            background-color: #e8e8e8;
+            font-weight: bold;
+        }
+        
+        .total-cell {
+            background-color: #f0f0f0;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        /* تنسيقات حقول الإدخال */
+        input, select, textarea {
+            width: 100%;
+            padding: 1mm;
+            border: 1px solid #ccc;
+            border-radius: 2px;
+            font-size: 10pt;
+            text-align: right;
+            background: transparent;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: 1px solid #4a90e2;
+            background-color: #fff;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 20mm;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        /* تنسيقات الأزرار (للعرض فقط) */
+        .no-print {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 5px;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+        }
+        
+        .btn:hover {
+            background-color: #357ae8;
+        }
+        
+        .btn-print {
+            background-color: #34a853;
+        }
+        
+        .btn-print:hover {
+            background-color: #2d8c47;
+        }
+        
+        .btn-clear {
+            background-color: #ea4335;
+        }
+        
+        .btn-clear:hover {
+            background-color: #d33426;
+        }
+        
+        /* تنسيقات للرسم البياني */
+        .chart-container {
+            width: 100%;
+            height: 60mm;
+            margin: 5mm 0;
+            border: 1px solid #ccc;
+            padding: 3mm;
+            background-color: #f9f9f9;
+        }
+        
+        .chart-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+            color: #666;
+            font-style: italic;
+            font-size: 11pt;
+        }
+        
+        /* تنسيقات التوقيعات */
+        .signature-section {
+            margin-top: 15mm;
+            padding-top: 5mm;
+            border-top: 1px dashed #666;
+        }
+        
+        .signature-box {
+            width: 45%;
+            display: inline-block;
+            vertical-align: top;
+            text-align: center;
+            margin: 0 2%;
+        }
+        
+        .signature-line {
+            margin-top: 15mm;
+            border-bottom: 1px solid #000;
+            padding-bottom: 2mm;
+            min-height: 10mm;
+        }
+        
+        .signature-info {
+            margin-top: 2mm;
+            font-size: 10pt;
+        }
+        
+        /* تعديلات للحقول الفارغة */
+        .empty-field {
+            display: inline-block;
+            min-width: 30mm;
+            border-bottom: 1px dotted #999;
+            margin: 0 2mm;
+            text-align: center;
+            color: transparent;
+        }
+        
+        /* تنسيقات خاصة للمحتوى الطويل */
+        .page-break {
+            page-break-before: always;
+            break-before: page;
+        }
+        
+        .avoid-break {
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        
+        /* تنسيقات رأس الصفحة */
+        .page-header {
+            position: relative;
+            margin-bottom: 15mm;
+        }
+        
+        .page-number {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            font-size: 10pt;
+            color: #666;
+        }
+        
+        /* تنسيقات للمسافات المحددة */
+        .spacer-5mm {
+            height: 5mm;
+        }
+        
+        .spacer-10mm {
+            height: 10mm;
+        }
+        
+        .spacer-15mm {
+            height: 15mm;
+        }
+    </style>
+</head>
+<body>
+    <!-- الصفحة الأولى -->
+    <div class="page" id="page-1">
+        <div class="page-header">
+            <!-- الشعار -->
+            <div class="header-logo">
+                <div class="logo-placeholder">
+                    [شعار المدرسة أو الوزارة]
+                </div>
+            </div>
+            
+            <!-- العنوان الرئيسي -->
+            <div class="document-title">
+                تقرير متابعة جودة التعليم والتعلم للقيادة العليا والوسطى
+            </div>
+            
+            <!-- اسم المدرسة -->
+            <div class="school-name">
+                لمدرسة <span class="empty-field"></span>
+            </div>
+            
+            <!-- الشهر -->
+            <div class="month-info">
+                <span class="underline">شهر</span> <span class="empty-field"></span>
+            </div>
+            
+            <!-- العام الدراسي -->
+            <div class="academic-year">
+                العام الدراسي 2025 / 2026م
+            </div>
+            
+            <!-- معلومات الإعداد -->
+            <div class="preparer-info">
+                إعداد المدير/ة المساعد/ة /يعتمد، مدير/ة المدرسة
+            </div>
+            
+            <div class="page-number">صفحة 1</div>
+        </div>
+        
+        <!-- القسم الأول -->
+        <div class="section-title keep-together">
+            أولاً: متابعة تسليم القيادة الوسطى (الزيارات/محاضر الاجتماعات /الخطة الأسبوعية) للمواد الدراسية الى المدير/ة المساعد/ة في المدرسة
+        </div>
+        
+        <!-- جدول متابعة القيادة الوسطى -->
+        <table class="keep-together">
+            <thead>
+                <tr>
+                    <th style="width: 25%;">القسم</th>
+                    <th colspan="4">متابعة القيادة العليا للقيادة الوسطى</th>
+                </tr>
+                <tr class="table-header-row">
+                    <th></th>
+                    <th style="width: 20%;">عدد استمارات الزيارات الصفية التي نفذت من قبل المعلم الأول أو المنسق خلال الشهر</th>
+                    <th style="width: 20%;">يوجد محضر اجتماع المعلم الأول أو المنسق مع المعلمين</th>
+                    <th style="width: 20%;">توجد خطة أسبوعية للمعلم الأول<br>أو المنسق</th>
+                    <th style="width: 15%;">أسباب عدم التسليم</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="section-cell">معلم أول / منسق اللغة العربية</td>
+                    <td><input type="text" placeholder=""></td>
+                    <td><input type="text" placeholder=""></td>
+                    <td><input type="text" placeholder=""></td>
+                    <td><input type="text" placeholder=""></td>
+                </tr>
+                <tr>
+                    <td class="section-cell">معلم أول/منسق رياضيات وعلوم</td>
+                    <td><input type="text" placeholder=""></td>
+                    <td><input type="text" placeholder=""></td>
+                    <td><input type="text" placeholder=""></td>
+                    <td><input type="text" placeholder=""></td>
+                </tr>
+                <tr>
+                    <td class="section-cell">معلم اول/منسق اللغة الإنجليزية</td>
+                    <td><input type="text" placeholder=""></td>
+                    <td><input type="text" placeholder=""></td>
+                    <td><input type="text" placeholder=""></td>
+                    <td><input type="text" placeholder=""></td>
+                </tr>
+                <tr>
+                    <td class="section-cell">معلم أول/منسق تربية اسلامية</td>
+                    <td><input type="text" placeholder=""></td>
+                    <td><input type="text" placeholder=""></td>
+                    <td><input type="text" placeholder=""></td>
+                    <td><input type="text" placeholder=""></td>
+                </tr>
+                <tr>
+                    <td class="section-cell">معلم اول/منسق المواد الاجتماعية</td>
+                    <td><input type="text" placeholder=""></td>
+                    <td><input type="text" placeholder=""></td>
+                    <td><input type="text" placeholder=""></td>
+                    <td><input type="text" placeholder=""></td>
+                </tr>
+                <tr>
+                    <td class="section-cell">معلم أول/منسق نظام فصل</td>
+                    <td><input type="text" placeholder=""></td>
+                    <td><input type="text" placeholder=""></td>
+                    <td><input type="text" placeholder=""></td>
+                    <td><input type="text" placeholder=""></td>
+                </tr>
+                <tr>
+                    <td class="section-cell">منسق المواد الإثرائية</td>
+                    <td><input type="text" placeholder=""></td>
+                    <td><input type="text" placeholder=""></td>
+                    <td><input type="text" placeholder=""></td>
+                    <td><input type="text" placeholder=""></td>
+                </tr>
+                <tr>
+                    <td class="section-cell">منسق التربية الرياضية</td>
+                    <td><input type="text" placeholder=""></td>
+                    <td><input type="text" placeholder=""></td>
+                    <td><input type="text" placeholder=""></td>
+                    <td><input type="text" placeholder=""></td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <!-- ملاحظات عامة -->
+        <div class="notes">
+            ملاحظات عامة: يتم التنسيق مع القيادة الوسطى لتنفيذ الزيارات الصفية بحسب ما يتناسب مع ظروف الجداول والنصاب المسند لهم.
+        </div>
+        
+        <!-- توقيع المعد -->
+        <div class="preparer-signature">
+            أعده: <span class="empty-field" style="width: 50mm;"></span>
+        </div>
+    </div>
+    
+    <!-- الصفحة الثانية -->
+    <div class="page page-break" id="page-2">
+        <div class="page-header">
+            <div class="document-title" style="font-size: 18pt; margin-top: 5mm;">
+                تقرير متابعة جودة التعليم والتعلم للقيادة العليا والوسطى
+            </div>
+            <div class="page-number">صفحة 2</div>
+        </div>
+        
+        <!-- القسم الثاني -->
+        <div class="section-title">
+            ثانياً: عدد الزيارات التي نُفذت خلال شهر <span class="empty-field" style="width: 20mm;"></span> من قبل:
+        </div>
+        
+        <div class="spacer-5mm"></div>
+        
+        <div style="margin-right: 10mm;">
+            <div style="margin-bottom: 3mm;">
+                <span style="font-size: 12pt;">1- القيادة العليا =</span>
+                <input type="text" style="width: 20mm; display: inline-block; margin-right: 5mm;" placeholder="">
+            </div>
+            
+            <div>
+                <span style="font-size: 12pt;">2- القيادة الوسطى =</span>
+                <input type="text" style="width: 20mm; display: inline-block; margin-right: 5mm;" placeholder="">
+            </div>
+        </div>
+        
+        <div class="spacer-10mm"></div>
+        
+        <!-- القسم الثالث -->
+        <div class="section-title">
+            ثالثاً: بيان أسماء المعلمين المُزارين من قبل القيادة العليا والوسطى خلال شهر <span class="empty-field" style="width: 20mm;"></span>
+        </div>
+        
+        <!-- جدول المدير -->
+        <div class="subsection-title" style="font-size: 12pt; margin-top: 3mm;">
+            مدير المدرسة
+        </div>
+        
+        <table style="font-size: 9pt;">
+            <thead>
+                <tr>
+                    <th style="width: 5%;">ت</th>
+                    <th style="width: 20%;">اسم المعلم</th>
+                    <th style="width: 15%;">القسم</th>
+                    <th style="width: 15%;">تاريخ الزيارة</th>
+                    <th style="width: 15%;">تقييم الزيارة</th>
+                    <th style="width: 30%;">اسم الزائر</th>
+                </tr>
+            </thead>
+            <tbody id="principal-visits">
+                <!-- سيتم إضافة الصفوف ديناميكياً -->
+            </tbody>
+            <tfoot>
+                <tr class="total-row">
+                    <td colspan="6" style="text-align: right; padding-right: 10mm;">
+                        مجموع الزيارات = <span id="principal-total">0</span>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+        
+        <!-- جدول المدير المساعد -->
+        <div class="subsection-title" style="font-size: 12pt; margin-top: 5mm;">
+            المدير المساعد
+        </div>
+        
+        <table style="font-size: 9pt;">
+            <thead>
+                <tr>
+                    <th style="width: 5%;">ت</th>
+                    <th style="width: 20%;">اسم المعلم</th>
+                    <th style="width: 15%;">القسم</th>
+                    <th style="width: 15%;">تاريخ الزيارة</th>
+                    <th style="width: 15%;">تقييم الزيارة</th>
+                    <th style="width: 30%;">اسم الزائر</th>
+                </tr>
+            </thead>
+            <tbody id="assistant-visits">
+                <!-- سيتم إضافة الصفوف ديناميكياً -->
+            </tbody>
+            <tfoot>
+                <tr class="total-row">
+                    <td colspan="6" style="text-align: right; padding-right: 10mm;">
+                        مجموع الزيارات = <span id="assistant-total">0</span>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    
+    <!-- الصفحة الثالثة -->
+    <div class="page page-break" id="page-3">
+        <div class="page-header">
+            <div class="document-title" style="font-size: 18pt; margin-top: 5mm;">
+                تقرير متابعة جودة التعليم والتعلم للقيادة العليا والوسطى
+            </div>
+            <div class="page-number">صفحة 3</div>
+        </div>
+        
+        <!-- جداول معلمي المواد (تابع) -->
+        <div class="subsection-title" style="font-size: 12pt;">
+            معلم أول/منسق رياضيات وعلوم
+        </div>
+        
+        <table style="font-size: 9pt;">
+            <thead>
+                <tr>
+                    <th style="width: 5%;">ت</th>
+                    <th style="width: 20%;">اسم المعلم</th>
+                    <th style="width: 15%;">القسم</th>
+                    <th style="width: 15%;">تاريخ الزيارة</th>
+                    <th style="width: 15%;">تقييم الزيارة</th>
+                    <th style="width: 30%;">اسم الزائر</th>
+                </tr>
+            </thead>
+            <tbody id="math-visits">
+                <!-- سيتم إضافة الصفوف ديناميكياً -->
+            </tbody>
+            <tfoot>
+                <tr class="total-row">
+                    <td colspan="6" style="text-align: right; padding-right: 10mm;">
+                        مجموع الزيارات = <span id="math-total">0</span>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+        
+        <!-- جداول أخرى للمواد (سيتم تكرار النمط) -->
+        <div class="subsection-title" style="font-size: 12pt; margin-top: 5mm;">
+            معلم أول/منسق اللغة العربية
+        </div>
+        
+        <table style="font-size: 9pt;">
+            <thead>
+                <tr>
+                    <th style="width: 5%;">ت</th>
+                    <th style="width: 20%;">اسم المعلم</th>
+                    <th style="width: 15%;">القسم</th>
+                    <th style="width: 15%;">تاريخ الزيارة</th>
+                    <th style="width: 15%;">تقييم الزيارة</th>
+                    <th style="width: 30%;">اسم الزائر</th>
+                </tr>
+            </thead>
+            <tbody id="arabic-visits">
+                <!-- سيتم إضافة الصفوف ديناميكياً -->
+            </tbody>
+            <tfoot>
+                <tr class="total-row">
+                    <td colspan="6" style="text-align: right; padding-right: 10mm;">
+                        مجموع الزيارات = <span id="arabic-total">0</span>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+        
+        <!-- مساحة للجداول المتبقية -->
+        <div class="spacer-15mm"></div>
+        <div style="text-align: center; color: #666; font-style: italic; font-size: 10pt;">
+            [يتبع في الصفحة التالية...]
+        </div>
+    </div>
+    
+    <!-- الصفحة الرابعة -->
+    <div class="page page-break" id="page-4">
+        <div class="page-header">
+            <div class="document-title" style="font-size: 18pt; margin-top: 5mm;">
+                تقرير متابعة جودة التعليم والتعلم للقيادة العليا والوسطى
+            </div>
+            <div class="page-number">صفحة 4</div>
+        </div>
+        
+        <!-- القسم الرابع -->
+        <div class="section-title">
+            رابعاً: عدد الزيارات الصفية وتقييم الأداء الصفي
+        </div>
+        
+        <table style="font-size: 9pt;">
+            <thead>
+                <tr>
+                    <th rowspan="2" style="width: 5%;">ت</th>
+                    <th rowspan="2" style="width: 25%;">الأقسام الأكاديمية</th>
+                    <th rowspan="2" style="width: 15%;">مجموع عدد الزيارات للقسم</th>
+                    <th colspan="4">مستويات الأداء</th>
+                </tr>
+                <tr>
+                    <th style="width: 15%;">يفوق التوقعات بكثير</th>
+                    <th style="width: 15%;">يفوق التوقعات</th>
+                    <th style="width: 15%;">يفي بالتوقعات</th>
+                    <th style="width: 15%;">يفي بالتوقعات جزئيا</th>
+                </tr>
+            </thead>
+            <tbody id="performance-table">
+                <!-- سيتم إضافة الصفوف ديناميكياً -->
+            </tbody>
+            <tfoot>
+                <tr class="total-row">
+                    <td colspan="2">مجموع عدد الزيارات الصفية للقيادة العليا والوسطى</td>
+                    <td id="total-visits-all">0</td>
+                    <td id="total-exceeds-greatly">0</td>
+                    <td id="total-exceeds">0</td>
+                    <td id="total-meets">0</td>
+                    <td id="total-partially-meets">0</td>
+                </tr>
+            </tfoot>
+        </table>
+        
+        <!-- رسم بياني -->
+        <div class="subsection-title" style="margin-top: 8mm;">
+            رسم بياني يوضح مجموع عدد الزيارات الصفية للقيادة العليا والوسطى
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-placeholder">
+                سيتم عرض رسم بياني هنا بعد إدخال البيانات
+            </div>
+        </div>
+    </div>
+    
+    <!-- الصفحة الخامسة -->
+    <div class="page page-break" id="page-5">
+        <div class="page-header">
+            <div class="document-title" style="font-size: 18pt; margin-top: 5mm;">
+                تقرير متابعة جودة التعليم والتعلم للقيادة العليا والوسطى
+            </div>
+            <div class="page-number">صفحة 5</div>
+        </div>
+        
+        <!-- القسم الخامس -->
+        <div class="section-title">
+            سادساً: حصر أسماء المعلمين المتميزين في الأقسام الأكاديمية
+        </div>
+        
+        <table style="font-size: 10pt;">
+            <thead>
+                <tr>
+                    <th style="width: 8%;">الرقم</th>
+                    <th style="width: 20%;">اسم المعلم</th>
+                    <th style="width: 15%;">التقدير</th>
+                    <th style="width: 32%;">المبررات</th>
+                    <th style="width: 25%;">القسم الأكاديمي</th>
+                </tr>
+            </thead>
+            <tbody id="distinguished-teachers">
+                <!-- سيتم إضافة الصفوف ديناميكياً -->
+            </tbody>
+        </table>
+        
+        <div class="spacer-10mm"></div>
+        
+        <!-- المعلمين الأولى بالرعاية -->
+        <div class="subsection-title">
+            حصر أسماء المعلمين الأولى بالرعاية في الأقسام الأكاديمية
+        </div>
+        
+        <table style="font-size: 10pt;">
+            <thead>
+                <tr>
+                    <th style="width: 8%;">الرقم</th>
+                    <th style="width: 20%;">اسم المعلم</th>
+                    <th style="width: 15%;">التقدير</th>
+                    <th style="width: 32%;">المبررات</th>
+                    <th style="width: 25%;">القسم الأكاديمي</th>
+                </tr>
+            </thead>
+            <tbody id="needs-care-teachers">
+                <!-- سيتم إضافة الصفوف ديناميكياً -->
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- الصفحة السادسة -->
+    <div class="page page-break" id="page-6">
+        <div class="page-header">
+            <div class="document-title" style="font-size: 18pt; margin-top: 5mm;">
+                تقرير متابعة جودة التعليم والتعلم للقيادة العليا والوسطى
+            </div>
+            <div class="page-number">صفحة 6</div>
+        </div>
+        
+        <!-- القسم السادس -->
+        <div class="section-title">
+            سابعاً: التقرير النوعي
+        </div>
+        
+        <div class="subsection-title">
+            جوانب القوة والتطوير لأداء المعلمين خلال الزيارات الصفية في الأقسام الأكاديمية
+        </div>
+        
+        <table style="font-size: 10pt;">
+            <thead>
+                <tr>
+                    <th style="width: 30%;">الأقسام الأكاديمية</th>
+                    <th style="width: 35%;">جوانب القوة</th>
+                    <th style="width: 35%;">جوانب بحاجة إلى تطوير</th>
+                </tr>
+            </thead>
+            <tbody id="qualitative-report">
+                <!-- سيتم إضافة الصفوف ديناميكياً -->
+            </tbody>
+        </table>
+        
+        <!-- قسم التوقيعات -->
+        <div class="signature-section">
+            <div style="display: flex; justify-content: space-between; margin-top: 15mm;">
+                <div class="signature-box">
+                    <div style="font-size: 12pt; font-weight: bold; margin-bottom: 5mm;">
+                        توقيع المدير/ة المساعد/ة
+                    </div>
+                    <div class="signature-line"></div>
+                    <div class="signature-info">
+                        الاسم: <span class="empty-field" style="width: 40mm;"></span>
+                    </div>
+                    <div class="signature-info">
+                        التاريخ: <span class="empty-field" style="width: 30mm;"></span>
+                    </div>
+                </div>
+                
+                <div class="signature-box">
+                    <div style="font-size: 12pt; font-weight: bold; margin-bottom: 5mm;">
+                        توقيع مدير/ة المدرسة
+                    </div>
+                    <div class="signature-line"></div>
+                    <div class="signature-info">
+                        الاسم: <span class="empty-field" style="width: 40mm;"></span>
+                    </div>
+                    <div class="signature-info">
+                        التاريخ: <span class="empty-field" style="width: 30mm;"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- أزرار التحكم (للعرض فقط) -->
+    <div class="no-print" style="text-align: center; margin-top: 20px; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: white; padding: 15px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.2); z-index: 1000;">
+        <button class="btn btn-print" onclick="window.print()">🖨️ طباعة التقرير</button>
+        <button class="btn" onclick="addSampleData()">📊 تحميل بيانات تجريبية</button>
+        <button class="btn btn-clear" onclick="clearAllData()">🗑️ مسح النموذج</button>
+        <button class="btn" onclick="addVisitRow('principal')">➕ إضافة زيارة مدير</button>
+        <button class="btn" onclick="addDistinguishedTeacher()">⭐ إضافة معلم متميز</button>
+    </div>
 
-<div class="text-center" style="text-align: center;">
-    <!-- نصوص في الوسط -->
-</div>
-
-<div class="text-right" dir="rtl">
-    <!-- نصوص بمحاذاة لليمين -->
-</div>
+    <script>
+        // بيانات التقرير
+        const academicDepartments = [
+            "قسم الرياضيات",
+            "قسم العلوم", 
+            "قسم اللغة العربية",
+            "قسم اللغة الانجليزية",
+            "قسم التربية الاسلامية",
+            "قسم المواد الاجتماعية",
+            "قسم المواد الاثرائية",
+            "قسم التربية الرياضية",
+            "قسم نظام فصل"
+        ];
+        
+        const performanceLevels = [
+            "يفوق التوقعات بكثير",
+            "يفوق التوقعات",
+            "يفي بالتوقعات",
+            "يفي بالتوقعات جزئيا"
+        ];
+        
+        const coordinators = [
+            { id: 'math', name: 'معلم أول/منسق رياضيات وعلوم' },
+            { id: 'arabic', name: 'معلم أول/منسق اللغة العربية' },
+            { id: 'english', name: 'معلم أول/منسق اللغة الإنجليزية' },
+            { id: 'islamic', name: 'معلم أول/منسق تربية اسلامية' },
+            { id: 'social', name: 'معلم أول/منسق المواد الاجتماعية' },
+            { id: 'enrichment', name: 'منسق المواد الإثرائية' },
+            { id: 'sports', name: 'منسق التربية الرياضية' },
+            { id: 'class', name: 'معلم أول/منسق نظام فصل' }
+        ];
+        
+        // تهيئة الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeVisitTables();
+            initializePerformanceTable();
+            initializeDistinguishedTeachers();
+            initializeNeedsCareTeachers();
+            initializeQualitativeReport();
+        });
+        
+        // تهيئة جداول الزيارات
+        function initializeVisitTables() {
+            // تهيئة جدول المدير
+            initVisitTable('principal-visits', 'مدير المدرسة', 6, 'principal-total');
+            
+            // تهيئة جدول المدير المساعد
+            initVisitTable('assistant-visits', 'المدير المساعد', 6, 'assistant-total');
+            
+            // تهيئة جداول المعلمين
+            initVisitTable('math-visits', 'معلم أول/منسق رياضيات وعلوم', 6, 'math-total');
+            initVisitTable('arabic-visits', 'معلم أول/منسق اللغة العربية', 6, 'arabic-total');
+        }
+        
+        function initVisitTable(tableId, visitorName, rowCount, totalId) {
+            const tableBody = document.getElementById(tableId);
+            tableBody.innerHTML = '';
+            
+            for (let i = 1; i <= rowCount; i++) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${i}</td>
+                    <td><input type="text" style="width: 95%;" placeholder="اسم المعلم"></td>
+                    <td>
+                        <select style="width: 95%;">
+                            <option value="">اختر القسم</option>
+                            ${academicDepartments.map(dept => `<option value="${dept}">${dept}</option>`).join('')}
+                        </select>
+                    </td>
+                    <td><input type="date" style="width: 95%;"></td>
+                    <td>
+                        <select style="width: 95%;">
+                            <option value="">اختر التقييم</option>
+                            ${performanceLevels.map(level => `<option value="${level}">${level}</option>`).join('')}
+                        </select>
+                    </td>
+                    <td>${visitorName}</td>
+                `;
+                tableBody.appendChild(row);
+            }
+            
+            // تحديث المجموع
+            updateVisitTotal(totalId, rowCount);
+        }
+        
+        function updateVisitTotal(totalId, count) {
+            document.getElementById(totalId).textContent = count;
+        }
+        
+        // تهيئة جدول تقييم الأداء
+        function initializePerformanceTable() {
+            const tableBody = document.getElementById('performance-table');
+            tableBody.innerHTML = '';
+            
+            academicDepartments.forEach((dept, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${dept}</td>
+                    <td><input type="number" min="0" style="width: 90%;" class="dept-visits" onchange="updatePerformanceTotals()"></td>
+                    <td><input type="number" min="0" style="width: 90%;" class="exceeds-greatly" onchange="updatePerformanceTotals()"></td>
+                    <td><input type="number" min="0" style="width: 90%;" class="exceeds" onchange="updatePerformanceTotals()"></td>
+                    <td><input type="number" min="0" style="width: 90%;" class="meets" onchange="updatePerformanceTotals()"></td>
+                    <td><input type="number" min="0" style="width: 90%;" class="partially-meets" onchange="updatePerformanceTotals()"></td>
+                `;
+                tableBody.appendChild(row);
+            });
+            
+            updatePerformanceTotals();
+        }
+        
+        function updatePerformanceTotals() {
+            let totalVisits = 0;
+            let totalExceedsGreatly = 0;
+            let totalExceeds = 0;
+            let totalMeets = 0;
+            let totalPartiallyMeets = 0;
+            
+            document.querySelectorAll('.dept-visits').forEach(input => {
+                totalVisits += parseInt(input.value) || 0;
+            });
+            
+            document.querySelectorAll('.exceeds-greatly').forEach(input => {
+                totalExceedsGreatly += parseInt(input.value) || 0;
+            });
+            
+            document.querySelectorAll('.exceeds').forEach(input => {
+                totalExceeds += parseInt(input.value) || 0;
+            });
+            
+            document.querySelectorAll('.meets').forEach(input => {
+                totalMeets += parseInt(input.value) || 0;
+            });
+            
+            document.querySelectorAll('.partially-meets').forEach(input => {
+                totalPartiallyMeets += parseInt(input.value) || 0;
+            });
+            
+            document.getElementById('total-visits-all').textContent = totalVisits;
+            document.getElementById('total-exceeds-greatly').textContent = totalExceedsGreatly;
+            document.getElementById('total-exceeds').textContent = totalExceeds;
+            document.getElementById('total-meets').textContent = totalMeets;
+            document.getElementById('total-partially-meets').textContent = totalPartiallyMeets;
+        }
+        
+        // تهيئة المعلمين المتميزين
+        function initializeDistinguishedTeachers() {
+            const tableBody = document.getElementById('distinguished-teachers');
+            tableBody.innerHTML = '';
+            
+            for (let i = 1; i <= 3; i++) {
+                addDistinguishedTeacherRow();
+            }
+        }
+        
+        function addDistinguishedTeacherRow() {
+            const tableBody = document.getElementById('distinguished-teachers');
+            const rowCount = tableBody.querySelectorAll('tr').length;
+            
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${rowCount + 1}</td>
+                <td><input type="text" style="width: 95%;" placeholder="اسم المعلم"></td>
+                <td>
+                    <select style="width: 95%;">
+                        <option value="">اختر التقدير</option>
+                        <option value="ممتاز">ممتاز</option>
+                        <option value="جيد جداً">جيد جداً</option>
+                        <option value="جيد">جيد</option>
+                    </select>
+                </td>
+                <td><textarea style="width: 95%; height: 40px;" placeholder="أسباب التميز"></textarea></td>
+                <td>
+                    <select style="width: 95%;">
+                        <option value="">اختر القسم</option>
+                        ${academicDepartments.map(dept => `<option value="${dept}">${dept}</option>`).join('')}
+                    </select>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        }
+        
+        function addDistinguishedTeacher() {
+            addDistinguishedTeacherRow();
+        }
+        
+        // تهيئة المعلمين الأولى بالرعاية
+        function initializeNeedsCareTeachers() {
+            const tableBody = document.getElementById('needs-care-teachers');
+            tableBody.innerHTML = '';
+            
+            for (let i = 1; i <= 3; i++) {
+                addNeedsCareTeacherRow();
+            }
+        }
+        
+        function addNeedsCareTeacherRow() {
+            const tableBody = document.getElementById('needs-care-teachers');
+            const rowCount = tableBody.querySelectorAll('tr').length;
+            
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${rowCount + 1}</td>
+                <td><input type="text" style="width: 95%;" placeholder="اسم المعلم"></td>
+                <td>
+                    <select style="width: 95%;">
+                        <option value="">اختر التقدير</option>
+                        <option value="مقبول">مقبول</option>
+                        <option value="بحاجة لتحسين">بحاجة لتحسين</option>
+                        <option value="ضعيف">ضعيف</option>
+                    </select>
+                </td>
+                <td><textarea style="width: 95%; height: 40px;" placeholder="أسباب الحاجة للرعاية"></textarea></td>
+                <td>
+                    <select style="width: 95%;">
+                        <option value="">اختر القسم</option>
+                        ${academicDepartments.map(dept => `<option value="${dept}">${dept}</option>`).join('')}
+                    </select>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        }
+        
+        // تهيئة التقرير النوعي
+        function initializeQualitativeReport() {
+            const tableBody = document.getElementById('qualitative-report');
+            tableBody.innerHTML = '';
+            
+            const qualitativeSections = [
+                "الرياضيات والعلوم",
+                "اللغة العربية",
+                "اللغة الانجليزية",
+                "التربية الإسلامية",
+                "المواد الاجتماعية",
+                "المواد الاثرائية",
+                "التربية الرياضية",
+                "نظام الفصل"
+            ];
+            
+            qualitativeSections.forEach(section => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${section}</td>
+                    <td><textarea style="width: 95%; height: 60px;" placeholder="جوانب القوة"></textarea></td>
+                    <td><textarea style="width: 95%; height: 60px;" placeholder="جوانب بحاجة إلى تطوير"></textarea></td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // إضافة صف زيارة
+        function addVisitRow(type) {
+            let tableId, visitorName, totalId;
+            
+            switch(type) {
+                case 'principal':
+                    tableId = 'principal-visits';
+                    visitorName = 'مدير المدرسة';
+                    totalId = 'principal-total';
+                    break;
+                case 'assistant':
+                    tableId = 'assistant-visits';
+                    visitorName = 'المدير المساعد';
+                    totalId = 'assistant-total';
+                    break;
+                case 'math':
+                    tableId = 'math-visits';
+                    visitorName = 'معلم أول/منسق رياضيات وعلوم';
+                    totalId = 'math-total';
+                    break;
+            }
+            
+            const tableBody = document.getElementById(tableId);
+            const rowCount = tableBody.querySelectorAll('tr').length + 1;
+            
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${rowCount}</td>
+                <td><input type="text" style="width: 95%;" placeholder="اسم المعلم"></td>
+                <td>
+                    <select style="width: 95%;">
+                        <option value="">اختر القسم</option>
+                        ${academicDepartments.map(dept => `<option value="${dept}">${dept}</option>`).join('')}
+                    </select>
+                </td>
+                <td><input type="date" style="width: 95%;"></td>
+                <td>
+                    <select style="width: 95%;">
+                        <option value="">اختر التقييم</option>
+                        ${performanceLevels.map(level => `<option value="${level}">${level}</option>`).join('')}
+                    </select>
+                </td>
+                <td>${visitorName}</td>
+            `;
+            tableBody.appendChild(row);
+            
+            // تحديث المجموع
+            updateVisitTotal(totalId, rowCount);
+        }
+        
+        // تحميل بيانات تجريبية
+        function addSampleData() {
+            if (confirm('هل تريد تحميل بيانات تجريبية؟ سيتم استبدال البيانات الحالية.')) {
+                // تعبئة بعض الحقول
+                document.querySelector('.school-name .empty-field').parentNode.innerHTML = 
+                    'لمدرسة <span style="border-bottom: 1px solid #000; padding: 0 5px;">النموذجية الثانوية</span>';
+                
+                document.querySelector('.month-info .empty-field').parentNode.innerHTML = 
+                    '<span class="underline">شهر</span> <span style="border-bottom: 1px solid #000; padding: 0 5px;">أكتوبر</span>';
+                
+                // تعبئة بعض الزيارات
+                const firstTeacherInput = document.querySelector('#principal-visits input[type="text"]');
+                if (firstTeacherInput) firstTeacherInput.value = 'أحمد محمد علي';
+                
+                // تعبئة تقييم الأداء
+                const firstDeptVisits = document.querySelector('.dept-visits');
+                if (firstDeptVisits) firstDeptVisits.value = '8';
+                
+                const firstExceeds = document.querySelector('.exceeds');
+                if (firstExceeds) firstExceeds.value = '3';
+                
+                alert('تم تحميل البيانات التجريبية بنجاح!');
+            }
+        }
+        
+        // مسح جميع البيانات
+        function clearAllData() {
+            if (confirm('هل أنت متأكد من مسح جميع البيانات في التقرير؟')) {
+                // إعادة تعيين جميع الحقول
+                document.querySelectorAll('input:not([type="button"]), select, textarea').forEach(element => {
+                    element.value = '';
+                });
+                
+                // إعادة تعيين المجاميع
+                document.querySelectorAll('[id$="-total"]').forEach(element => {
+                    element.textContent = '0';
+                });
+                
+                // إعادة تعيين النصوص الفارغة
+                document.querySelectorAll('.empty-field').forEach(element => {
+                    element.style.display = 'inline-block';
+                });
+                
+                alert('تم مسح جميع البيانات بنجاح.');
+            }
+        }
+        
+        // دالة للطباعة
+        function printReport() {
+            window.print();
+        }
+        
+        // حفظ حالة التقرير
+        function saveReportState() {
+            const reportData = {
+                timestamp: new Date().toISOString(),
+                schoolName: document.querySelector('.school-name').innerText,
+                // يمكن إضافة المزيد من البيانات هنا
+            };
+            
+            localStorage.setItem('educationQualityReport', JSON.stringify(reportData));
+            alert('تم حفظ حالة التقرير مؤقتاً.');
+        }
+        
+        // تحميل حالة التقرير المحفوظة
+        function loadReportState() {
+            const savedData = localStorage.getItem('educationQualityReport');
+            if (savedData) {
+                if (confirm('يوجد تقرير محفوظ. هل تريد تحميله؟')) {
+                    const data = JSON.parse(savedData);
+                    // قم بتحميل البيانات هنا
+                    console.log('تم تحميل التقرير المحفوظ:', data);
+                }
+            }
+        }
+        
+        // تحميل الحالة المحفوظة عند فتح الصفحة
+        window.onload = loadReportState;
+    </script>
+</body>
+</html>
