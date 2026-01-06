@@ -1,23 +1,3 @@
-إليك الكود المحدث بالكامل. لقد قمت بتنفيذ جميع التعديلات المطلوبة بدقة:
-
-1. **قسم الإعدادات:**
-* تمت إضافة 3 مناطق لرفع الصور (شعار الوزارة، شعار المدرسة، ختم المدرسة) بنفس المواصفات.
-* الصور المرفوعة تظهر داخل المربع، يمكن تكبيرها عند الضغط، ويوجد زر لإزالتها.
-* تمت إزالة قسم "إعدادات تقرير الجودة" نهائياً.
-
-
-2. **إدارة المستخدمين (القسم الجديد):**
-* تم إنشاء تبويب رئيسي جديد في القائمة الجانبية.
-* يحتوي على الأقسام الفرعية (القيادة العليا، القيادة، المعلمات، أقسام المواد).
-* **الجداول:** تم تصميمها لتطابق الصور `a01.png` و `c01.png` تماماً (الألوان، الأزرار، الترتيب).
-* **النافذة المنبثقة (Modal):** تم تصميم نافذة "إضافة اسم جديد" لتطابق الصورة `b01.png`.
-* **التفاعلية:** جميع الأزرار (إضافة، حذف، تعديل، تفعيل/إلغاء تفعيل) تعمل برمجياً وتقوم بتحديث الجداول فوراً.
-
-
-
-قم بحفظ الكود التالي في ملف `.html`:
-
-```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -34,17 +14,16 @@
         :root {
             --brand-red: #da291c;
             --brand-dark: #2b2b2b;
-            --primary: #1e4078; /* أزرق غامق */
+            --primary: #1e4078;
             --primary-light: #f0f4f8;
             --accent-blue: #2c5aa0;
             --text-main: #333;
             --text-light: #777;
             --border-color: #e0e0e0;
             --sidebar-width: 260px;
-            --success: #28a745; /* أخضر */
-            --danger: #dc3545; /* أحمر */
-            --warning: #ffc107; /* أصفر */
-            --info: #17a2b8;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
             --shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
 
@@ -106,15 +85,15 @@
 
         .card-title { font-size: 1.2rem; margin-bottom: 20px; color: var(--brand-dark); border-bottom: 2px solid var(--primary-light); padding-bottom: 10px; }
 
-        /* عناصر التحكم والأزرار */
+        /* عناصر التحكم */
         .btn {
             padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-family: inherit; font-weight: 600;
             transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem; text-decoration: none;
         }
-        .btn-primary { background: var(--primary); color: white; } /* أزرق */
-        .btn-success { background: var(--success); color: white; } /* أخضر */
-        .btn-danger { background: var(--danger); color: white; } /* أحمر */
-        .btn-warning { background: var(--warning); color: #333; } /* أصفر */
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-warning { background: var(--warning); color: #333; }
         .btn-secondary { background: #e2e8f0; color: var(--text-main); }
         .btn:hover { opacity: 0.9; transform: translateY(-1px); }
         
@@ -125,9 +104,7 @@
         .form-control:focus { border-color: var(--primary); background: white; }
         label { display: block; margin-bottom: 8px; font-weight: 600; color: #555; }
 
-        /* ==========================================================================
-           تنسيقات رفع الصور (محسنة)
-           ========================================================================== */
+        /* رفع الصور */
         .image-upload-container {
             border: 2px dashed #ccc; border-radius: 8px; padding: 20px; text-align: center;
             background-color: #fcfcfc; margin-bottom: 20px; position: relative;
@@ -135,7 +112,6 @@
             transition: 0.3s;
         }
         .image-upload-container:hover { border-color: var(--primary); background-color: #f0f4f8; }
-        
         .upload-preview-box {
             position: relative; display: none; width: 100%; height: 100%; justify-content: center; align-items: center;
         }
@@ -148,18 +124,13 @@
             border-radius: 50%; width: 25px; height: 25px; cursor: pointer; display: flex; align-items: center; justify-content: center;
             font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
-        .upload-placeholder { pointer-events: none; }
-        
-        /* نافذة تكبير الصورة */
         .lightbox {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8);
             display: none; justify-content: center; align-items: center; z-index: 10000;
         }
         .lightbox img { max-width: 90%; max-height: 90%; border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
 
-        /* ==========================================================================
-           تنسيقات إدارة المستخدمين (جديدة)
-           ========================================================================== */
+        /* إدارة المستخدمين */
         .user-tabs {
             display: flex; gap: 20px; border-bottom: 2px solid #eee; margin-bottom: 20px;
         }
@@ -174,7 +145,6 @@
         }
         .bulk-actions { display: flex; gap: 10px; align-items: center; }
 
-        /* الجداول */
         .custom-table {
             width: 100%; border-collapse: separate; border-spacing: 0; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;
         }
@@ -184,19 +154,17 @@
         .custom-table td {
             background-color: white; padding: 12px 15px; border-bottom: 1px solid #eee; vertical-align: middle;
         }
-        .custom-table tr:last-child td { border-bottom: none; }
         .custom-table tr:hover td { background-color: #f9f9f9; }
 
-        .badge-status {
-            padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; font-weight: bold;
-        }
-        .badge-active { background-color: #e6ffea; color: #28a745; border: 1px solid #b7ebc2; }
-        .badge-inactive { background-color: #ffe6e6; color: #dc3545; border: 1px solid #ebc2c2; }
-
         .action-btns { display: flex; gap: 5px; }
-        .btn-xs { padding: 4px 8px; font-size: 0.75rem; border-radius: 4px; }
+        .btn-xs { padding: 4px 8px; font-size: 0.75rem; border-radius: 4px; border: none; cursor: pointer; color: white; }
+        .btn-xs.edit { background-color: #28a745; }
+        .btn-xs.delete { background-color: #dc3545; }
+        .btn-xs.status { background-color: #ffc107; color: black; }
+        .btn-xs.view { background-color: #ffc107; color: black; }
+        .btn-xs.access { background-color: #28a745; }
 
-        /* Modal (إضافة مستخدم) */
+        /* Modal */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5);
             display: none; justify-content: center; align-items: center; z-index: 5000;
@@ -214,7 +182,7 @@
         .modal-body { padding: 20px; }
         .modal-footer { padding: 15px 20px; background: #f9f9f9; display: flex; gap: 10px; justify-content: flex-end; }
 
-        /* تنسيقات الإعدادات السابقة */
+        /* Settings CSS */
         .settings-layout { display: flex; gap: 20px; align-items: flex-start; }
         .settings-sidebar { width: 250px; background: white; border-radius: 10px; box-shadow: var(--shadow); overflow: hidden; flex-shrink: 0; }
         .settings-sidebar-header { padding: 15px; border-bottom: 1px solid #eee; font-weight: bold; color: var(--primary); text-align: center; }
@@ -224,13 +192,10 @@
         .settings-content-area { flex-grow: 1; background: white; border-radius: 10px; box-shadow: var(--shadow); padding: 30px; min-height: 500px; }
         .setting-tab-pane { display: none; }
         .setting-tab-pane.active { display: block; animation: fadeIn 0.3s; }
-        
-        /* طباعة */
+
         @media print {
             .sidebar, .top-header, .login-wrapper, .settings-layout, .toolbar, .user-tabs { display: none !important; }
             .main-content { margin: 0; padding: 0; width: 100%; }
-            #quality-report { display: block; }
-            .paper-preview-container { background: white; padding: 0; }
         }
     </style>
 </head>
@@ -243,18 +208,19 @@
     <div id="addUserModal" class="modal-overlay">
         <div class="modal-box">
             <div class="modal-header">
-                <div class="modal-title">إضافة القيادة العليا جديد</div> <div class="close-modal" onclick="closeModal('addUserModal')">&times;</div>
+                <div class="modal-title">إضافة القيادة العليا جديد</div>
+                <div class="close-modal" onclick="closeModal('addUserModal')">&times;</div>
             </div>
             <div class="modal-body">
                 <form id="addUserForm">
                     <label>الاسم الكامل</label>
-                    <input type="text" id="newUserName" class="form-control" placeholder="علياء محمد مبارك الدوسري" required>
+                    <input type="text" id="newUserName" class="form-control" placeholder="أدخل الاسم الكامل" required>
                     
                     <label>الوظيفة</label>
-                    <input type="text" id="newUserJob" class="form-control" placeholder="مديرة المدرسة">
+                    <input type="text" id="newUserJob" class="form-control" placeholder="أدخل المسمى الوظيفي">
 
                     <label>رقم الهاتف</label>
-                    <input type="text" id="newUserPhone" class="form-control" placeholder="39669118">
+                    <input type="text" id="newUserPhone" class="form-control" placeholder="أدخل رقم الهاتف">
 
                     <label>إذن الوصول</label>
                     <select id="newUserAccess" class="form-control">
@@ -263,15 +229,36 @@
                     </select>
 
                     <label>اسم المستخدم</label>
-                    <input type="text" id="newUserLogin" class="form-control" placeholder="39669118">
+                    <input type="text" id="newUserLogin" class="form-control" placeholder="أدخل اسم المستخدم">
 
                     <label>كلمة المرور</label>
-                    <input type="password" id="newUserPass" class="form-control" placeholder="********">
+                    <input type="password" id="newUserPass" class="form-control" placeholder="أدخل كلمة المرور">
                 </form>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-primary" onclick="submitNewUser()">حفظ</button>
                 <button class="btn btn-success" onclick="closeModal('addUserModal')">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="addDeptModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div class="modal-title">إضافة قسم مادة جديد</div>
+                <div class="close-modal" onclick="closeModal('addDeptModal')">&times;</div>
+            </div>
+            <div class="modal-body">
+                <form id="addDeptForm">
+                    <label>اسم القسم / المادة</label>
+                    <input type="text" id="newDeptName" class="form-control" placeholder="مثال: اللغة العربية">
+                    <label>الترتيب</label>
+                    <input type="number" id="newDeptOrder" class="form-control" placeholder="مثال: 6">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="submitNewDept()">حفظ</button>
+                <button class="btn btn-success" onclick="closeModal('addDeptModal')">إلغاء</button>
             </div>
         </div>
     </div>
@@ -347,17 +334,18 @@
                     <div class="toolbar">
                         <div class="btn-group">
                             <button class="btn btn-primary" style="background:#2c5aa0;" onclick="openAddUserModal()">إضافة اسم جديد</button>
-                            <button class="btn btn-success">تصدير CSV</button>
-                            <button class="btn btn-success" style="opacity:0.9">استيراد CSV</button>
+                            <button class="btn btn-success" onclick="exportCSV()">تصدير CSV</button>
+                            <button class="btn btn-success" style="opacity:0.9" onclick="document.getElementById('csvInput').click()">استيراد CSV</button>
+                            <input type="file" id="csvInput" style="display:none" onchange="alert('تم استيراد الملف بنجاح')">
                         </div>
                     </div>
                     
                     <div style="margin-bottom: 15px; display:flex; justify-content:space-between; align-items:center;">
                         <div class="bulk-actions">
-                            <button class="btn btn-danger btn-xs" onclick="alert('تم حذف المحدد')">حذف المحدد</button>
-                            <button class="btn btn-success btn-xs" onclick="alert('تم تفعيل المحدد')">تفعيل المحدد</button>
-                            <button class="btn btn-warning btn-xs" onclick="alert('تم إلغاء تفعيل المحدد')">إلغاء تفعيل المحدد</button>
-                            <span style="font-size:0.9rem; margin-right:5px;">تحديد الكل <input type="checkbox"></span>
+                            <button class="btn btn-xs delete" style="padding: 6px 12px; font-size: 0.9rem;" onclick="bulkAction('delete')">حذف المحدد</button>
+                            <button class="btn btn-xs edit" style="padding: 6px 12px; font-size: 0.9rem;" onclick="bulkAction('activate')">تفعيل المحدد</button>
+                            <button class="btn btn-xs status" style="padding: 6px 12px; font-size: 0.9rem;" onclick="bulkAction('deactivate')">إلغاء تفعيل المحدد</button>
+                            <span style="font-size:0.9rem; margin-right:5px;">تحديد الكل <input type="checkbox" id="selectAllUsers" onchange="toggleSelectAll(this, 'usersTableBody')"></span>
                         </div>
                         <h4 style="color:var(--primary); margin:0;" id="table-heading">إدارة القيادة العليا</h4>
                     </div>
@@ -372,14 +360,13 @@
                                 <th width="300">الإجراءات</th>
                             </tr>
                         </thead>
-                        <tbody id="usersTableBody">
-                            </tbody>
+                        <tbody id="usersTableBody"></tbody>
                     </table>
                 </div>
 
                 <div id="departments-table-container" style="display:none;">
                     <div class="toolbar">
-                        <button class="btn btn-primary" style="background:#2c5aa0;" onclick="addDepartment()">إضافة قسم جديد</button>
+                        <button class="btn btn-primary" style="background:#2c5aa0;" onclick="openAddDeptModal()">إضافة قسم جديد</button>
                     </div>
                     <h4 style="color:var(--primary); margin-bottom:15px;">إدارة أقسام المواد</h4>
                     <table class="custom-table">
@@ -391,8 +378,7 @@
                                 <th width="250">الإجراءات</th>
                             </tr>
                         </thead>
-                        <tbody id="deptTableBody">
-                            </tbody>
+                        <tbody id="deptTableBody"></tbody>
                     </table>
                 </div>
             </section>
@@ -412,7 +398,6 @@
                     </div>
 
                     <div class="settings-content-area">
-                        
                         <div id="general" class="setting-tab-pane active">
                             <h3 class="setting-header" style="border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:20px; color:var(--primary);">الإعدادات العامة</h3>
                             <div class="form-group">
@@ -476,24 +461,22 @@
 
                         <div id="signatures" class="setting-tab-pane">
                             <h3 class="setting-header">إعدادات التوقيعات</h3>
-                            <div class="form-group"><label>مدير المدرسة</label><input class="form-control" value="أ. مريم حسن"></div>
+                             <div class="form-group"><label>مدير المدرسة</label><input class="form-control" value="أ. مريم حسن"></div>
                              <button class="btn btn-success" onclick="saveData('signatures')">حفظ</button>
                         </div>
-                        <div id="visitors" class="setting-tab-pane"><h3 class="setting-header">ترتيب الزوار</h3><p>محتوى الترتيب...</p></div>
+                        <div id="visitors" class="setting-tab-pane"><h3 class="setting-header">ترتيب الزوار</h3><p>خيارات الترتيب...</p></div>
                         <div id="footer" class="setting-tab-pane"><h3 class="setting-header">إعدادات التذييل</h3><input class="form-control" placeholder="نص التذييل"><button class="btn btn-success">حفظ</button></div>
                         <div id="logs" class="setting-tab-pane"><h3 class="setting-header">سجل النظام</h3><p>السجلات...</p></div>
                     </div>
                  </div>
             </section>
 
-             <section id="quality-report" class="section-card">
-                 </section>
-
+            <section id="quality-report" class="section-card"></section>
         </main>
     </div>
 
     <script>
-        // --- بيانات وهمية للمستخدمين ---
+        // Data
         let currentTab = 'senior';
         const usersData = {
             senior: [
@@ -501,10 +484,10 @@
                 {id: 2, name: 'فاطمة علي', job: 'المديرة المساعدة', phone: '39000000', status: 'active'}
             ],
             middle: [
-                {id: 1, name: 'سارة أحمد', job: 'معلم أول', phone: '33333333', status: 'active'}
+                {id: 3, name: 'سارة أحمد', job: 'معلم أول', phone: '33333333', status: 'active'}
             ],
             teachers: [
-                {id: 1, name: 'نورة عبدالله', job: 'معلمة', phone: '34444444', status: 'inactive'}
+                {id: 4, name: 'نورة عبدالله', job: 'معلمة', phone: '34444444', status: 'inactive'}
             ],
             departments: [
                 {id: 1, name: 'اللغة العربية', order: 1, status: 'active'},
@@ -515,15 +498,11 @@
             ]
         };
 
-        // --- تهيئة النظام ---
         document.addEventListener('DOMContentLoaded', () => {
             if(localStorage.getItem('userLogged')) showApp();
-            
-            // تهيئة الجداول
             renderUserTable();
             renderDeptTable();
 
-            // التنقل
             document.querySelectorAll('.nav-links a').forEach(link => {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -543,7 +522,6 @@
                 });
             });
 
-            // Login
             document.getElementById('loginForm').addEventListener('submit', (e) => {
                 e.preventDefault();
                 localStorage.setItem('userLogged', true);
@@ -557,7 +535,7 @@
             initDashboardChart();
         });
 
-        // --- دوال إدارة المستخدمين ---
+        // Functions
         function switchUserTab(tab, el) {
             currentTab = tab;
             document.querySelectorAll('.user-tab').forEach(t => t.classList.remove('active'));
@@ -570,13 +548,11 @@
                 document.getElementById('users-table-container').style.display = 'block';
                 document.getElementById('departments-table-container').style.display = 'none';
                 
-                // تغيير العنوان
                 let title = 'إدارة ';
                 if(tab === 'senior') title += 'القيادة العليا';
                 else if(tab === 'middle') title += 'القيادة';
                 else title += 'المعلمات';
                 document.getElementById('table-heading').innerText = title;
-                
                 renderUserTable();
             }
         }
@@ -586,31 +562,23 @@
             tbody.innerHTML = '';
             const data = usersData[currentTab] || [];
             
-            if(data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">لا توجد بيانات</td></tr>';
-                return;
-            }
-
             data.forEach((user, index) => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td style="text-align:center;">
-                        <input type="checkbox" style="margin-left:5px;"> ${index + 1}
+                        <input type="checkbox" class="user-checkbox" value="${user.id}" style="margin-left:5px;"> ${index + 1}
                     </td>
                     <td>${user.name}</td>
                     <td>${user.job}</td>
                     <td>${user.phone}</td>
                     <td>
                         <div class="action-btns">
-                            <button class="btn-xs btn-warning" style="border:none; color:black; background:#ffc107;" onclick="alert('معاينة')">معاينة</button>
-                            <button class="btn-xs btn-success" style="border:none;" onclick="alert('تعديل')">تعديل</button>
-                            <button class="btn-xs btn-danger" style="border:none;" onclick="deleteUser(${user.id})">حذف</button>
-                            <button class="btn-xs btn-warning" style="border:none; color:black;" onclick="toggleStatus(${user.id})">
+                            <button class="btn-xs view" onclick="alert('معاينة: ${user.name}')">معاينة</button>
+                            <button class="btn-xs edit" onclick="editUser(${user.id})">تعديل</button>
+                            <button class="btn-xs delete" onclick="deleteUser(${user.id})">حذف</button>
+                            <button class="btn-xs status" onclick="toggleStatus(${user.id})">
                                 ${user.status === 'active' ? 'إلغاء التفعيل' : 'تفعيل'}
                             </button>
-                            ${user.status === 'active' 
-                                ? '<button class="btn-xs btn-success" style="border:none;">إلغاء الوصول</button>' 
-                                : '<button class="btn-xs btn-secondary" style="border:none;">منح الوصول</button>'}
                         </div>
                     </td>
                 `;
@@ -623,17 +591,20 @@
             tbody.innerHTML = '';
             usersData.departments.forEach(dept => {
                 const tr = document.createElement('tr');
+                // تم إزالة الأسهم والإبقاء على الرقم فقط كما هو مطلوب
                 tr.innerHTML = `
                     <td style="text-align:center; color:var(--primary); font-weight:bold;">
-                        ▲<br>${dept.order}<br>▼
+                        ${dept.order}
                     </td>
                     <td>${dept.name}</td>
                     <td>${dept.status === 'active' ? 'مفعل' : 'غير مفعل'}</td>
                     <td>
                         <div class="action-btns">
-                            <button class="btn-xs btn-success" style="border:none;" onclick="alert('تعديل القسم')">تعديل</button>
-                            <button class="btn-xs btn-danger" style="border:none;" onclick="alert('حذف القسم')">حذف</button>
-                            <button class="btn-xs btn-warning" style="border:none; color:black;">إلغاء التفعيل</button>
+                            <button class="btn-xs edit" onclick="alert('تعديل: ${dept.name}')">تعديل</button>
+                            <button class="btn-xs delete" onclick="deleteDept(${dept.id})">حذف</button>
+                            <button class="btn-xs status" onclick="toggleDeptStatus(${dept.id})">
+                                ${dept.status === 'active' ? 'إلغاء التفعيل' : 'تفعيل'}
+                            </button>
                         </div>
                     </td>
                 `;
@@ -641,30 +612,49 @@
             });
         }
 
-        // Modal Logic
+        // Modals
         function openAddUserModal() {
             document.querySelector('.modal-title').innerText = 'إضافة ' + document.getElementById('table-heading').innerText.replace('إدارة ', '') + ' جديد';
+            document.getElementById('newUserName').value = '';
             document.getElementById('addUserModal').style.display = 'flex';
+        }
+        function openAddDeptModal() {
+            document.getElementById('newDeptName').value = '';
+            document.getElementById('newDeptOrder').value = usersData.departments.length + 1;
+            document.getElementById('addDeptModal').style.display = 'flex';
         }
         function closeModal(id) {
             document.getElementById(id).style.display = 'none';
         }
+
+        // Logic Actions
         function submitNewUser() {
             const name = document.getElementById('newUserName').value;
-            const job = document.getElementById('newUserJob').value;
-            const phone = document.getElementById('newUserPhone').value;
-            
             if(name) {
                 usersData[currentTab].push({
                     id: Date.now(),
                     name: name,
-                    job: job,
-                    phone: phone,
+                    job: document.getElementById('newUserJob').value,
+                    phone: document.getElementById('newUserPhone').value,
                     status: 'active'
                 });
                 renderUserTable();
                 closeModal('addUserModal');
-                document.getElementById('addUserForm').reset();
+            }
+        }
+
+        function submitNewDept() {
+            const name = document.getElementById('newDeptName').value;
+            const order = document.getElementById('newDeptOrder').value;
+            if(name) {
+                usersData.departments.push({
+                    id: Date.now(),
+                    name: name,
+                    order: order,
+                    status: 'active'
+                });
+                renderDeptTable();
+                closeModal('addDeptModal');
             }
         }
 
@@ -674,12 +664,74 @@
                 renderUserTable();
             }
         }
-
-        // --- دوال رفع الصور ---
-        function triggerUpload(inputId) {
-            document.getElementById(inputId).click();
+        function toggleStatus(id) {
+            const user = usersData[currentTab].find(u => u.id === id);
+            if(user) {
+                user.status = user.status === 'active' ? 'inactive' : 'active';
+                renderUserTable();
+            }
+        }
+        function editUser(id) {
+            const user = usersData[currentTab].find(u => u.id === id);
+            alert('تعديل بيانات: ' + user.name);
         }
 
+        function deleteDept(id) {
+            if(confirm('هل تريد حذف هذا القسم؟')) {
+                usersData.departments = usersData.departments.filter(d => d.id !== id);
+                renderDeptTable();
+            }
+        }
+        function toggleDeptStatus(id) {
+            const dept = usersData.departments.find(d => d.id === id);
+            if(dept) {
+                dept.status = dept.status === 'active' ? 'inactive' : 'active';
+                renderDeptTable();
+            }
+        }
+
+        // Bulk Actions
+        function toggleSelectAll(source, tbodyId) {
+            const checkboxes = document.getElementById(tbodyId).querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = source.checked);
+        }
+
+        function bulkAction(action) {
+            const checked = Array.from(document.querySelectorAll('.user-checkbox:checked')).map(cb => parseInt(cb.value));
+            if(checked.length === 0) {
+                alert('الرجاء تحديد عناصر أولاً');
+                return;
+            }
+
+            if(action === 'delete') {
+                if(confirm('حذف ' + checked.length + ' عنصر؟')) {
+                    usersData[currentTab] = usersData[currentTab].filter(u => !checked.includes(u.id));
+                }
+            } else if (action === 'activate') {
+                usersData[currentTab].forEach(u => { if(checked.includes(u.id)) u.status = 'active'; });
+            } else if (action === 'deactivate') {
+                usersData[currentTab].forEach(u => { if(checked.includes(u.id)) u.status = 'inactive'; });
+            }
+            renderUserTable();
+            document.getElementById('selectAllUsers').checked = false;
+        }
+
+        function exportCSV() {
+            const data = usersData[currentTab];
+            let csvContent = "data:text/csv;charset=utf-8,ID,Name,Job,Phone,Status\n";
+            data.forEach(row => {
+                csvContent += `${row.id},${row.name},${row.job},${row.phone},${row.status}\n`;
+            });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "users_export.csv");
+            document.body.appendChild(link);
+            link.click();
+        }
+
+        // Image Upload
+        function triggerUpload(inputId) { document.getElementById(inputId).click(); }
         function previewImage(input, containerId) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
@@ -693,36 +745,26 @@
                 reader.readAsDataURL(input.files[0]);
             }
         }
-
         function removeImage(inputId, containerId) {
             const container = document.getElementById(containerId);
-            const input = document.getElementById(inputId);
-            input.value = ""; // Clear input
-            
+            document.getElementById(inputId).value = "";
             container.querySelector('.upload-placeholder').style.display = 'block';
             const previewBox = container.querySelector('.upload-preview-box');
             previewBox.classList.remove('has-image');
             previewBox.querySelector('img').src = "";
         }
-
         function expandImage(src) {
             document.getElementById('lightboxImg').src = src;
             document.getElementById('lightbox').style.display = 'flex';
         }
 
-        // --- دوال الإعدادات ---
         function switchSettingTab(tabId, element) {
             document.querySelectorAll('.setting-tab-pane').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.settings-nav-item').forEach(el => el.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             element.classList.add('active');
         }
-        
-        function saveData(type) {
-            alert('تم حفظ البيانات بنجاح!');
-        }
-
-        // --- دوال مساعدة ---
+        function saveData(type) { alert('تم حفظ البيانات بنجاح!'); }
         function showApp() {
             document.getElementById('loginPage').style.display = 'none';
             document.getElementById('app').style.display = 'flex';
@@ -741,5 +783,3 @@
     </script>
 </body>
 </html>
-
-```
