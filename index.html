@@ -17,7 +17,7 @@
         .sidebar-header { padding: 20px; border-bottom: 1px solid #f0f4f8; display: flex; gap: 10px; align-items: center; }
         .sidebar-header i { font-size: 1.8rem; color: var(--primary); }
         .nav-links { list-style: none; padding: 20px 0; margin: 0; }
-        .nav-links li { margin-bottom: 5px; display: none; } /* مخفي افتراضياً حتى التحقق من الصلاحية */
+        .nav-links li { margin-bottom: 5px; display: none; } /* مخفي افتراضياً */
         .nav-links a { display: flex; align-items: center; padding: 12px 25px; color: #777; text-decoration: none; transition: 0.3s; font-weight: 600; border-right: 4px solid transparent; cursor: pointer; }
         .nav-links a:hover, .nav-links a.active { color: var(--primary); background: #f0f4f8; border-right-color: var(--primary); }
         .nav-links a i { margin-left: 10px; width: 25px; text-align: center; }
@@ -134,7 +134,9 @@
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                     <h3>إدارة المستخدمين</h3>
                     <div style="display:flex; gap:10px;">
-                        <button class="btn" style="background:#2c5aa0; color:white;" onclick="openAddUserModal()">إضافة اسم جديد</button>
+                        <button class="btn" style="background:#2c5aa0; color:white;" onclick="openAddUserModal()">
+                            <i class="fas fa-plus"></i> إضافة اسم جديد
+                        </button>
                     </div>
                 </div>
                 
@@ -360,12 +362,9 @@
             const perms = CURRENT_USER.permissions || DEFAULT_PERMS;
             if (perms[pageId] && perms[pageId].view === false) return;
 
-            // Hide all sections
             document.querySelectorAll('.section-card').forEach(d => d.classList.remove('active'));
-            // Reset nav active states
             document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
             
-            // Show target section
             const target = document.getElementById(pageId);
             const link = document.querySelector(`a[data-page="${pageId}"]`);
             
@@ -524,8 +523,7 @@
             el.classList.add('active'); 
         }
 
-        // === Navigation Listener Fix ===
-        // هذا الجزء هو المسؤول عن تشغيل التنقل عند الضغط
+        // Navigation Fix from Previous Step
         document.querySelectorAll('.nav-links a').forEach(link => {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
