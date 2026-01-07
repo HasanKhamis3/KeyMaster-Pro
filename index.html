@@ -25,73 +25,37 @@
             --shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
 
-        /* --- تنسيقات النظام العامة --- */
         * { box-sizing: border-box; outline: none; }
         body { margin: 0; background-color: #f7f9fc; font-family: 'Cairo', sans-serif; color: var(--text-main); }
         
         /* شاشة تسجيل الدخول */
-        .login-wrapper {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
-            background: linear-gradient(135deg, var(--primary), var(--brand-dark));
-            display: flex; justify-content: center; align-items: center; z-index: 9999;
-        }
-        .login-card {
-            background: white; padding: 40px; border-radius: 12px; width: 100%; max-width: 400px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center;
-        }
-        .error-msg { color: var(--danger); font-size: 0.9rem; margin-top: 10px; display: none; }
+        .login-wrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: linear-gradient(135deg, var(--primary), var(--brand-dark)); display: flex; justify-content: center; align-items: center; z-index: 9999; }
+        .login-card { background: white; padding: 40px; border-radius: 12px; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center; }
+        .error-msg { color: var(--danger); font-size: 0.9rem; margin-top: 10px; display: none; font-weight: bold; }
 
         /* الهيكل الرئيسي */
         .app-container { display: flex; min-height: 100vh; }
-        
-        /* القائمة الجانبية */
-        .sidebar {
-            width: var(--sidebar-width); background: white; border-left: 1px solid var(--border-color);
-            position: fixed; right: 0; top: 0; height: 100%; z-index: 100;
-            display: flex; flex-direction: column; transition: 0.3s;
-        }
+        .sidebar { width: var(--sidebar-width); background: white; border-left: 1px solid var(--border-color); position: fixed; right: 0; top: 0; height: 100%; z-index: 100; display: flex; flex-direction: column; transition: 0.3s; }
         .sidebar-header { padding: 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--primary-light); }
         .sidebar-header h2 { font-size: 1.1rem; margin: 0; color: var(--primary); font-weight: 700; }
         
         .nav-links { list-style: none; padding: 20px 0; margin: 0; flex: 1; }
         .nav-links li { margin-bottom: 5px; }
-        .nav-links a {
-            display: flex; align-items: center; padding: 12px 25px; color: var(--text-light);
-            text-decoration: none; transition: 0.3s; font-weight: 600; font-size: 0.95rem; border-right: 3px solid transparent;
-        }
-        .nav-links a:hover, .nav-links a.active {
-            color: var(--primary); background: var(--primary-light); border-right-color: var(--primary);
-        }
-        /* إخفاء العناصر عند عدم وجود صلاحية */
         .nav-links li.hidden { display: none !important; }
-
+        .nav-links a { display: flex; align-items: center; padding: 12px 25px; color: var(--text-light); text-decoration: none; transition: 0.3s; font-weight: 600; font-size: 0.95rem; border-right: 3px solid transparent; }
+        .nav-links a:hover, .nav-links a.active { color: var(--primary); background: var(--primary-light); border-right-color: var(--primary); }
         .nav-links a i { margin-left: 10px; width: 20px; text-align: center; }
 
-        /* المحتوى الرئيسي */
-        .main-content {
-            margin-right: var(--sidebar-width); flex: 1; padding: 30px; width: calc(100% - var(--sidebar-width));
-        }
-
-        .top-header {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;
-        }
+        .main-content { margin-right: var(--sidebar-width); flex: 1; padding: 30px; width: calc(100% - var(--sidebar-width)); }
+        .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .user-profile { display: flex; align-items: center; gap: 10px; background: white; padding: 8px 15px; border-radius: 30px; box-shadow: var(--shadow); }
         .avatar { width: 35px; height: 35px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
 
-        .section-card {
-            background: white; border-radius: 10px; padding: 25px; box-shadow: var(--shadow); margin-bottom: 25px;
-            display: none; animation: fadeIn 0.4s ease;
-        }
+        .section-card { background: white; border-radius: 10px; padding: 25px; box-shadow: var(--shadow); margin-bottom: 25px; display: none; animation: fadeIn 0.4s ease; }
         .section-card.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card-title { font-size: 1.2rem; margin-bottom: 20px; color: var(--brand-dark); border-bottom: 2px solid var(--primary-light); padding-bottom: 10px; }
-
-        /* عناصر التحكم */
-        .btn {
-            padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-family: inherit; font-weight: 600;
-            transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem; text-decoration: none;
-        }
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-family: inherit; font-weight: 600; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem; text-decoration: none; }
         .btn-primary { background: var(--primary); color: white; }
         .btn-success { background: var(--success); color: white; }
         .btn-danger { background: var(--danger); color: white; }
@@ -99,24 +63,21 @@
         .btn-secondary { background: #e2e8f0; color: var(--text-main); }
         .btn:hover { opacity: 0.9; transform: translateY(-1px); }
         
-        .form-control {
-            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 15px;
-            font-family: inherit; font-size: 0.95rem; background-color: #fbfbfb; transition: 0.3s;
-        }
+        .form-control { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 15px; font-family: inherit; font-size: 0.95rem; background-color: #fbfbfb; transition: 0.3s; }
         .form-control:focus { border-color: var(--primary); background: white; }
         label { display: block; margin-bottom: 8px; font-weight: 600; color: #555; }
 
-        /* حقول كلمة المرور المخصصة */
-        .password-wrapper { position: relative; }
+        /* حقول كلمة المرور المخصصة (للدخول والتعديل) */
+        .password-wrapper { position: relative; width: 100%; }
         .password-wrapper input { padding-left: 40px; } /* مساحة للعين */
         .password-toggle-icon {
-            position: absolute; left: 10px; top: 38%; transform: translateY(-50%);
-            cursor: pointer; color: #777; font-size: 1.1rem; display: none; /* مخفي افتراضياً */
+            position: absolute; left: 15px; top: 22px; transform: translateY(-50%);
+            cursor: pointer; color: #777; font-size: 1rem; z-index: 10;
         }
+        .login-card .password-toggle-icon { top: 22px; } /* ضبط خاص لكارت الدخول */
         .password-toggle-icon:hover { color: var(--primary); }
         .password-date { font-size: 0.8rem; color: #888; margin-top: -10px; margin-bottom: 15px; display: block; text-align: left; }
 
-        /* إدارة المستخدمين */
         .user-tabs { display: flex; gap: 20px; border-bottom: 2px solid #eee; margin-bottom: 20px; }
         .user-tab { padding: 10px 20px; cursor: pointer; font-weight: bold; color: #777; border-bottom: 3px solid transparent; transition: 0.3s; }
         .user-tab:hover { color: var(--primary); }
@@ -138,7 +99,6 @@
         .btn-xs.view { background-color: #ffc107; color: black; }
         .btn-xs.access { background-color: #28a745; }
 
-        /* Modal العام */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 5000; }
         .modal-box { background: white; width: 600px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; animation: slideDown 0.3s ease; max-height: 90vh; overflow-y: auto; }
         @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -148,32 +108,23 @@
         .modal-body { padding: 20px; }
         .modal-footer { padding: 15px 20px; background: #f9f9f9; display: flex; gap: 10px; justify-content: flex-end; }
 
-        /* تفاصيل المعاينة */
         .view-user-details { text-align: center; }
         .view-user-details h3 { color: var(--primary); margin-bottom: 5px; }
         .view-user-details p { color: #777; margin-bottom: 20px; font-size: 0.9rem; }
         .detail-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
         .detail-label { font-weight: bold; color: #555; }
 
-        /* الصلاحيات */
         .permissions-list { max-height: 400px; overflow-y: auto; padding: 10px; border: 1px solid #eee; border-radius: 8px; }
         .perm-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 10px; border-bottom: 1px solid #eee; }
         .perm-item:last-child { border-bottom: none; }
         .perm-checks { display: flex; gap: 15px; }
         
-        /* استيراد CSV */
         .csv-import-list { max-height: 300px; overflow-y: auto; border: 1px solid #eee; margin-top: 10px; }
         .csv-import-list table { width: 100%; border-collapse: collapse; }
         .csv-import-list th, .csv-import-list td { padding: 8px; border-bottom: 1px solid #eee; text-align: right; font-size: 0.9rem; }
         .csv-import-list th { background: #f9f9f9; position: sticky; top: 0; }
 
-        /* رفع الصور */
-        .image-upload-container {
-            border: 2px dashed #ccc; border-radius: 8px; padding: 20px; text-align: center;
-            background-color: #fcfcfc; margin-bottom: 20px; position: relative;
-            min-height: 150px; display: flex; align-items: center; justify-content: center; flex-direction: column;
-            transition: 0.3s;
-        }
+        .image-upload-container { border: 2px dashed #ccc; border-radius: 8px; padding: 20px; text-align: center; background-color: #fcfcfc; margin-bottom: 20px; position: relative; min-height: 150px; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
         .image-upload-container:hover { border-color: var(--primary); background-color: #f0f4f8; }
         .upload-preview-box { position: relative; display: none; width: 100%; height: 100%; justify-content: center; align-items: center; }
         .upload-preview-box.has-image { display: flex; }
@@ -182,7 +133,6 @@
         .lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 10000; }
         .lightbox img { max-width: 90%; max-height: 90%; border-radius: 8px; }
 
-        /* Settings CSS */
         .settings-layout { display: flex; gap: 20px; align-items: flex-start; }
         .settings-sidebar { width: 250px; background: white; border-radius: 10px; box-shadow: var(--shadow); overflow: hidden; flex-shrink: 0; }
         .settings-sidebar-header { padding: 15px; border-bottom: 1px solid #eee; font-weight: bold; color: var(--primary); text-align: center; }
@@ -304,7 +254,12 @@
             <h2 style="color:var(--primary); margin-bottom:20px;">نظام متابعة جودة التعليم</h2>
             <form id="loginForm">
                 <input type="text" id="loginUser" class="form-control" placeholder="اسم المستخدم" required>
-                <input type="password" id="loginPass" class="form-control" placeholder="كلمة المرور" required>
+                
+                <div class="password-wrapper" style="margin-bottom:15px;">
+                    <input type="password" id="loginPass" class="form-control" placeholder="كلمة المرور" required>
+                    <i class="fas fa-eye password-toggle-icon" onclick="togglePasswordVisibility('loginPass', this)"></i>
+                </div>
+
                 <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">تسجيل الدخول</button>
                 <div id="loginError" class="error-msg">خطأ: المستخدم معطل. يرجى التواصل مع المشرف للمساعدة.</div>
                 <div id="loginFail" class="error-msg" style="color:orange; display:none;">خطأ في اسم المستخدم أو كلمة المرور</div>
@@ -434,16 +389,18 @@
         const defaultPerms = {};
         sidebarItems.forEach(item => defaultPerms[item.id] = {view: true, edit: false});
 
+        // تم تحديث البيانات الافتراضية هنا لتطابق الصورة تماماً (علياء - 39669118)
         const defaultData = {
             admins: [
                 {id: 999, name: 'مدير النظام', job: 'System Admin', login: 'admin', pass: 'admin123', status: 'active', access: 'allow', permissions: JSON.parse(JSON.stringify(defaultPerms))}
             ],
             senior: [
-                {id: 1, name: 'علياء محمد مبارك الدوسري', job: 'مديرة المدرسة', phone: '39669118', login:'aliya', pass:'123', status: 'active', access: 'allow', permissions: JSON.parse(JSON.stringify(defaultPerms)), lastPassUpdate: '2025/1/1'},
-                {id: 2, name: 'فاطمة علي', job: 'المديرة المساعدة', phone: '39000000', login:'fatima', pass:'123', status: 'active', access: 'allow', permissions: JSON.parse(JSON.stringify(defaultPerms)), lastPassUpdate: '2025/1/1'}
+                // تحديث بيانات علياء: اسم المستخدم 39669118 وكلمة المرور 39669118
+                {id: 1, name: 'علياء محمد مبارك الدوسري', job: 'مديرة المدرسة', phone: '39669118', login:'39669118', pass:'39669118', status: 'active', access: 'allow', permissions: JSON.parse(JSON.stringify(defaultPerms)), lastPassUpdate: '2026/1/1'},
+                {id: 2, name: 'فاطمة علي', job: 'المديرة المساعدة', phone: '39000000', login:'fatima', pass:'123', status: 'active', access: 'allow', permissions: JSON.parse(JSON.stringify(defaultPerms)), lastPassUpdate: '2026/1/1'}
             ],
             middle: [
-                {id: 3, name: 'سارة أحمد', job: 'معلم أول', phone: '33333333', login:'sara', pass:'123', status: 'active', access: 'allow', permissions: JSON.parse(JSON.stringify(defaultPerms)), lastPassUpdate: '2025/1/1'}
+                {id: 3, name: 'سارة أحمد', job: 'معلم أول', phone: '33333333', login:'sara', pass:'123', status: 'active', access: 'allow', permissions: JSON.parse(JSON.stringify(defaultPerms)), lastPassUpdate: '2026/1/1'}
             ],
             teachers: [
                 {id: 4, name: 'نورة عبدالله', dept: 'اللغة العربية', status: 'active', permissions: JSON.parse(JSON.stringify(defaultPerms))}
@@ -479,13 +436,31 @@
                 const p = document.getElementById('loginPass').value;
                 const errDisable = document.getElementById('loginError');
                 const errFail = document.getElementById('loginFail');
-                errDisable.style.display = 'none'; errFail.style.display = 'none';
+                
+                errDisable.style.display = 'none';
+                errFail.style.display = 'none';
+
                 let foundUser = null;
-                ['admins', 'senior', 'middle'].forEach(grp => { const match = usersData[grp].find(usr => usr.login === u && usr.pass === p); if(match) foundUser = match; });
+                // استخدام دالة تنظيف للنصوص للتأكد من عدم وجود مسافات
+                const cleanU = String(u).trim();
+                const cleanP = String(p).trim();
+
+                ['admins', 'senior', 'middle'].forEach(grp => { 
+                    const match = usersData[grp].find(usr => String(usr.login).trim() === cleanU && String(usr.pass).trim() === cleanP);
+                    if(match) foundUser = match;
+                });
+
                 if(foundUser) {
                     if(foundUser.status === 'inactive') { errDisable.style.display = 'block'; }
-                    else { currentUser = foundUser; localStorage.setItem('userLogged', true); localStorage.setItem('currentUserId', currentUser.id); showApp(); }
-                } else { errFail.style.display = 'block'; }
+                    else { 
+                        currentUser = foundUser; 
+                        localStorage.setItem('userLogged', true); 
+                        localStorage.setItem('currentUserId', currentUser.id); 
+                        showApp(); 
+                    }
+                } else {
+                    errFail.style.display = 'block';
+                }
             });
             document.getElementById('logoutBtn').addEventListener('click', () => { localStorage.removeItem('userLogged'); localStorage.removeItem('currentUserId'); location.reload(); });
         });
@@ -512,7 +487,6 @@
             if(name) { usersData.departments.push({ id: Date.now(), name: name, order: document.getElementById('newDeptOrder').value, status: 'active' }); saveSystemData(); renderDeptTable(); closeModal('addDeptModal'); }
         }
         
-        // --- Edit User Logic (UPDATED) ---
         function editUser(id) {
             const user = usersData[currentTab].find(u => u.id === id);
             document.getElementById('editUserId').value = id;
@@ -524,22 +498,16 @@
                 document.getElementById('editUserPhone').value = user.phone;
                 document.getElementById('editUserLogin').value = user.login || '';
                 
-                // Password handling
+                // عرض كلمة المرور كنقاط
                 const passField = document.getElementById('editUserPass');
                 const toggleBtn = document.getElementById('togglePassBtn');
                 passField.value = user.pass || ''; 
-                passField.type = 'password';
+                passField.type = 'password'; // يظهر كنقاط تلقائياً
                 
-                // Show Eye Icon ONLY for Admin (ID 999)
-                if (currentUser && currentUser.id === 999) {
-                    toggleBtn.style.display = 'block';
-                } else {
-                    toggleBtn.style.display = 'none';
-                }
+                // أيقونة العين تظهر فقط للمدير
+                if (currentUser && currentUser.id === 999) { toggleBtn.style.display = 'block'; } else { toggleBtn.style.display = 'none'; }
 
-                // Last Update Date
                 document.getElementById('lastPassUpdate').innerText = "تاريخ آخر تحديث: " + (user.lastPassUpdate || 'غير متوفر');
-
                 document.getElementById('editUserModal').style.display = 'flex'; 
             }
         }
@@ -552,7 +520,6 @@
             user.phone = document.getElementById('editUserPhone').value;
             user.login = document.getElementById('editUserLogin').value;
             
-            // Save Password Changes
             const newPass = document.getElementById('editUserPass').value;
             if (newPass !== user.pass) {
                 user.pass = newPass;
@@ -564,15 +531,8 @@
 
         function togglePasswordVisibility(fieldId, icon) {
             const field = document.getElementById(fieldId);
-            if (field.type === "password") {
-                field.type = "text";
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                field.type = "password";
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
+            if (field.type === "password") { field.type = "text"; icon.classList.remove('fa-eye'); icon.classList.add('fa-eye-slash'); } 
+            else { field.type = "password"; icon.classList.remove('fa-eye-slash'); icon.classList.add('fa-eye'); }
         }
 
         function savePermissions() {
@@ -602,7 +562,6 @@
             saveSystemData(); alert(`تم استيراد ${count} مستخدم بنجاح`); closeModal('importModal'); renderUserTable();
         }
 
-        // --- UI ---
         function updateSidebarVisibility() {
             if(!currentUser) return;
             document.getElementById('currentUserLabel').innerText = currentUser.name;
@@ -619,22 +578,12 @@
             data.forEach((user, index) => {
                 const tr = document.createElement('tr');
                 let infoCols = currentTab === 'teachers' ? `<td>${user.name}</td><td>${user.dept}</td>` : `<td>${user.name}</td><td>${user.job}</td><td>${user.phone}</td>`;
-                tr.innerHTML = `
-                    <td style="text-align:center;"><input type="checkbox" class="user-checkbox" value="${user.id}" style="margin-left:5px;"> ${index + 1}</td>
-                    ${infoCols}
-                    <td><div class="action-btns">
-                        <button class="btn-xs view" onclick="viewUser(${user.id})">معاينة</button>
-                        <button class="btn-xs edit" onclick="editUser(${user.id})">تعديل</button>
-                        <button class="btn-xs delete" onclick="deleteUser(${user.id})">حذف</button>
-                        <button class="btn-xs status" style="background-color:${user.status==='active'?'#ffc107':'#28a745'}" onclick="toggleStatus(${user.id})">${user.status === 'active' ? 'إلغاء التفعيل' : 'تفعيل'}</button>
-                        ${currentTab !== 'teachers' ? `<button class="btn-xs access" onclick="openPermissions(${user.id})">صلاحيات الوصول</button>` : ''}
-                    </div></td>`;
+                tr.innerHTML = `<td style="text-align:center;"><input type="checkbox" class="user-checkbox" value="${user.id}" style="margin-left:5px;"> ${index + 1}</td>${infoCols}<td><div class="action-btns"><button class="btn-xs view" onclick="viewUser(${user.id})">معاينة</button><button class="btn-xs edit" onclick="editUser(${user.id})">تعديل</button><button class="btn-xs delete" onclick="deleteUser(${user.id})">حذف</button><button class="btn-xs status" style="background-color:${user.status==='active'?'#ffc107':'#28a745'}" onclick="toggleStatus(${user.id})">${user.status === 'active' ? 'إلغاء التفعيل' : 'تفعيل'}</button>${currentTab !== 'teachers' ? `<button class="btn-xs access" onclick="openPermissions(${user.id})">صلاحيات الوصول</button>` : ''}</div></td>`;
                 tbody.appendChild(tr);
             });
         }
         function renderDeptTable() { const tbody = document.getElementById('deptTableBody'); tbody.innerHTML = ''; usersData.departments.forEach(dept => { const tr = document.createElement('tr'); tr.innerHTML = `<td>${dept.order}</td><td>${dept.name}</td><td>${dept.status}</td><td><div class="action-btns"><button class="btn-xs edit" onclick="alert('تعديل')">تعديل</button><button class="btn-xs delete" onclick="alert('حذف')">حذف</button><button class="btn-xs status" style="background-color:#ffc107">إلغاء التفعيل</button></div></td>`; tbody.appendChild(tr); }); }
 
-        // --- Helpers ---
         function switchUserTab(tab, el) { currentTab = tab; document.querySelectorAll('.user-tab').forEach(t => t.classList.remove('active')); el.classList.add('active'); const tableContainer = document.getElementById('users-table-container'); const deptContainer = document.getElementById('departments-table-container'); if(tab === 'departments') { tableContainer.style.display = 'none'; deptContainer.style.display = 'block'; } else { tableContainer.style.display = 'block'; deptContainer.style.display = 'none'; let title = 'إدارة '; let thHtml = ''; if(tab === 'senior') { title += 'القيادة العليا'; thHtml = `<th width="50">الترتيب</th><th>الاسم</th><th>الوظيفة</th><th>رقم الهاتف</th><th width="350">الإجراءات</th>`; } else if(tab === 'middle') { title += 'القيادة الوسطى'; thHtml = `<th width="50">الترتيب</th><th>الاسم</th><th>الوظيفة</th><th>رقم الهاتف</th><th width="350">الإجراءات</th>`; } else { title += 'المعلمات'; thHtml = `<th width="50">الترتيب</th><th>الاسم</th><th>القسم</th><th width="350">الإجراءات</th>`; } document.getElementById('table-heading').innerText = title; document.getElementById('usersTableHead').innerHTML = `<tr>${thHtml}</tr>`; renderUserTable(); } }
         function openPermissions(id) { const user = usersData[currentTab].find(u => u.id === id); document.getElementById('permUserName').innerText = 'إدارة صلاحيات: ' + user.name; const container = document.getElementById('permListContainer'); container.innerHTML = ''; sidebarItems.forEach(item => { const userPerm = user.permissions[item.id] || {view: true, edit: false}; const div = document.createElement('div'); div.className = 'perm-item'; div.innerHTML = `<span>${item.label}</span><div class="perm-checks"><label><input type="checkbox" class="perm-view" data-id="${item.id}" ${userPerm.view ? 'checked' : ''}> معاينة</label><label><input type="checkbox" class="perm-edit" data-id="${item.id}" ${userPerm.edit ? 'checked' : ''}> تعديل</label></div>`; container.appendChild(div); }); document.getElementById('permissionsModal').setAttribute('data-userid', id); document.getElementById('permissionsModal').style.display = 'flex'; }
         function exportCSV() { const data = usersData[currentTab]; let csvContent = ""; if(currentTab === 'teachers') { csvContent = "الاسم,القسم\n"; data.forEach(row => { csvContent += `"${row.name}","${row.dept}"\n`; }); } else { csvContent = "الاسم,الوظيفة,رقم الهاتف,اسم المستخدم,كلمة المرور\n"; data.forEach(row => { csvContent += `"${row.name}","${row.job}","${row.phone}","${row.login||''}","${row.pass||''}"\n`; }); } const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `users_${currentTab}.csv`; document.body.appendChild(link); link.click(); document.body.removeChild(link); }
