@@ -18,8 +18,8 @@
         .sidebar-header { padding: 20px; border-bottom: 1px solid #f0f4f8; display: flex; gap: 10px; align-items: center; }
         .sidebar-header i { font-size: 1.8rem; color: var(--primary); }
         .nav-links { list-style: none; padding: 20px 0; margin: 0; }
-        .nav-links li { margin-bottom: 5px; display: none; /* Hidden by default for permissions */ }
-        .nav-links a { display: flex; align-items: center; padding: 12px 25px; color: #777; text-decoration: none; transition: 0.3s; font-weight: 600; border-right: 4px solid transparent; }
+        .nav-links li { margin-bottom: 5px; display: none; } /* Hidden by default */
+        .nav-links a { display: flex; align-items: center; padding: 12px 25px; color: #777; text-decoration: none; transition: 0.3s; font-weight: 600; border-right: 4px solid transparent; cursor: pointer; }
         .nav-links a:hover, .nav-links a.active { color: var(--primary); background: #f0f4f8; border-right-color: var(--primary); }
         .nav-links a i { margin-left: 10px; width: 25px; text-align: center; }
 
@@ -34,9 +34,10 @@
         .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.3s; }
         .btn-primary { background: var(--primary); color: white; width: 100%; }
         
-        /* Content Sections */
-        .section-card { background: white; border-radius: 10px; padding: 25px; margin-bottom: 20px; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
-        .section-card.active { display: block; }
+        /* Content Sections - FIXED DISPLAY */
+        .section-card { background: white; border-radius: 10px; padding: 25px; margin-bottom: 20px; display: none !important; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+        .section-card.active { display: block !important; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* Tables & Tabs */
         .user-tabs { display: flex; gap: 15px; border-bottom: 2px solid #eee; margin-bottom: 20px; }
@@ -44,7 +45,6 @@
         .user-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
         
         .custom-table { width: 100%; border-collapse: collapse; }
-        /* Central Alignment for Table Headers and Data */
         .custom-table th { background: #2c5aa0; color: white; padding: 12px; text-align: center; font-weight: bold; }
         .custom-table td { padding: 12px; border-bottom: 1px solid #eee; background: white; text-align: center; vertical-align: middle; }
         
@@ -56,7 +56,7 @@
         .modal-body { padding: 20px; }
         .modal-footer { padding: 15px 20px; background: #f9f9f9; display: flex; gap: 10px; justify-content: flex-end; }
 
-        /* Settings Layout (Restored Full) */
+        /* Settings Layout */
         .settings-layout { display: flex; gap: 20px; align-items: flex-start; }
         .settings-sidebar { width: 250px; background: white; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; flex-shrink: 0; }
         .settings-sidebar-header { padding: 15px; border-bottom: 1px solid #eee; font-weight: bold; color: var(--primary); text-align: center; }
@@ -74,12 +74,10 @@
         
         .perm-list { border: 1px solid #eee; border-radius: 6px; padding: 10px; max-height: 300px; overflow-y: auto; }
         .perm-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
-        .perm-item:last-child { border-bottom: none; }
-
         .image-upload-container { border: 2px dashed #ccc; border-radius: 8px; padding: 20px; text-align: center; background-color: #fcfcfc; margin-bottom: 20px; position: relative; min-height: 150px; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
         .upload-preview-box img { max-width: 100%; max-height: 150px; }
 
-        /* View Modal Details (Restored Design) */
+        /* View Modal Details */
         .user-view-card { text-align: center; margin-bottom: 20px; }
         .user-view-avatar { width: 80px; height: 80px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 15px auto; }
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: right; background: #f9f9f9; padding: 15px; border-radius: 8px; }
@@ -114,12 +112,12 @@
                 <div><div style="font-weight:bold;">جودة التعليم</div><small style="color:#888;">وزارة التربية</small></div>
             </div>
             <ul class="nav-links">
-                <li id="nav-dashboard"><a href="#dashboard" data-page="dashboard"><i class="fas fa-home"></i> لوحة التحكم</a></li>
-                <li id="nav-user-management"><a href="#user-management" data-page="user-management"><i class="fas fa-users-cog"></i> إدارة المستخدمين</a></li>
-                <li id="nav-visits"><a href="#visits" data-page="visits"><i class="fas fa-clipboard-check"></i> الزيارات الصفية</a></li>
-                <li id="nav-performance"><a href="#performance" data-page="performance"><i class="fas fa-chart-line"></i> تقييم الأداء</a></li>
-                <li id="nav-quality-report"><a href="#quality-report" data-page="quality-report"><i class="fas fa-file-word"></i> تقرير الجودة</a></li>
-                <li id="nav-settings"><a href="#settings" data-page="settings"><i class="fas fa-cog"></i> الإعدادات</a></li>
+                <li id="nav-dashboard"><a onclick="navigate('dashboard')"><i class="fas fa-home"></i> لوحة التحكم</a></li>
+                <li id="nav-user-management"><a onclick="navigate('user-management')"><i class="fas fa-users-cog"></i> إدارة المستخدمين</a></li>
+                <li id="nav-visits"><a onclick="navigate('visits')"><i class="fas fa-clipboard-check"></i> الزيارات الصفية</a></li>
+                <li id="nav-performance"><a onclick="navigate('performance')"><i class="fas fa-chart-line"></i> تقييم الأداء</a></li>
+                <li id="nav-quality-report"><a onclick="navigate('quality-report')"><i class="fas fa-file-word"></i> تقرير الجودة</a></li>
+                <li id="nav-settings"><a onclick="navigate('settings')"><i class="fas fa-cog"></i> الإعدادات</a></li>
             </ul>
         </aside>
 
@@ -225,6 +223,29 @@
         </div>
     </div>
 
+    <div id="editUserModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">تعديل بيانات المستخدم <span onclick="closeModal('editUserModal')" style="cursor:pointer;">&times;</span></div>
+            <div class="modal-body">
+                <input type="hidden" id="editId">
+                <label>الاسم الكامل</label><input type="text" id="editName" class="form-control">
+                <label>الوظيفة/القسم</label><input type="text" id="editJob" class="form-control">
+                <label>رقم الهاتف</label><input type="text" id="editPhone" class="form-control">
+                <label>اسم الدخول</label><input type="text" id="editLogin" class="form-control">
+                <label>كلمة المرور</label>
+                <div class="password-wrapper">
+                    <input type="password" id="editPass" class="form-control" placeholder="اترك فارغاً لعدم التغيير">
+                    <i class="fas fa-eye password-icon" onclick="togglePass('editPass', this)"></i>
+                </div>
+                <small style="color:#888; display:block; margin-top:-10px;">تاريخ آخر تحديث: <span id="lastUpdate"></span></small>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="updateUser()">حفظ</button>
+                <button class="btn" style="background:#ddd;" onclick="closeModal('editUserModal')">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
     <div id="viewUserModal" class="modal-overlay">
         <div class="modal-box">
             <div class="modal-header">معاينة بيانات المستخدم <span onclick="closeModal('viewUserModal')" style="cursor:pointer;">&times;</span></div>
@@ -264,6 +285,7 @@
         const DEFAULT_PERMS = {};
         SECTIONS.forEach(s => DEFAULT_PERMS[s.id] = {view: true, edit: false});
 
+        // Default Data with Fixed Dates and Permissions
         const INITIAL_DB = {
             admins: [{id: 999, name: 'مدير النظام', login: 'admin', pass: 'admin123', status: 'active', permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS))}],
             senior: [{id: 1, name: 'علياء محمد مبارك الدوسري', job: 'مديرة المدرسة', phone: '39669118', login: '39669118', pass: '39669118', status: 'active', permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS)), dateAdded: '2025/01/01'}],
@@ -279,13 +301,14 @@
         // === Core Functions ===
         
         function initSystem() {
-            const storedDB = localStorage.getItem('QualitySys_DB_V2');
+            const storedDB = localStorage.getItem('QualitySys_DB_Final_V3');
             if (storedDB) {
                 DB = JSON.parse(storedDB);
+                // Ensure integrity
                 ['admins', 'senior', 'middle', 'teachers'].forEach(grp => {
                     if(DB[grp]) DB[grp].forEach(u => { 
                         if(!u.permissions) u.permissions = JSON.parse(JSON.stringify(DEFAULT_PERMS));
-                        if(!u.dateAdded) u.dateAdded = '2025/01/01'; // Ensure date exists
+                        if(!u.dateAdded) u.dateAdded = '2025/01/01';
                     });
                 });
             } else {
@@ -313,7 +336,7 @@
         }
 
         function saveDB() {
-            localStorage.setItem('QualitySys_DB_V2', JSON.stringify(DB));
+            localStorage.setItem('QualitySys_DB_Final_V3', JSON.stringify(DB));
         }
 
         function login(e) {
@@ -372,19 +395,20 @@
         }
 
         function navigate(pageId) {
+            // Permission check
             const perms = CURRENT_USER.permissions || DEFAULT_PERMS;
             if (perms[pageId] && perms[pageId].view === false) return;
 
+            // Visual Updates
             document.querySelectorAll('.section-card').forEach(d => d.classList.remove('active'));
-            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+            document.querySelectorAll('.nav-links a').forEach(a => {
+                a.classList.remove('active');
+                if(a.parentElement.id === 'nav-' + pageId) a.classList.add('active');
+            });
             
             const target = document.getElementById(pageId);
-            const link = document.querySelector(`a[data-page="${pageId}"]`);
-            
             if (target) target.classList.add('active');
-            if (link) link.classList.add('active');
             
-            // Special handling for settings layout
             if(pageId === 'settings') {
                 document.getElementById('settings').style.display = 'block';
             }
@@ -424,11 +448,9 @@
             });
         }
 
-        // === Restore View Modal Logic ===
         function viewUser(id) {
             const u = DB[CURRENT_TAB].find(x => x.id === id);
             const content = document.getElementById('viewUserContent');
-            
             content.innerHTML = `
                 <div class="user-view-card">
                     <div class="user-view-avatar">${u.name.charAt(0)}</div>
@@ -444,7 +466,65 @@
             document.getElementById('viewUserModal').style.display = 'flex';
         }
 
-        // === Permissions Management ===
+        // === Add/Edit User ===
+        function openAddUserModal() { document.getElementById('addUserForm').reset(); document.getElementById('addUserModal').style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        
+        function saveNewUser() {
+            const newUser = {
+                id: Date.now(),
+                name: document.getElementById('addName').value,
+                job: document.getElementById('addJob').value,
+                phone: document.getElementById('addPhone').value,
+                login: document.getElementById('addLogin').value,
+                pass: document.getElementById('addPass').value,
+                status: 'active',
+                dateAdded: new Date().toLocaleDateString('en-GB'),
+                permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS))
+            };
+            DB[CURRENT_TAB].push(newUser);
+            saveDB();
+            renderTable();
+            closeModal('addUserModal');
+        }
+
+        function editUser(id) {
+            const u = DB[CURRENT_TAB].find(x => x.id === id);
+            document.getElementById('editId').value = id;
+            document.getElementById('editName').value = u.name;
+            document.getElementById('editJob').value = u.job || u.dept;
+            document.getElementById('editPhone').value = u.phone;
+            document.getElementById('editLogin').value = u.login;
+            document.getElementById('editPass').value = u.pass; // Show current password in dots
+            document.getElementById('lastUpdate').innerText = u.dateAdded || '-';
+            document.getElementById('editUserModal').style.display = 'flex';
+        }
+
+        function updateUser() {
+            const id = document.getElementById('editId').value;
+            const u = DB[CURRENT_TAB].find(x => x.id == id);
+            u.name = document.getElementById('editName').value;
+            if(CURRENT_TAB === 'teachers') u.dept = document.getElementById('editJob').value;
+            else u.job = document.getElementById('editJob').value;
+            u.phone = document.getElementById('editPhone').value;
+            u.login = document.getElementById('editLogin').value;
+            const newPass = document.getElementById('editPass').value;
+            if(newPass) u.pass = newPass;
+            
+            saveDB();
+            renderTable();
+            closeModal('editUserModal');
+        }
+
+        function deleteUser(id) {
+            if(confirm('هل أنت متأكد من الحذف؟')) {
+                DB[CURRENT_TAB] = DB[CURRENT_TAB].filter(u => u.id !== id);
+                saveDB();
+                renderTable();
+            }
+        }
+
+        // === Permissions ===
         function openPerms(id) {
             EDITING_PERM_ID = id;
             const u = DB[CURRENT_TAB].find(x => x.id === id);
@@ -479,7 +559,6 @@
 
             saveDB();
 
-            // Force update if editing self
             if (CURRENT_USER.id === u.id) {
                 CURRENT_USER = u;
                 applySidebarPermissions();
@@ -489,27 +568,7 @@
             alert('تم حفظ الصلاحيات');
         }
 
-        // === Utils & Modals ===
-        function openAddUserModal() { document.getElementById('addUserModal').style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function saveNewUser() {
-            const newUser = {
-                id: Date.now(),
-                name: document.getElementById('addName').value,
-                job: document.getElementById('addJob').value,
-                phone: document.getElementById('addPhone').value,
-                login: document.getElementById('addLogin').value,
-                pass: document.getElementById('addPass').value,
-                status: 'active',
-                dateAdded: new Date().toLocaleDateString('en-GB'),
-                permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS))
-            };
-            DB[CURRENT_TAB].push(newUser);
-            saveDB();
-            renderTable();
-            closeModal('addUserModal');
-        }
-        
+        // === Utils ===
         function togglePass(id, icon) {
             const input = document.getElementById(id);
             if(input.type === 'password') { input.type = 'text'; icon.classList.replace('fa-eye', 'fa-eye-slash'); }
@@ -526,6 +585,8 @@
         // Start
         document.getElementById('loginForm').addEventListener('submit', login);
         initSystem();
+        const ctx = document.getElementById('chart').getContext('2d');
+        new Chart(ctx, {type:'bar',data:{labels:['العربية','الرياضيات','العلوم'],datasets:[{label:'البيانات',data:[12,19,3],backgroundColor:'#1e4078'}]}});
     </script>
 </body>
 </html>
