@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -299,6 +298,7 @@
                 <input type="password" id="loginPass" class="form-control" placeholder="كلمة المرور" required>
                 <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">تسجيل الدخول</button>
                 <div id="loginError" class="error-msg">خطأ: المستخدم معطل. يرجى التواصل مع المشرف للمساعدة.</div>
+                <div id="loginFail" class="error-msg" style="color:orange; display:none;">خطأ في اسم المستخدم أو كلمة المرور</div>
             </form>
         </div>
     </div>
@@ -317,7 +317,7 @@
         </aside>
 
         <main class="main-content">
-            <header class="top-header"><h2 id="pageTitle">لوحة التحكم</h2><div class="user-profile"><span id="currentUserLabel">مدير النظام</span><button id="logoutBtn" class="btn btn-secondary btn-sm"><i class="fas fa-sign-out-alt"></i></button></div></header>
+            <header class="top-header"><h2 id="pageTitle">لوحة التحكم</h2><div class="user-profile"><span id="currentUserLabel">مستخدم</span><button id="logoutBtn" class="btn btn-secondary btn-sm"><i class="fas fa-sign-out-alt"></i></button></div></header>
 
             <section id="dashboard" class="section-card active">
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom:30px;">
@@ -449,8 +449,11 @@
 
         // Initial Data
         const usersData = {
+            admins: [
+                {id: 999, name: 'مدير النظام', job: 'System Admin', login: 'admin', pass: 'admin123', status: 'active', access: 'allow', permissions: JSON.parse(JSON.stringify(defaultPerms))}
+            ],
             senior: [
-                {id: 1, name: 'علياء محمد مبارك الدوسري', job: 'مديرة المدرسة', phone: '39669118', login:'admin', pass:'123', status: 'active', access: 'allow', permissions: JSON.parse(JSON.stringify(defaultPerms))},
+                {id: 1, name: 'علياء محمد مبارك الدوسري', job: 'مديرة المدرسة', phone: '39669118', login:'aliya', pass:'123', status: 'active', access: 'allow', permissions: JSON.parse(JSON.stringify(defaultPerms))},
                 {id: 2, name: 'فاطمة علي', job: 'المديرة المساعدة', phone: '39000000', login:'fatima', pass:'123', status: 'active', access: 'allow', permissions: JSON.parse(JSON.stringify(defaultPerms))}
             ],
             middle: [
@@ -467,47 +470,58 @@
         };
 
         document.addEventListener('DOMContentLoaded', () => {
-            if(localStorage.getItem('userLogged')) {
-                // Simulate session restore (very basic)
-                currentUser = usersData.senior[0]; // Default to admin for demo
-                showApp();
+            // Restore Session
+            const savedUserId = localStorage.getItem('currentUserId');
+            if(localStorage.getItem('userLogged') && savedUserId) {
+                // Find user by ID across all groups
+                ['admins', 'senior', 'middle'].forEach(grp => {
+                    const found = usersData[grp].find(u => u.id == savedUserId);
+                    if(found) currentUser = found;
+                });
+                
+                if(currentUser) showApp();
             }
+
             renderUserTable();
             renderDeptTable();
             setupNav();
             initDashboardChart();
 
+            // Login Logic
             document.getElementById('loginForm').addEventListener('submit', (e) => {
                 e.preventDefault();
                 const u = document.getElementById('loginUser').value;
                 const p = document.getElementById('loginPass').value;
-                const err = document.getElementById('loginError');
+                const errDisable = document.getElementById('loginError');
+                const errFail = document.getElementById('loginFail');
                 
+                errDisable.style.display = 'none';
+                errFail.style.display = 'none';
+
                 let foundUser = null;
-                ['senior', 'middle'].forEach(grp => {
+                // Only check auth groups (NOT teachers)
+                ['admins', 'senior', 'middle'].forEach(grp => {
                     const match = usersData[grp].find(usr => usr.login === u && usr.pass === p);
                     if(match) foundUser = match;
                 });
 
                 if(foundUser) {
                     if(foundUser.status === 'inactive') {
-                        err.style.display = 'block';
+                        errDisable.style.display = 'block';
                     } else {
-                        err.style.display = 'none';
                         currentUser = foundUser;
                         localStorage.setItem('userLogged', true);
+                        localStorage.setItem('currentUserId', currentUser.id);
                         showApp();
                     }
                 } else {
-                    // Fallback for demo if credentials don't match list but valid inputs
-                    currentUser = usersData.senior[0];
-                    localStorage.setItem('userLogged', true);
-                    showApp();
+                    errFail.style.display = 'block';
                 }
             });
 
             document.getElementById('logoutBtn').addEventListener('click', () => {
                 localStorage.removeItem('userLogged');
+                localStorage.removeItem('currentUserId');
                 location.reload();
             });
         });
@@ -567,7 +581,10 @@
         }
 
         function updateSidebarVisibility() {
-            if(!currentUser || !currentUser.permissions) return;
+            if(!currentUser) return;
+            document.getElementById('currentUserLabel').innerText = currentUser.name;
+
+            if(!currentUser.permissions) return;
             
             sidebarItems.forEach(item => {
                 const li = document.getElementById('nav-' + item.id);
@@ -577,7 +594,6 @@
                     else li.classList.add('hidden');
                 }
             });
-            document.getElementById('currentUserLabel').innerText = currentUser.name;
         }
 
         // --- CSV Export (Fix: Columns & BOM) ---
@@ -850,5 +866,3 @@
     </script>
 </body>
 </html>
-
-```
