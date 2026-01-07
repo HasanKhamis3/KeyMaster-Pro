@@ -25,35 +25,73 @@
             --shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
 
+        /* --- تنسيقات النظام العامة --- */
         * { box-sizing: border-box; outline: none; }
         body { margin: 0; background-color: #f7f9fc; font-family: 'Cairo', sans-serif; color: var(--text-main); }
         
-        .login-wrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: linear-gradient(135deg, var(--primary), var(--brand-dark)); display: flex; justify-content: center; align-items: center; z-index: 9999; }
-        .login-card { background: white; padding: 40px; border-radius: 12px; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center; }
+        /* شاشة تسجيل الدخول */
+        .login-wrapper {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: linear-gradient(135deg, var(--primary), var(--brand-dark));
+            display: flex; justify-content: center; align-items: center; z-index: 9999;
+        }
+        .login-card {
+            background: white; padding: 40px; border-radius: 12px; width: 100%; max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center;
+        }
         .error-msg { color: var(--danger); font-size: 0.9rem; margin-top: 10px; display: none; }
 
+        /* الهيكل الرئيسي */
         .app-container { display: flex; min-height: 100vh; }
-        .sidebar { width: var(--sidebar-width); background: white; border-left: 1px solid var(--border-color); position: fixed; right: 0; top: 0; height: 100%; z-index: 100; display: flex; flex-direction: column; transition: 0.3s; }
+        
+        /* القائمة الجانبية */
+        .sidebar {
+            width: var(--sidebar-width); background: white; border-left: 1px solid var(--border-color);
+            position: fixed; right: 0; top: 0; height: 100%; z-index: 100;
+            display: flex; flex-direction: column; transition: 0.3s;
+        }
         .sidebar-header { padding: 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--primary-light); }
         .sidebar-header h2 { font-size: 1.1rem; margin: 0; color: var(--primary); font-weight: 700; }
         
         .nav-links { list-style: none; padding: 20px 0; margin: 0; flex: 1; }
         .nav-links li { margin-bottom: 5px; }
-        .nav-links li.hidden { display: none !important; } /* Permission Hiding */
-        .nav-links a { display: flex; align-items: center; padding: 12px 25px; color: var(--text-light); text-decoration: none; transition: 0.3s; font-weight: 600; font-size: 0.95rem; border-right: 3px solid transparent; }
-        .nav-links a:hover, .nav-links a.active { color: var(--primary); background: var(--primary-light); border-right-color: var(--primary); }
+        .nav-links a {
+            display: flex; align-items: center; padding: 12px 25px; color: var(--text-light);
+            text-decoration: none; transition: 0.3s; font-weight: 600; font-size: 0.95rem; border-right: 3px solid transparent;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--primary); background: var(--primary-light); border-right-color: var(--primary);
+        }
+        /* إخفاء العناصر عند عدم وجود صلاحية */
+        .nav-links li.hidden { display: none !important; }
+
         .nav-links a i { margin-left: 10px; width: 20px; text-align: center; }
 
-        .main-content { margin-right: var(--sidebar-width); flex: 1; padding: 30px; width: calc(100% - var(--sidebar-width)); }
-        .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        /* المحتوى الرئيسي */
+        .main-content {
+            margin-right: var(--sidebar-width); flex: 1; padding: 30px; width: calc(100% - var(--sidebar-width));
+        }
+
+        .top-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;
+        }
         .user-profile { display: flex; align-items: center; gap: 10px; background: white; padding: 8px 15px; border-radius: 30px; box-shadow: var(--shadow); }
         .avatar { width: 35px; height: 35px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
 
-        .section-card { background: white; border-radius: 10px; padding: 25px; box-shadow: var(--shadow); margin-bottom: 25px; display: none; animation: fadeIn 0.4s ease; }
+        .section-card {
+            background: white; border-radius: 10px; padding: 25px; box-shadow: var(--shadow); margin-bottom: 25px;
+            display: none; animation: fadeIn 0.4s ease;
+        }
         .section-card.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-family: inherit; font-weight: 600; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem; text-decoration: none; }
+        .card-title { font-size: 1.2rem; margin-bottom: 20px; color: var(--brand-dark); border-bottom: 2px solid var(--primary-light); padding-bottom: 10px; }
+
+        /* عناصر التحكم */
+        .btn {
+            padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-family: inherit; font-weight: 600;
+            transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem; text-decoration: none;
+        }
         .btn-primary { background: var(--primary); color: white; }
         .btn-success { background: var(--success); color: white; }
         .btn-danger { background: var(--danger); color: white; }
@@ -61,10 +99,24 @@
         .btn-secondary { background: #e2e8f0; color: var(--text-main); }
         .btn:hover { opacity: 0.9; transform: translateY(-1px); }
         
-        .form-control { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 15px; font-family: inherit; font-size: 0.95rem; background-color: #fbfbfb; transition: 0.3s; }
+        .form-control {
+            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 15px;
+            font-family: inherit; font-size: 0.95rem; background-color: #fbfbfb; transition: 0.3s;
+        }
         .form-control:focus { border-color: var(--primary); background: white; }
         label { display: block; margin-bottom: 8px; font-weight: 600; color: #555; }
 
+        /* حقول كلمة المرور المخصصة */
+        .password-wrapper { position: relative; }
+        .password-wrapper input { padding-left: 40px; } /* مساحة للعين */
+        .password-toggle-icon {
+            position: absolute; left: 10px; top: 38%; transform: translateY(-50%);
+            cursor: pointer; color: #777; font-size: 1.1rem; display: none; /* مخفي افتراضياً */
+        }
+        .password-toggle-icon:hover { color: var(--primary); }
+        .password-date { font-size: 0.8rem; color: #888; margin-top: -10px; margin-bottom: 15px; display: block; text-align: left; }
+
+        /* إدارة المستخدمين */
         .user-tabs { display: flex; gap: 20px; border-bottom: 2px solid #eee; margin-bottom: 20px; }
         .user-tab { padding: 10px 20px; cursor: pointer; font-weight: bold; color: #777; border-bottom: 3px solid transparent; transition: 0.3s; }
         .user-tab:hover { color: var(--primary); }
@@ -86,6 +138,7 @@
         .btn-xs.view { background-color: #ffc107; color: black; }
         .btn-xs.access { background-color: #28a745; }
 
+        /* Modal العام */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 5000; }
         .modal-box { background: white; width: 600px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; animation: slideDown 0.3s ease; max-height: 90vh; overflow-y: auto; }
         @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -95,23 +148,32 @@
         .modal-body { padding: 20px; }
         .modal-footer { padding: 15px 20px; background: #f9f9f9; display: flex; gap: 10px; justify-content: flex-end; }
 
+        /* تفاصيل المعاينة */
         .view-user-details { text-align: center; }
         .view-user-details h3 { color: var(--primary); margin-bottom: 5px; }
         .view-user-details p { color: #777; margin-bottom: 20px; font-size: 0.9rem; }
         .detail-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
         .detail-label { font-weight: bold; color: #555; }
 
+        /* الصلاحيات */
         .permissions-list { max-height: 400px; overflow-y: auto; padding: 10px; border: 1px solid #eee; border-radius: 8px; }
         .perm-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 10px; border-bottom: 1px solid #eee; }
         .perm-item:last-child { border-bottom: none; }
         .perm-checks { display: flex; gap: 15px; }
         
+        /* استيراد CSV */
         .csv-import-list { max-height: 300px; overflow-y: auto; border: 1px solid #eee; margin-top: 10px; }
         .csv-import-list table { width: 100%; border-collapse: collapse; }
         .csv-import-list th, .csv-import-list td { padding: 8px; border-bottom: 1px solid #eee; text-align: right; font-size: 0.9rem; }
         .csv-import-list th { background: #f9f9f9; position: sticky; top: 0; }
 
-        .image-upload-container { border: 2px dashed #ccc; border-radius: 8px; padding: 20px; text-align: center; background-color: #fcfcfc; margin-bottom: 20px; position: relative; min-height: 150px; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
+        /* رفع الصور */
+        .image-upload-container {
+            border: 2px dashed #ccc; border-radius: 8px; padding: 20px; text-align: center;
+            background-color: #fcfcfc; margin-bottom: 20px; position: relative;
+            min-height: 150px; display: flex; align-items: center; justify-content: center; flex-direction: column;
+            transition: 0.3s;
+        }
         .image-upload-container:hover { border-color: var(--primary); background-color: #f0f4f8; }
         .upload-preview-box { position: relative; display: none; width: 100%; height: 100%; justify-content: center; align-items: center; }
         .upload-preview-box.has-image { display: flex; }
@@ -120,6 +182,7 @@
         .lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 10000; }
         .lightbox img { max-width: 90%; max-height: 90%; border-radius: 8px; }
 
+        /* Settings CSS */
         .settings-layout { display: flex; gap: 20px; align-items: flex-start; }
         .settings-sidebar { width: 250px; background: white; border-radius: 10px; box-shadow: var(--shadow); overflow: hidden; flex-shrink: 0; }
         .settings-sidebar-header { padding: 15px; border-bottom: 1px solid #eee; font-weight: bold; color: var(--primary); text-align: center; }
@@ -164,7 +227,14 @@
                 <label>رقم الهاتف</label><input type="text" id="editUserPhone" class="form-control">
                 <label>إذن الوصول</label><select id="editUserAccess" class="form-control"><option value="allow">مسموح</option><option value="deny">مرفوض</option></select>
                 <label>اسم المستخدم</label><input type="text" id="editUserLogin" class="form-control">
-                <label>كلمة المرور</label><input type="password" id="editUserPass" class="form-control" placeholder="اترك فارغاً لعدم التغيير">
+                
+                <label>كلمة المرور</label>
+                <div class="password-wrapper">
+                    <input type="password" id="editUserPass" class="form-control" placeholder="ادخل كلمة المرور الجديدة">
+                    <i class="fas fa-eye password-toggle-icon" id="togglePassBtn" onclick="togglePasswordVisibility('editUserPass', this)"></i>
+                </div>
+                <small id="lastPassUpdate" class="password-date">تاريخ آخر تحديث: -</small>
+
             </div>
             <div class="modal-footer"><button class="btn btn-primary" onclick="saveEditUser()">حفظ</button><button class="btn btn-success" onclick="closeModal('editUserModal')">إلغاء</button></div>
         </div>
@@ -369,11 +439,11 @@
                 {id: 999, name: 'مدير النظام', job: 'System Admin', login: 'admin', pass: 'admin123', status: 'active', access: 'allow', permissions: JSON.parse(JSON.stringify(defaultPerms))}
             ],
             senior: [
-                {id: 1, name: 'علياء محمد مبارك الدوسري', job: 'مديرة المدرسة', phone: '39669118', login:'aliya', pass:'123', status: 'active', access: 'allow', permissions: JSON.parse(JSON.stringify(defaultPerms))},
-                {id: 2, name: 'فاطمة علي', job: 'المديرة المساعدة', phone: '39000000', login:'fatima', pass:'123', status: 'active', access: 'allow', permissions: JSON.parse(JSON.stringify(defaultPerms))}
+                {id: 1, name: 'علياء محمد مبارك الدوسري', job: 'مديرة المدرسة', phone: '39669118', login:'aliya', pass:'123', status: 'active', access: 'allow', permissions: JSON.parse(JSON.stringify(defaultPerms)), lastPassUpdate: '2025/1/1'},
+                {id: 2, name: 'فاطمة علي', job: 'المديرة المساعدة', phone: '39000000', login:'fatima', pass:'123', status: 'active', access: 'allow', permissions: JSON.parse(JSON.stringify(defaultPerms)), lastPassUpdate: '2025/1/1'}
             ],
             middle: [
-                {id: 3, name: 'سارة أحمد', job: 'معلم أول', phone: '33333333', login:'sara', pass:'123', status: 'active', access: 'allow', permissions: JSON.parse(JSON.stringify(defaultPerms))}
+                {id: 3, name: 'سارة أحمد', job: 'معلم أول', phone: '33333333', login:'sara', pass:'123', status: 'active', access: 'allow', permissions: JSON.parse(JSON.stringify(defaultPerms)), lastPassUpdate: '2025/1/1'}
             ],
             teachers: [
                 {id: 4, name: 'نورة عبدالله', dept: 'اللغة العربية', status: 'active', permissions: JSON.parse(JSON.stringify(defaultPerms))}
@@ -424,8 +494,12 @@
         function submitNewUser() {
             const name = document.getElementById('newUserName').value;
             if(name) {
-                const pass = document.getElementById('newUserPass').value; // Get Password explicitly
-                usersData[currentTab].push({ id: Date.now(), name: name, job: document.getElementById('newUserJob').value, phone: document.getElementById('newUserPhone').value, status: 'active', login: document.getElementById('newUserLogin').value, pass: pass, permissions: JSON.parse(JSON.stringify(defaultPerms)) });
+                const pass = document.getElementById('newUserPass').value;
+                usersData[currentTab].push({ 
+                    id: Date.now(), name: name, job: document.getElementById('newUserJob').value, phone: document.getElementById('newUserPhone').value, 
+                    status: 'active', login: document.getElementById('newUserLogin').value, pass: pass, 
+                    permissions: JSON.parse(JSON.stringify(defaultPerms)), lastPassUpdate: new Date().toLocaleDateString('ar-BH')
+                });
                 saveSystemData(); renderUserTable(); closeModal('addUserModal');
             }
         }
@@ -437,6 +511,39 @@
             const name = document.getElementById('newDeptName').value;
             if(name) { usersData.departments.push({ id: Date.now(), name: name, order: document.getElementById('newDeptOrder').value, status: 'active' }); saveSystemData(); renderDeptTable(); closeModal('addDeptModal'); }
         }
+        
+        // --- Edit User Logic (UPDATED) ---
+        function editUser(id) {
+            const user = usersData[currentTab].find(u => u.id === id);
+            document.getElementById('editUserId').value = id;
+            if(currentTab === 'teachers') { 
+                alert('تعديل معلمة: ' + user.name); 
+            } else { 
+                document.getElementById('editUserName').value = user.name;
+                document.getElementById('editUserJob').value = user.job;
+                document.getElementById('editUserPhone').value = user.phone;
+                document.getElementById('editUserLogin').value = user.login || '';
+                
+                // Password handling
+                const passField = document.getElementById('editUserPass');
+                const toggleBtn = document.getElementById('togglePassBtn');
+                passField.value = user.pass || ''; 
+                passField.type = 'password';
+                
+                // Show Eye Icon ONLY for Admin (ID 999)
+                if (currentUser && currentUser.id === 999) {
+                    toggleBtn.style.display = 'block';
+                } else {
+                    toggleBtn.style.display = 'none';
+                }
+
+                // Last Update Date
+                document.getElementById('lastPassUpdate').innerText = "تاريخ آخر تحديث: " + (user.lastPassUpdate || 'غير متوفر');
+
+                document.getElementById('editUserModal').style.display = 'flex'; 
+            }
+        }
+
         function saveEditUser() {
             const id = parseInt(document.getElementById('editUserId').value);
             const user = usersData[currentTab].find(u => u.id === id);
@@ -444,10 +551,30 @@
             user.job = document.getElementById('editUserJob').value;
             user.phone = document.getElementById('editUserPhone').value;
             user.login = document.getElementById('editUserLogin').value;
+            
+            // Save Password Changes
             const newPass = document.getElementById('editUserPass').value;
-            if(newPass.trim() !== "") user.pass = newPass; // Update Password only if entered
+            if (newPass !== user.pass) {
+                user.pass = newPass;
+                user.lastPassUpdate = new Date().toLocaleDateString('ar-BH');
+            }
+
             saveSystemData(); renderUserTable(); closeModal('editUserModal');
         }
+
+        function togglePasswordVisibility(fieldId, icon) {
+            const field = document.getElementById(fieldId);
+            if (field.type === "password") {
+                field.type = "text";
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                field.type = "password";
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
         function savePermissions() {
             const userId = parseInt(document.getElementById('permissionsModal').getAttribute('data-userid'));
             const user = usersData[currentTab].find(u => u.id === userId);
@@ -492,7 +619,16 @@
             data.forEach((user, index) => {
                 const tr = document.createElement('tr');
                 let infoCols = currentTab === 'teachers' ? `<td>${user.name}</td><td>${user.dept}</td>` : `<td>${user.name}</td><td>${user.job}</td><td>${user.phone}</td>`;
-                tr.innerHTML = `<td style="text-align:center;"><input type="checkbox" class="user-checkbox" value="${user.id}" style="margin-left:5px;"> ${index + 1}</td>${infoCols}<td><div class="action-btns"><button class="btn-xs view" onclick="viewUser(${user.id})">معاينة</button><button class="btn-xs edit" onclick="editUser(${user.id})">تعديل</button><button class="btn-xs delete" onclick="deleteUser(${user.id})">حذف</button><button class="btn-xs status" style="background-color:${user.status==='active'?'#ffc107':'#28a745'}" onclick="toggleStatus(${user.id})">${user.status === 'active' ? 'إلغاء التفعيل' : 'تفعيل'}</button>${currentTab !== 'teachers' ? `<button class="btn-xs access" onclick="openPermissions(${user.id})">صلاحيات الوصول</button>` : ''}</div></td>`;
+                tr.innerHTML = `
+                    <td style="text-align:center;"><input type="checkbox" class="user-checkbox" value="${user.id}" style="margin-left:5px;"> ${index + 1}</td>
+                    ${infoCols}
+                    <td><div class="action-btns">
+                        <button class="btn-xs view" onclick="viewUser(${user.id})">معاينة</button>
+                        <button class="btn-xs edit" onclick="editUser(${user.id})">تعديل</button>
+                        <button class="btn-xs delete" onclick="deleteUser(${user.id})">حذف</button>
+                        <button class="btn-xs status" style="background-color:${user.status==='active'?'#ffc107':'#28a745'}" onclick="toggleStatus(${user.id})">${user.status === 'active' ? 'إلغاء التفعيل' : 'تفعيل'}</button>
+                        ${currentTab !== 'teachers' ? `<button class="btn-xs access" onclick="openPermissions(${user.id})">صلاحيات الوصول</button>` : ''}
+                    </div></td>`;
                 tbody.appendChild(tr);
             });
         }
@@ -505,7 +641,6 @@
         function processCSV(input) { if (!input.files[0]) return; const reader = new FileReader(); reader.readAsText(input.files[0], 'UTF-8'); reader.onload = function(e) { const text = e.target.result; const rows = text.split('\n').map(row => row.split(',')); importedDataTemp = []; const tbody = document.getElementById('csvPreviewBody'); tbody.innerHTML = ''; for(let i=1; i<rows.length; i++) { const cols = rows[i].map(c => c.replace(/"/g, '').trim()); if(cols.length < 2) continue; let rowData = {}; let displayTxt = ""; if(currentTab === 'teachers') { rowData = { name: cols[0], dept: cols[1] }; displayTxt = `${rowData.name} (${rowData.dept})`; } else { rowData = { name: cols[0], job: cols[1], phone: cols[2], login: cols[3], pass: cols[4] }; displayTxt = `${rowData.name} - ${rowData.job}`; } importedDataTemp.push(rowData); const tr = document.createElement('tr'); tr.innerHTML = `<td><input type="checkbox" class="import-check" value="${i-1}"></td><td>${displayTxt}</td>`; tbody.appendChild(tr); } document.getElementById('importModal').style.display = 'flex'; input.value = ''; }; }
         function toggleImportAll(source) { document.querySelectorAll('.import-check').forEach(cb => cb.checked = source.checked); }
         function viewUser(id) { const user = usersData[currentTab].find(u => u.id === id); const content = document.getElementById('viewContent'); if(currentTab === 'teachers') { content.innerHTML = `<h3>${user.name}</h3><div class="detail-row"><span class="detail-label">القسم:</span><span>${user.dept}</span></div><div class="detail-row"><span class="detail-label">الحالة:</span><span>${user.status==='active'?'مفعل':'معطل'}</span></div>`; } else { content.innerHTML = `<h3>${user.name}</h3><div class="detail-row"><span class="detail-label">الوظيفة:</span><span>${user.job}</span></div><div class="detail-row"><span class="detail-label">رقم الهاتف:</span><span>${user.phone}</span></div><div class="detail-row"><span class="detail-label">الحالة:</span><span>${user.status==='active'?'مفعل':'معطل'}</span></div><div class="detail-row"><span class="detail-label">اسم المستخدم:</span><span>${user.login||'-'}</span></div>`; } document.getElementById('viewUserModal').style.display = 'flex'; }
-        function editUser(id) { const user = usersData[currentTab].find(u => u.id === id); document.getElementById('editUserId').value = id; if(currentTab === 'teachers') { alert('تعديل معلمة: ' + user.name); } else { document.getElementById('editUserName').value = user.name; document.getElementById('editUserJob').value = user.job; document.getElementById('editUserPhone').value = user.phone; document.getElementById('editUserLogin').value = user.login || ''; document.getElementById('editUserModal').style.display = 'flex'; } }
         function handleAddUserClick() { currentTab === 'teachers' ? openAddTeacherModal() : openAddUserModal(); }
         function openAddUserModal() { document.getElementById('newUserName').value=''; document.getElementById('addUserModal').style.display = 'flex'; }
         function openAddTeacherModal() { const deptSelect = document.getElementById('newTeacherDept'); deptSelect.innerHTML = ''; usersData.departments.forEach(dept => { if(dept.status === 'active') { const opt = document.createElement('option'); opt.value = dept.name; opt.innerText = dept.name; deptSelect.appendChild(opt); } }); document.getElementById('newTeacherName').value=''; document.getElementById('addTeacherModal').style.display = 'flex'; }
