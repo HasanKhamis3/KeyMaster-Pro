@@ -6,7 +6,6 @@
     <title>نظام متابعة جودة التعليم</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --primary: #1e4078; --text: #333; --bg: #f7f9fc; --danger: #da291c; --success: #28a745; }
         * { box-sizing: border-box; font-family: 'Cairo', sans-serif; }
@@ -44,9 +43,9 @@
         .user-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
         
         .custom-table { width: 100%; border-collapse: collapse; }
-        /* Centered Headers and Cells */
-        .custom-table th { background: #2c5aa0; color: white; padding: 12px; text-align: center; font-weight: bold; }
-        .custom-table td { padding: 12px; border-bottom: 1px solid #eee; background: white; text-align: center; vertical-align: middle; }
+        /* Centered Headers and Cells as requested */
+        .custom-table th { background: #2c5aa0; color: white; padding: 12px; text-align: center; font-weight: bold; border: 1px solid #ddd; }
+        .custom-table td { padding: 12px; border-bottom: 1px solid #eee; background: white; text-align: center; vertical-align: middle; border: 1px solid #eee; }
         
         /* Modals */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 5000; }
@@ -56,7 +55,15 @@
         .modal-body { padding: 20px; }
         .modal-footer { padding: 15px 20px; background: #f9f9f9; display: flex; gap: 10px; justify-content: flex-end; }
 
-        /* Settings Layout (Restored) */
+        /* View User Details Styling (Restored) */
+        .user-view-card { text-align: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+        .user-view-avatar { width: 90px; height: 90px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 15px auto; box-shadow: 0 5px 15px rgba(30, 64, 120, 0.2); }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: right; background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #eee; }
+        .info-item { display: flex; flex-direction: column; }
+        .info-item label { color: #888; font-size: 0.85rem; margin-bottom: 5px; font-weight: 600; }
+        .info-item span { font-weight: bold; color: #333; font-size: 1.1rem; }
+
+        /* Settings Layout */
         .settings-layout { display: flex; gap: 20px; align-items: flex-start; }
         .settings-sidebar { width: 250px; background: white; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; flex-shrink: 0; }
         .settings-sidebar-header { padding: 15px; border-bottom: 1px solid #eee; font-weight: bold; color: var(--primary); text-align: center; }
@@ -75,14 +82,6 @@
         .perm-list { border: 1px solid #eee; border-radius: 6px; padding: 10px; max-height: 300px; overflow-y: auto; }
         .perm-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
         .image-upload-container { border: 2px dashed #ccc; border-radius: 8px; padding: 20px; text-align: center; background-color: #fcfcfc; margin-bottom: 20px; position: relative; min-height: 150px; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
-        .upload-preview-box img { max-width: 100%; max-height: 150px; }
-
-        /* View Modal Details */
-        .user-view-card { text-align: center; margin-bottom: 20px; }
-        .user-view-avatar { width: 80px; height: 80px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 15px auto; }
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: right; background: #f9f9f9; padding: 15px; border-radius: 8px; }
-        .info-item label { display: block; color: #777; font-size: 0.85rem; margin-bottom: 5px; }
-        .info-item span { font-weight: bold; color: #333; }
 
         @media print { .sidebar, .login-wrapper { display: none; } .main-content { margin: 0; } }
     </style>
@@ -100,7 +99,6 @@
                     <i class="fas fa-eye password-icon" onclick="togglePass('loginPass', this)"></i>
                 </div>
                 <button type="submit" class="btn btn-primary">دخول</button>
-                <p id="loginError" style="color:red; font-size:0.9rem; margin-top:10px; display:none;">بيانات غير صحيحة أو حساب معطل</p>
             </form>
         </div>
     </div>
@@ -149,11 +147,11 @@
                 <table class="custom-table">
                     <thead>
                         <tr id="tableHeadRow">
-                            <th width="5%">الترتيب</th>
+                            <th width="10%">الترتيب</th>
                             <th width="25%">الاسم</th>
                             <th width="20%">الوظيفة</th>
                             <th width="15%">رقم الهاتف</th>
-                            <th width="35%">إدارة المستخدمين</th>
+                            <th width="30%">إدارة المستخدمين</th>
                         </tr>
                     </thead>
                     <tbody id="usersTableBody"></tbody>
@@ -180,16 +178,13 @@
                             <h3 style="color:var(--primary); margin-bottom:20px; border-bottom:1px solid #eee; padding-bottom:10px;">الإعدادات العامة</h3>
                             <div class="form-group"><label>اسم المدرسة</label><input type="text" id="confSchool" class="form-control" value="مدرسة مدينة حمد الابتدائية للبنات"></div>
                             <div class="form-group"><label>العام الدراسي</label><input type="text" id="confYear" class="form-control" value="2025 / 2026م"></div>
-                            <div class="form-group"><label>شعار الوزارة</label><div class="image-upload-container"><button class="btn" style="background:#28a745; color:white;">تحميل شعار الوزارة</button></div></div>
-                            <div class="form-group"><label>شعار المدرسة</label><div class="image-upload-container"><button class="btn" style="background:#28a745; color:white;">تحميل شعار المدرسة</button></div></div>
-                            <div class="form-group"><label>ختم المدرسة</label><div class="image-upload-container"><button class="btn" style="background:#28a745; color:white;">تحميل ختم المدرسة</button></div></div>
                             <button class="btn btn-primary" onclick="alert('تم الحفظ')">حفظ الإعدادات</button>
                         </div>
-                        <div id="rep" class="setting-tab-pane"><h3>إعدادات تقرير الجودة</h3><p>خيارات التقرير...</p></div>
-                        <div id="sig" class="setting-tab-pane"><h3>إعدادات التوقيعات</h3><p>تحديد الموقعين...</p></div>
-                        <div id="vis" class="setting-tab-pane"><h3>ترتيب الزوار</h3><p>ترتيب ظهور الزوار...</p></div>
-                        <div id="fot" class="setting-tab-pane"><h3>إعدادات التذييل</h3><input class="form-control" placeholder="نص التذييل"></div>
-                        <div id="log" class="setting-tab-pane"><h3>سجل النظام</h3><p>السجلات...</p></div>
+                        <div id="rep" class="setting-tab-pane"><h3>إعدادات تقرير الجودة</h3></div>
+                        <div id="sig" class="setting-tab-pane"><h3>إعدادات التوقيعات</h3></div>
+                        <div id="vis" class="setting-tab-pane"><h3>ترتيب الزوار</h3></div>
+                        <div id="fot" class="setting-tab-pane"><h3>إعدادات التذييل</h3></div>
+                        <div id="log" class="setting-tab-pane"><h3>سجل النظام</h3></div>
                     </div>
                 </div>
             </div>
@@ -275,7 +270,7 @@
                 ['admins', 'senior', 'middle', 'teachers'].forEach(grp => {
                     if(DB[grp]) DB[grp].forEach(u => { 
                         if(!u.permissions) u.permissions = JSON.parse(JSON.stringify(DEFAULT_PERMS));
-                        if(!u.dateAdded) u.dateAdded = '2025/01/01'; // Ensure date exists
+                        if(!u.dateAdded) u.dateAdded = '2025/01/01'; 
                     });
                 });
             } else {
@@ -353,9 +348,9 @@
                 const el = document.getElementById('nav-' + sec.id);
                 if (el) {
                     if (perms[sec.id] && perms[sec.id].view === false) {
-                        el.style.display = 'none'; // Hide
+                        el.style.display = 'none'; 
                     } else {
-                        el.style.display = 'block'; // Show
+                        el.style.display = 'block'; 
                     }
                 }
             });
@@ -374,7 +369,6 @@
             if (target) target.classList.add('active');
             if (link) link.classList.add('active');
             
-            // Special handling for settings layout
             if(pageId === 'settings') {
                 document.getElementById('settings').style.display = 'block';
             }
@@ -395,16 +389,19 @@
             
             const list = DB[CURRENT_TAB] || [];
             list.forEach((u, idx) => {
-                let row = `<td>${idx+1}</td><td>${u.name}</td>`;
+                // Building rows based on requested headers: Rank, Name, Job, Phone, Management
+                let row = `<td>${idx+1}</td>`;
+                row += `<td>${u.name}</td>`;
                 row += `<td>${u.job || (CURRENT_TAB === 'teachers' ? u.dept : '-')}</td>`;
                 row += `<td>${u.phone || '-'}</td>`;
                 
+                // Action Buttons
                 row += `<td>
                     <div style="display:flex; justify-content:center; gap:5px;">
-                        <button class="btn" style="padding:5px; background:#ffc107; color:black; font-size:0.8rem;" onclick="viewUser(${u.id})">معاينة</button>
-                        <button class="btn" style="padding:5px; background:#28a745; color:white; font-size:0.8rem;" onclick="editUser(${u.id})">تعديل</button>
-                        <button class="btn" style="padding:5px; background:#dc3545; color:white; font-size:0.8rem;" onclick="deleteUser(${u.id})">حذف</button>
-                        <button class="btn" style="padding:5px; background:#6c757d; color:white; font-size:0.8rem;" onclick="openPerms(${u.id})">الصلاحيات</button>
+                        <button class="btn" style="padding:5px 10px; background:#ffc107; color:black; font-size:0.8rem;" onclick="viewUser(${u.id})">معاينة</button>
+                        <button class="btn" style="padding:5px 10px; background:#28a745; color:white; font-size:0.8rem;" onclick="editUser(${u.id})">تعديل</button>
+                        <button class="btn" style="padding:5px 10px; background:#dc3545; color:white; font-size:0.8rem;" onclick="deleteUser(${u.id})">حذف</button>
+                        <button class="btn" style="padding:5px 10px; background:#6c757d; color:white; font-size:0.8rem;" onclick="openPerms(${u.id})">الصلاحيات</button>
                     </div>
                 </td>`;
                 
@@ -414,11 +411,12 @@
             });
         }
 
-        // === Restore View Modal Logic ===
+        // === View User Function (Updated for Details) ===
         function viewUser(id) {
             const u = DB[CURRENT_TAB].find(x => x.id === id);
             const content = document.getElementById('viewUserContent');
             
+            // Recreating the detailed view: Name, Job, Phone, Date Added, Status
             content.innerHTML = `
                 <div class="user-view-card">
                     <div class="user-view-avatar">${u.name.charAt(0)}</div>
@@ -469,7 +467,6 @@
 
             saveDB();
 
-            // Force update if editing self
             if (CURRENT_USER.id === u.id) {
                 CURRENT_USER = u;
                 applySidebarPermissions();
@@ -482,6 +479,7 @@
         // === Utils & Modals ===
         function openAddUserModal() { document.getElementById('addUserModal').style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        
         function saveNewUser() {
             const newUser = {
                 id: Date.now(),
@@ -491,15 +489,29 @@
                 login: document.getElementById('addLogin').value,
                 pass: document.getElementById('addPass').value,
                 status: 'active',
-                dateAdded: new Date().toLocaleDateString('en-GB'),
+                dateAdded: new Date().toLocaleDateString('en-GB'), // Capture current date
                 permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS))
             };
             DB[CURRENT_TAB].push(newUser);
             saveDB();
             renderTable();
             closeModal('addUserModal');
+            // Clear form
+            document.getElementById('addUserForm').reset();
         }
         
+        function deleteUser(id) {
+            if(confirm('هل أنت متأكد من الحذف؟')) {
+                DB[CURRENT_TAB] = DB[CURRENT_TAB].filter(u => u.id !== id);
+                saveDB();
+                renderTable();
+            }
+        }
+        
+        function editUser(id) {
+            alert('وظيفة التعديل قيد التطوير');
+        }
+
         function togglePass(id, icon) {
             const input = document.getElementById(id);
             if(input.type === 'password') { input.type = 'text'; icon.classList.replace('fa-eye', 'fa-eye-slash'); }
