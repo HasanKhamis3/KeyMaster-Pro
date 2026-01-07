@@ -14,158 +14,81 @@
         :root {
             --brand-red: #da291c;
             --brand-dark: #2b2b2b;
-            --primary: #1e4078; /* أزرق غامق */
+            --primary: #1e4078;
             --primary-light: #f0f4f8;
             --accent-blue: #2c5aa0;
             --text-main: #333;
             --text-light: #777;
             --border-color: #e0e0e0;
             --sidebar-width: 260px;
-            --success: #28a745; /* أخضر */
-            --danger: #dc3545; /* أحمر */
-            --warning: #ffc107; /* أصفر */
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
             --info: #17a2b8;
             --shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
 
-        /* --- تنسيقات النظام العامة --- */
         * { box-sizing: border-box; outline: none; }
         body { margin: 0; background-color: #f7f9fc; font-family: 'Cairo', sans-serif; color: var(--text-main); }
         
-        /* شاشة تسجيل الدخول */
-        .login-wrapper {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
-            background: linear-gradient(135deg, var(--primary), var(--brand-dark));
-            display: flex; justify-content: center; align-items: center; z-index: 9999;
-        }
-        .login-card {
-            background: white; padding: 40px; border-radius: 12px; width: 100%; max-width: 400px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center;
-        }
+        /* Login */
+        .login-wrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: linear-gradient(135deg, var(--primary), var(--brand-dark)); display: flex; justify-content: center; align-items: center; z-index: 9999; }
+        .login-card { background: white; padding: 40px; border-radius: 12px; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center; }
         .error-msg { color: var(--danger); font-size: 0.9rem; margin-top: 10px; display: none; font-weight: bold; }
 
-        /* الهيكل الرئيسي */
+        /* Layout */
         .app-container { display: flex; min-height: 100vh; }
-        
-        /* القائمة الجانبية */
-        .sidebar {
-            width: var(--sidebar-width); background: white; border-left: 1px solid var(--border-color);
-            position: fixed; right: 0; top: 0; height: 100%; z-index: 100;
-            display: flex; flex-direction: column; transition: 0.3s;
-        }
+        .sidebar { width: var(--sidebar-width); background: white; border-left: 1px solid var(--border-color); position: fixed; right: 0; top: 0; height: 100%; z-index: 100; display: flex; flex-direction: column; transition: 0.3s; }
         .sidebar-header { padding: 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--primary-light); }
         .sidebar-header h2 { font-size: 1.1rem; margin: 0; color: var(--primary); font-weight: 700; }
         
         .nav-links { list-style: none; padding: 20px 0; margin: 0; flex: 1; }
-        .nav-links li { margin-bottom: 5px; display: none; /* مخفي افتراضياً للصلاحيات */ }
-        .nav-links a {
-            display: flex; align-items: center; padding: 12px 25px; color: var(--text-light);
-            text-decoration: none; transition: 0.3s; font-weight: 600; font-size: 0.95rem; border-right: 3px solid transparent;
-            cursor: pointer;
-        }
-        .nav-links a:hover, .nav-links a.active {
-            color: var(--primary); background: var(--primary-light); border-right-color: var(--primary);
-        }
+        .nav-links li { margin-bottom: 5px; display: block; /* Show by default, hide via JS if needed */ }
+        .nav-links a { display: flex; align-items: center; padding: 12px 25px; color: var(--text-light); text-decoration: none; transition: 0.3s; font-weight: 600; font-size: 0.95rem; border-right: 3px solid transparent; cursor: pointer; }
+        .nav-links a:hover, .nav-links a.active { color: var(--primary); background: var(--primary-light); border-right-color: var(--primary); }
         .nav-links a i { margin-left: 10px; width: 20px; text-align: center; }
 
-        /* المحتوى الرئيسي */
-        .main-content {
-            margin-right: var(--sidebar-width); flex: 1; padding: 30px; width: calc(100% - var(--sidebar-width));
-        }
-
-        .top-header {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;
-        }
+        .main-content { margin-right: var(--sidebar-width); flex: 1; padding: 30px; width: calc(100% - var(--sidebar-width)); }
+        .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .user-profile { display: flex; align-items: center; gap: 10px; background: white; padding: 8px 15px; border-radius: 30px; box-shadow: var(--shadow); }
         .avatar { width: 35px; height: 35px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
 
-        .section-card {
-            background: white; border-radius: 10px; padding: 25px; box-shadow: var(--shadow); margin-bottom: 25px;
-            display: none; animation: fadeIn 0.4s ease;
-        }
+        .section-card { background: white; border-radius: 10px; padding: 25px; box-shadow: var(--shadow); margin-bottom: 25px; display: none; animation: fadeIn 0.4s ease; }
         .section-card.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card-title { font-size: 1.2rem; margin-bottom: 20px; color: var(--brand-dark); border-bottom: 2px solid var(--primary-light); padding-bottom: 10px; }
-
-        /* عناصر التحكم والأزرار */
-        .btn {
-            padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-family: inherit; font-weight: 600;
-            transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem; text-decoration: none;
-        }
-        .btn-primary { background: var(--primary); color: white; } /* أزرق */
-        .btn-success { background: var(--success); color: white; } /* أخضر */
-        .btn-danger { background: var(--danger); color: white; } /* أحمر */
-        .btn-warning { background: var(--warning); color: #333; } /* أصفر */
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-family: inherit; font-weight: 600; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem; text-decoration: none; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-warning { background: var(--warning); color: #333; }
         .btn-secondary { background: #e2e8f0; color: var(--text-main); }
         .btn:hover { opacity: 0.9; transform: translateY(-1px); }
         
-        .form-control {
-            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 15px;
-            font-family: inherit; font-size: 0.95rem; background-color: #fbfbfb; transition: 0.3s;
-        }
+        .form-control { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 15px; font-family: inherit; font-size: 0.95rem; background-color: #fbfbfb; transition: 0.3s; }
         .form-control:focus { border-color: var(--primary); background: white; }
         label { display: block; margin-bottom: 8px; font-weight: 600; color: #555; }
 
-        /* ==========================================================================
-           تنسيقات رفع الصور (محسنة)
-           ========================================================================== */
-        .image-upload-container {
-            border: 2px dashed #ccc; border-radius: 8px; padding: 20px; text-align: center;
-            background-color: #fcfcfc; margin-bottom: 20px; position: relative;
-            min-height: 150px; display: flex; align-items: center; justify-content: center; flex-direction: column;
-            transition: 0.3s;
-        }
-        .image-upload-container:hover { border-color: var(--primary); background-color: #f0f4f8; }
-        
-        .upload-preview-box {
-            position: relative; display: none; width: 100%; height: 100%; justify-content: center; align-items: center;
-        }
-        .upload-preview-box.has-image { display: flex; }
-        .upload-preview-box img {
-            max-width: 100%; max-height: 150px; cursor: zoom-in; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .remove-image-btn {
-            position: absolute; top: -10px; right: -10px; background: var(--danger); color: white;
-            border-radius: 50%; width: 25px; height: 25px; cursor: pointer; display: flex; align-items: center; justify-content: center;
-            font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-        .upload-placeholder { pointer-events: none; }
-        
-        /* نافذة تكبير الصورة */
-        .lightbox {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8);
-            display: none; justify-content: center; align-items: center; z-index: 10000;
-        }
-        .lightbox img { max-width: 90%; max-height: 90%; border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        /* Password Field */
+        .password-wrapper { position: relative; width: 100%; }
+        .password-wrapper input { padding-left: 40px; }
+        .password-toggle-icon { position: absolute; left: 15px; top: 22px; transform: translateY(-50%); cursor: pointer; color: #777; font-size: 1rem; z-index: 10; }
+        .login-card .password-toggle-icon { top: 22px; }
+        .password-date { font-size: 0.8rem; color: #888; margin-top: -10px; margin-bottom: 15px; display: block; text-align: left; }
 
-        /* ==========================================================================
-           تنسيقات إدارة المستخدمين
-           ========================================================================== */
-        .user-tabs {
-            display: flex; gap: 20px; border-bottom: 2px solid #eee; margin-bottom: 20px;
-        }
-        .user-tab {
-            padding: 10px 20px; cursor: pointer; font-weight: bold; color: #777; border-bottom: 3px solid transparent; transition: 0.3s;
-        }
+        /* User Management */
+        .user-tabs { display: flex; gap: 20px; border-bottom: 2px solid #eee; margin-bottom: 20px; }
+        .user-tab { padding: 10px 20px; cursor: pointer; font-weight: bold; color: #777; border-bottom: 3px solid transparent; transition: 0.3s; }
         .user-tab:hover { color: var(--primary); }
         .user-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
 
-        .toolbar {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;
-        }
+        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
         .bulk-actions { display: flex; gap: 10px; align-items: center; }
 
-        /* الجداول - تنسيق موسط */
-        .custom-table {
-            width: 100%; border-collapse: separate; border-spacing: 0; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;
-        }
-        .custom-table th {
-            background-color: #2c5aa0; color: white; padding: 12px 15px; text-align: center; font-weight: 600;
-        }
-        .custom-table td {
-            background-color: white; padding: 12px 15px; border-bottom: 1px solid #eee; vertical-align: middle; text-align: center;
-        }
+        /* Tables */
+        .custom-table { width: 100%; border-collapse: separate; border-spacing: 0; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; }
+        .custom-table th { background-color: #2c5aa0; color: white; padding: 12px 15px; text-align: center; font-weight: 600; }
+        .custom-table td { background-color: white; padding: 12px 15px; border-bottom: 1px solid #eee; vertical-align: middle; text-align: center; }
         .custom-table tr:hover td { background-color: #f9f9f9; }
 
         .action-btns { display: flex; gap: 5px; justify-content: center; }
@@ -177,43 +100,46 @@
         .btn-xs.access { background: #17a2b8; }
 
         /* Modals */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5);
-            display: none; justify-content: center; align-items: center; z-index: 5000;
-        }
-        .modal-box {
-            background: white; width: 600px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            overflow: hidden; animation: slideDown 0.3s ease; max-height: 90vh; overflow-y: auto;
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 5000; }
+        .modal-box { background: white; width: 600px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; animation: slideDown 0.3s ease; max-height: 90vh; overflow-y: auto; }
         @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .modal-header {
-            padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;
-        }
+        .modal-header { padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
         .modal-title { font-weight: bold; color: var(--primary); font-size: 1.1rem; }
         .close-modal { cursor: pointer; font-size: 1.2rem; color: #999; }
         .modal-body { padding: 20px; }
         .modal-footer { padding: 15px 20px; background: #f9f9f9; display: flex; gap: 10px; justify-content: flex-end; }
 
-        /* تفاصيل المعاينة */
+        /* View Modal Details */
         .user-view-card { text-align: center; margin-bottom: 20px; }
         .user-view-avatar { width: 80px; height: 80px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 15px auto; }
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: right; background: #f9f9f9; padding: 15px; border-radius: 8px; }
         .info-item label { display: block; color: #777; font-size: 0.85rem; margin-bottom: 5px; }
         .info-item span { font-weight: bold; color: #333; }
 
-        /* الصلاحيات */
+        /* Permissions */
         .perm-list { max-height: 400px; overflow-y: auto; padding: 10px; border: 1px solid #eee; border-radius: 8px; }
         .perm-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 10px; border-bottom: 1px solid #eee; }
         .perm-item:last-child { border-bottom: none; }
+        .perm-checks { display: flex; gap: 15px; }
         
-        /* كلمة المرور */
-        .password-wrapper { position: relative; }
-        .password-wrapper input { padding-left: 40px; }
-        .password-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #777; }
+        /* CSV Import */
+        .csv-import-list { max-height: 300px; overflow-y: auto; border: 1px solid #eee; margin-top: 10px; }
+        .csv-import-list table { width: 100%; border-collapse: collapse; }
+        .csv-import-list th, .csv-import-list td { padding: 8px; border-bottom: 1px solid #eee; text-align: right; font-size: 0.9rem; }
+        .csv-import-list th { background: #f9f9f9; position: sticky; top: 0; }
 
-        /* ==========================================================================
-           تنسيقات الإعدادات (من المرفق)
-           ========================================================================== */
+        /* Image Upload */
+        .image-upload-container { border: 2px dashed #ccc; border-radius: 8px; padding: 20px; text-align: center; background-color: #fcfcfc; margin-bottom: 20px; position: relative; min-height: 150px; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
+        .image-upload-container:hover { border-color: var(--primary); background-color: #f0f4f8; }
+        .upload-preview-box { position: relative; display: none; width: 100%; height: 100%; justify-content: center; align-items: center; }
+        .upload-preview-box.has-image { display: flex; }
+        .upload-preview-box img { max-width: 100%; max-height: 150px; cursor: zoom-in; border-radius: 4px; }
+        .remove-image-btn { position: absolute; top: -10px; right: -10px; background: var(--danger); color: white; border-radius: 50%; width: 25px; height: 25px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .upload-placeholder { pointer-events: none; }
+        .lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 10000; }
+        .lightbox img { max-width: 90%; max-height: 90%; border-radius: 8px; }
+
+        /* Settings Layout (Requested Update) */
         .settings-layout { display: flex; gap: 20px; align-items: flex-start; }
         .settings-sidebar { width: 250px; background: white; border-radius: 10px; box-shadow: var(--shadow); overflow: hidden; flex-shrink: 0; }
         .settings-sidebar-header { padding: 15px; border-bottom: 1px solid #eee; font-weight: bold; color: var(--primary); text-align: center; }
@@ -223,100 +149,13 @@
         .settings-content-area { flex-grow: 1; background: white; border-radius: 10px; box-shadow: var(--shadow); padding: 30px; min-height: 500px; }
         .setting-tab-pane { display: none; }
         .setting-tab-pane.active { display: block; animation: fadeIn 0.3s; }
-        
-        /* طباعة */
-        @media print {
-            .sidebar, .top-header, .login-wrapper, .settings-layout, .toolbar, .user-tabs { display: none !important; }
-            .main-content { margin: 0; padding: 0; width: 100%; }
-        }
+
+        @media print { .sidebar, .top-header, .login-wrapper { display: none !important; } .main-content { width: 100%; } }
     </style>
 </head>
 <body>
 
     <div id="lightbox" class="lightbox" onclick="this.style.display='none'"><img id="lightboxImg" src="" alt="Full size"></div>
-
-    <div id="addUserModal" class="modal-overlay">
-        <div class="modal-box">
-            <div class="modal-header"><div class="modal-title">إضافة مستخدم جديد</div><div class="close-modal" onclick="closeModal('addUserModal')">&times;</div></div>
-            <div class="modal-body">
-                <form id="addUserForm">
-                    <label>الاسم الكامل</label><input type="text" id="newUserName" class="form-control" required>
-                    <label>الوظيفة</label><input type="text" id="newUserJob" class="form-control">
-                    <label>رقم الهاتف</label><input type="text" id="newUserPhone" class="form-control">
-                    <label>إذن الوصول</label><select id="newUserAccess" class="form-control"><option value="allow">مسموح</option><option value="deny">مرفوض</option></select>
-                    <label>اسم المستخدم</label><input type="text" id="newUserLogin" class="form-control">
-                    <label>كلمة المرور</label><input type="password" id="newUserPass" class="form-control">
-                </form>
-            </div>
-            <div class="modal-footer"><button class="btn btn-primary" onclick="submitNewUser()">حفظ</button><button class="btn btn-success" onclick="closeModal('addUserModal')">إلغاء</button></div>
-        </div>
-    </div>
-
-    <div id="editUserModal" class="modal-overlay">
-        <div class="modal-box">
-            <div class="modal-header"><div class="modal-title">تعديل بيانات المستخدم</div><div class="close-modal" onclick="closeModal('editUserModal')">&times;</div></div>
-            <div class="modal-body">
-                <input type="hidden" id="editUserId">
-                <label>الاسم الكامل</label><input type="text" id="editUserName" class="form-control">
-                <label>الوظيفة</label><input type="text" id="editUserJob" class="form-control">
-                <label>رقم الهاتف</label><input type="text" id="editUserPhone" class="form-control">
-                <label>اسم المستخدم</label><input type="text" id="editUserLogin" class="form-control">
-                <label>كلمة المرور</label>
-                <div class="password-wrapper">
-                    <input type="password" id="editUserPass" class="form-control" placeholder="ادخل كلمة المرور الجديدة">
-                    <i class="fas fa-eye password-icon" id="togglePassBtn" onclick="togglePass('editUserPass', this)"></i>
-                </div>
-                <small id="lastPassUpdate" class="password-date">تاريخ آخر تحديث: -</small>
-            </div>
-            <div class="modal-footer"><button class="btn btn-primary" onclick="saveEditUser()">حفظ</button><button class="btn btn-success" onclick="closeModal('editUserModal')">إلغاء</button></div>
-        </div>
-    </div>
-
-    <div id="viewUserModal" class="modal-overlay">
-        <div class="modal-box">
-            <div class="modal-header"><div class="modal-title">معاينة بيانات المستخدم</div><div class="close-modal" onclick="closeModal('viewUserModal')">&times;</div></div>
-            <div class="modal-body" id="viewUserContent">
-                </div>
-            <div class="modal-footer"><button class="btn btn-success" onclick="closeModal('viewUserModal')">إغلاق</button></div>
-        </div>
-    </div>
-
-    <div id="permissionsModal" class="modal-overlay">
-        <div class="modal-box">
-            <div class="modal-header"><div class="modal-title">إدارة صلاحيات الوصول</div><div class="close-modal" onclick="closeModal('permissionsModal')">&times;</div></div>
-            <div class="modal-body">
-                <div style="font-weight:bold; margin-bottom:10px; color:var(--primary);" id="permUserName"></div>
-                <div class="permissions-list" id="permListContainer"></div>
-            </div>
-            <div class="modal-footer"><button class="btn btn-primary" onclick="savePermissions()">حفظ الصلاحيات</button><button class="btn btn-success" onclick="closeModal('permissionsModal')">إلغاء</button></div>
-        </div>
-    </div>
-
-    <div id="addTeacherModal" class="modal-overlay">
-        <div class="modal-box">
-            <div class="modal-header"><div class="modal-title">إضافة معلمة جديدة</div><div class="close-modal" onclick="closeModal('addTeacherModal')">&times;</div></div>
-            <div class="modal-body">
-                <form id="addTeacherForm">
-                    <label>الاسم الكامل</label><input type="text" id="newTeacherName" class="form-control">
-                    <label>القسم</label><select id="newTeacherDept" class="form-control"></select>
-                </form>
-            </div>
-            <div class="modal-footer"><button class="btn btn-primary" onclick="submitNewTeacher()">حفظ</button><button class="btn btn-success" onclick="closeModal('addTeacherModal')">إلغاء</button></div>
-        </div>
-    </div>
-    
-    <div id="addDeptModal" class="modal-overlay">
-        <div class="modal-box">
-            <div class="modal-header"><div class="modal-title">إضافة قسم</div><div class="close-modal" onclick="closeModal('addDeptModal')">&times;</div></div>
-            <div class="modal-body">
-                <form id="addDeptForm">
-                    <label>اسم القسم</label><input type="text" id="newDeptName" class="form-control">
-                    <label>الترتيب</label><input type="number" id="newDeptOrder" class="form-control">
-                </form>
-            </div>
-            <div class="modal-footer"><button class="btn btn-primary" onclick="submitNewDept()">حفظ</button><button class="btn btn-success" onclick="closeModal('addDeptModal')">إلغاء</button></div>
-        </div>
-    </div>
 
     <div id="loginPage" class="login-wrapper">
         <div class="login-card">
@@ -326,7 +165,7 @@
                 <input type="text" id="loginUser" class="form-control" placeholder="اسم المستخدم" required>
                 <div class="password-wrapper" style="margin-bottom:15px;">
                     <input type="password" id="loginPass" class="form-control" placeholder="كلمة المرور" required>
-                    <i class="fas fa-eye password-icon" onclick="togglePass('loginPass', this)"></i>
+                    <i class="fas fa-eye password-toggle-icon" onclick="togglePasswordVisibility('loginPass', this)"></i>
                 </div>
                 <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">تسجيل الدخول</button>
                 <div id="loginError" class="error-msg">خطأ: المستخدم معطل.</div>
@@ -373,21 +212,24 @@
                     <div class="toolbar">
                         <div class="btn-group">
                             <button class="btn btn-primary" style="background:#2c5aa0;" id="addUserBtn" onclick="handleAddUserClick()">إضافة اسم جديد</button>
+                            <button class="btn btn-success" onclick="exportCSV()">تصدير CSV</button>
+                            <button class="btn btn-success" style="opacity:0.9" onclick="document.getElementById('csvInput').click()">استيراد CSV</button>
+                            <input type="file" id="csvInput" style="display:none" onchange="processCSV(this)">
                         </div>
                     </div>
-                    <div style="margin-bottom: 15px;">
+                    
+                    <div style="margin-bottom: 15px; display:flex; justify-content:space-between; align-items:center;">
+                        <div class="bulk-actions">
+                            <button class="btn btn-xs delete" onclick="bulkAction('delete')">حذف المحدد</button>
+                            <button class="btn btn-xs edit" onclick="bulkAction('activate')">تفعيل المحدد</button>
+                            <button class="btn btn-xs status" onclick="bulkAction('deactivate')">إلغاء تفعيل المحدد</button>
+                            <span style="font-size:0.9rem; margin-right:5px;">تحديد الكل <input type="checkbox" id="selectAllUsers" onchange="toggleSelectAll(this, 'usersTableBody')"></span>
+                        </div>
                         <h4 style="color:var(--primary); margin:0;" id="table-heading">إدارة القيادة العليا</h4>
                     </div>
+
                     <table class="custom-table">
-                        <thead>
-                            <tr>
-                                <th width="10%">الترتيب</th>
-                                <th width="25%">الاسم</th>
-                                <th width="20%">الوظيفة</th>
-                                <th width="15%">رقم الهاتف</th>
-                                <th width="30%">إدارة المستخدمين</th>
-                            </tr>
-                        </thead>
+                        <thead id="usersTableHead"></thead>
                         <tbody id="usersTableBody"></tbody>
                     </table>
                 </div>
@@ -409,6 +251,7 @@
                     <div class="settings-sidebar">
                         <div class="settings-sidebar-header">الإعدادات</div>
                         <div class="settings-nav-item active" onclick="switchSettingTab('general', this)">الإعدادات العامة</div>
+                        <div class="settings-nav-item" onclick="switchSettingTab('report-config', this)">إعدادات تقرير الجودة</div>
                         <div class="settings-nav-item" onclick="switchSettingTab('signatures', this)">إعدادات التوقيعات</div>
                         <div class="settings-nav-item" onclick="switchSettingTab('visitors', this)">ترتيب الزوار</div>
                         <div class="settings-nav-item" onclick="switchSettingTab('footer', this)">إعدادات التذييل</div>
@@ -417,18 +260,31 @@
 
                     <div class="settings-content-area">
                         <div id="general" class="setting-tab-pane active">
-                            <h3 style="border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:20px; color:var(--primary);">الإعدادات العامة</h3>
+                            <h3 class="setting-header" style="border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:20px; color:var(--primary);">الإعدادات العامة</h3>
                             <div class="form-group"><label>اسم المدرسة</label><input type="text" id="schoolNameInput" class="form-control" value="مدرسة مدينة حمد الابتدائية للبنات"></div>
                             <div class="form-group"><label>العام الدراسي</label><input type="text" id="yearInput" class="form-control" value="2025 / 2026م"></div>
-                            <div class="form-group"><label>شعار الوزارة</label><div class="image-upload-container" id="upload-ministry"><div class="upload-placeholder"><button class="btn btn-success" onclick="triggerUpload('ministry-file')"><i class="fas fa-upload"></i> تحميل شعار الوزارة</button></div><div class="upload-preview-box"><div class="remove-image-btn" onclick="removeImage('ministry-file', 'upload-ministry')">&times;</div><img src="" onclick="expandImage(this.src)"></div><input type="file" id="ministry-file" style="display:none" onchange="previewImage(this, 'upload-ministry')"></div></div>
-                            <div class="form-group"><label>شعار المدرسة</label><div class="image-upload-container" id="upload-school"><div class="upload-placeholder"><button class="btn btn-success" onclick="triggerUpload('school-file')"><i class="fas fa-upload"></i> تحميل شعار المدرسة</button></div><div class="upload-preview-box"><div class="remove-image-btn" onclick="removeImage('school-file', 'upload-school')">&times;</div><img src="" onclick="expandImage(this.src)"></div><input type="file" id="school-file" style="display:none" onchange="previewImage(this, 'upload-school')"></div></div>
-                            <div class="form-group"><label>ختم المدرسة</label><div class="image-upload-container" id="upload-stamp"><div class="upload-placeholder"><button class="btn btn-success" onclick="triggerUpload('stamp-file')"><i class="fas fa-upload"></i> تحميل ختم المدرسة</button></div><div class="upload-preview-box"><div class="remove-image-btn" onclick="removeImage('stamp-file', 'upload-stamp')">&times;</div><img src="" onclick="expandImage(this.src)"></div><input type="file" id="stamp-file" style="display:none" onchange="previewImage(this, 'upload-stamp')"></div></div>
+                            
+                            <div class="form-group"><label>شعار الوزارة</label><div class="image-upload-container" id="upload-ministry"><div class="upload-placeholder"><button class="btn btn-success" onclick="triggerUpload('ministry-file')"><i class="fas fa-upload"></i> تحميل شعار الوزارة</button><div class="upload-hint" style="margin-top:10px; color:#999;">الحجم المقترح: 200x80 بكسل</div></div><div class="upload-preview-box"><div class="remove-image-btn" onclick="removeImage('ministry-file', 'upload-ministry')">&times;</div><img src="" onclick="expandImage(this.src)"></div><input type="file" id="ministry-file" style="display:none" onchange="previewImage(this, 'upload-ministry')"></div></div>
+                            <div class="form-group"><label>شعار المدرسة</label><div class="image-upload-container" id="upload-school"><div class="upload-placeholder"><button class="btn btn-success" onclick="triggerUpload('school-file')"><i class="fas fa-upload"></i> تحميل شعار المدرسة</button><div class="upload-hint" style="margin-top:10px; color:#999;">الحجم المقترح: 200x80 بكسل</div></div><div class="upload-preview-box"><div class="remove-image-btn" onclick="removeImage('school-file', 'upload-school')">&times;</div><img src="" onclick="expandImage(this.src)"></div><input type="file" id="school-file" style="display:none" onchange="previewImage(this, 'upload-school')"></div></div>
+                            <div class="form-group"><label>ختم المدرسة</label><div class="image-upload-container" id="upload-stamp"><div class="upload-placeholder"><button class="btn btn-success" onclick="triggerUpload('stamp-file')"><i class="fas fa-upload"></i> تحميل ختم المدرسة</button><div class="upload-hint" style="margin-top:10px; color:#999;">الحجم المقترح: 200x80 بكسل</div></div><div class="upload-preview-box"><div class="remove-image-btn" onclick="removeImage('stamp-file', 'upload-stamp')">&times;</div><img src="" onclick="expandImage(this.src)"></div><input type="file" id="stamp-file" style="display:none" onchange="previewImage(this, 'upload-stamp')"></div></div>
+                            
                             <button class="btn btn-success" onclick="saveData('general')">حفظ الإعدادات</button>
                         </div>
-                        <div id="signatures" class="setting-tab-pane"><h3>إعدادات التوقيعات</h3><div class="form-group"><label>مدير المدرسة</label><input class="form-control" value="أ. مريم حسن"></div><button class="btn btn-success">حفظ</button></div>
-                        <div id="visitors" class="setting-tab-pane"><h3>ترتيب الزوار</h3><p>خيارات الترتيب...</p></div>
-                        <div id="footer" class="setting-tab-pane"><h3>إعدادات التذييل</h3><input class="form-control" placeholder="نص التذييل"><button class="btn btn-success">حفظ</button></div>
-                        <div id="logs" class="setting-tab-pane"><h3>سجل النظام</h3><p>السجلات...</p></div>
+
+                        <div id="report-config" class="setting-tab-pane">
+                            <h3 class="setting-header">إعدادات تقرير الجودة</h3>
+                            <p>خيارات التقرير...</p>
+                        </div>
+
+                        <div id="signatures" class="setting-tab-pane">
+                            <h3 class="setting-header">إعدادات التوقيعات</h3>
+                            <div class="form-group"><label>مدير المدرسة</label><input class="form-control" value="أ. مريم حسن"></div>
+                            <button class="btn btn-success" onclick="saveData('signatures')">حفظ الإعدادات</button>
+                        </div>
+
+                        <div id="visitors" class="setting-tab-pane"><h3 class="setting-header">ترتيب الزوار</h3><p>محتوى الترتيب...</p></div>
+                        <div id="footer" class="setting-tab-pane"><h3 class="setting-header">إعدادات التذييل</h3><input class="form-control" placeholder="نص التذييل"><button class="btn btn-success" style="margin-top:10px;">حفظ إعدادات التذييل</button></div>
+                        <div id="logs" class="setting-tab-pane"><h3 class="setting-header">سجل النظام</h3><p>السجلات...</p></div>
                     </div>
                  </div>
             </section>
@@ -437,12 +293,104 @@
         </main>
     </div>
 
-    <script>
-        let currentTab = 'senior';
-        let currentUser = null;
-        let usersData = {};
+    <div id="addUserModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header"><div class="modal-title">إضافة مستخدم جديد</div><div class="close-modal" onclick="closeModal('addUserModal')">&times;</div></div>
+            <div class="modal-body">
+                <form id="addUserForm">
+                    <label>الاسم الكامل</label><input type="text" id="newUserName" class="form-control" placeholder="أدخل الاسم الكامل" required>
+                    <label>الوظيفة</label><input type="text" id="newUserJob" class="form-control" placeholder="أدخل المسمى الوظيفي">
+                    <label>رقم الهاتف</label><input type="text" id="newUserPhone" class="form-control" placeholder="أدخل رقم الهاتف">
+                    <label>إذن الوصول</label><select id="newUserAccess" class="form-control"><option value="allow">مسموح</option><option value="deny">مرفوض</option></select>
+                    <label>اسم المستخدم</label><input type="text" id="newUserLogin" class="form-control" placeholder="أدخل اسم المستخدم">
+                    <label>كلمة المرور</label><input type="password" id="newUserPass" class="form-control" placeholder="أدخل كلمة المرور">
+                </form>
+            </div>
+            <div class="modal-footer"><button class="btn btn-primary" onclick="submitNewUser()">حفظ</button><button class="btn btn-success" onclick="closeModal('addUserModal')">إلغاء</button></div>
+        </div>
+    </div>
 
-        // Sidebar Items Config
+    <div id="editUserModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header"><div class="modal-title">تعديل بيانات المستخدم</div><div class="close-modal" onclick="closeModal('editUserModal')">&times;</div></div>
+            <div class="modal-body">
+                <input type="hidden" id="editUserId">
+                <label>الاسم الكامل</label><input type="text" id="editUserName" class="form-control">
+                <label>الوظيفة</label><input type="text" id="editUserJob" class="form-control">
+                <label>رقم الهاتف</label><input type="text" id="editUserPhone" class="form-control">
+                <label>إذن الوصول</label><select id="editUserAccess" class="form-control"><option value="allow">مسموح</option><option value="deny">مرفوض</option></select>
+                <label>اسم المستخدم</label><input type="text" id="editUserLogin" class="form-control">
+                <label>كلمة المرور</label>
+                <div class="password-wrapper">
+                    <input type="password" id="editUserPass" class="form-control" placeholder="ادخل كلمة المرور الجديدة">
+                    <i class="fas fa-eye password-toggle-icon" id="togglePassBtn" onclick="togglePasswordVisibility('editUserPass', this)"></i>
+                </div>
+                <small id="lastPassUpdate" class="password-date">تاريخ آخر تحديث: -</small>
+            </div>
+            <div class="modal-footer"><button class="btn btn-primary" onclick="saveEditUser()">حفظ</button><button class="btn btn-success" onclick="closeModal('editUserModal')">إلغاء</button></div>
+        </div>
+    </div>
+
+    <div id="viewUserModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header"><div class="modal-title">معاينة بيانات المستخدم</div><div class="close-modal" onclick="closeModal('viewUserModal')">&times;</div></div>
+            <div class="modal-body" id="viewUserContent"></div>
+            <div class="modal-footer"><button class="btn btn-success" onclick="closeModal('viewUserModal')">إغلاق</button></div>
+        </div>
+    </div>
+
+    <div id="permissionsModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header"><div class="modal-title">إدارة صلاحيات الوصول</div><div class="close-modal" onclick="closeModal('permissionsModal')">&times;</div></div>
+            <div class="modal-body">
+                <div style="font-weight:bold; margin-bottom:10px; color:var(--primary);" id="permUserName"></div>
+                <div class="permissions-list" id="permListContainer"></div>
+            </div>
+            <div class="modal-footer"><button class="btn btn-primary" onclick="savePermissions()">حفظ الصلاحيات</button><button class="btn btn-success" onclick="closeModal('permissionsModal')">إلغاء</button></div>
+        </div>
+    </div>
+
+    <div id="importModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header"><div class="modal-title">استيراد من CSV</div><div class="close-modal" onclick="closeModal('importModal')">&times;</div></div>
+            <div class="modal-body">
+                <p style="color:#666; font-size:0.9rem;">الرجاء تحديد الأسماء التي ترغب بإضافتها:</p>
+                <div class="csv-import-list">
+                    <table id="csvPreviewTable"><thead><tr><th><input type="checkbox" onchange="toggleImportAll(this)"></th><th>البيانات المستخرجة</th></tr></thead><tbody id="csvPreviewBody"></tbody></table>
+                </div>
+            </div>
+            <div class="modal-footer"><button class="btn btn-primary" onclick="confirmImport()">إضافة المحدد</button><button class="btn btn-success" onclick="closeModal('importModal')">إلغاء</button></div>
+        </div>
+    </div>
+
+    <div id="addTeacherModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header"><div class="modal-title">إضافة معلمة جديدة</div><div class="close-modal" onclick="closeModal('addTeacherModal')">&times;</div></div>
+            <div class="modal-body">
+                <form id="addTeacherForm">
+                    <label>الاسم الكامل</label><input type="text" id="newTeacherName" class="form-control" placeholder="أدخل اسم المعلمة">
+                    <label>القسم</label><select id="newTeacherDept" class="form-control"></select>
+                </form>
+            </div>
+            <div class="modal-footer"><button class="btn btn-primary" onclick="submitNewTeacher()">حفظ</button><button class="btn btn-success" onclick="closeModal('addTeacherModal')">إلغاء</button></div>
+        </div>
+    </div>
+    
+    <div id="addDeptModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header"><div class="modal-title">إضافة قسم</div><div class="close-modal" onclick="closeModal('addDeptModal')">&times;</div></div>
+            <div class="modal-body">
+                <form id="addDeptForm">
+                    <label>اسم القسم</label><input type="text" id="newDeptName" class="form-control" placeholder="اسم القسم / المادة">
+                    <label>الترتيب</label><input type="number" id="newDeptOrder" class="form-control" placeholder="الترتيب">
+                </form>
+            </div>
+            <div class="modal-footer"><button class="btn btn-primary" onclick="submitNewDept()">حفظ</button><button class="btn btn-success" onclick="closeModal('addDeptModal')">إلغاء</button></div>
+        </div>
+    </div>
+
+    <script>
+        // === Configuration ===
         const sidebarItems = [
             {id: 'dashboard', label: 'لوحة التحكم'},
             {id: 'user-management', label: 'إدارة المستخدمين'},
@@ -456,19 +404,11 @@
         sidebarItems.forEach(item => defaultPerms[item.id] = {view: true, edit: false});
 
         const defaultData = {
-            admins: [
-                {id: 999, name: 'مدير النظام', login: 'admin', pass: 'admin123', status: 'active', access: 'allow', permissions: JSON.parse(JSON.stringify(defaultPerms))}
-            ],
-            senior: [
-                {id: 1, name: 'علياء محمد مبارك الدوسري', job: 'مديرة المدرسة', phone: '39669118', login:'39669118', pass:'39669118', status: 'active', access: 'allow', permissions: JSON.parse(JSON.stringify(defaultPerms)), dateAdded: '2025/01/01', lastPassUpdate: '2026/1/1'},
-                {id: 2, name: 'فاطمة علي', job: 'المديرة المساعدة', phone: '39000000', login:'fatima', pass:'123', status: 'active', access: 'allow', permissions: JSON.parse(JSON.stringify(defaultPerms)), dateAdded: '2025/01/01', lastPassUpdate: '2026/1/1'}
-            ],
-            middle: [
-                {id: 3, name: 'سارة أحمد', job: 'معلم أول', phone: '33333333', login:'sara', pass:'123', status: 'active', access: 'allow', permissions: JSON.parse(JSON.stringify(defaultPerms)), dateAdded: '2025/01/01', lastPassUpdate: '2026/1/1'}
-            ],
-            teachers: [
-                {id: 4, name: 'نورة عبدالله', dept: 'اللغة العربية', status: 'active', permissions: JSON.parse(JSON.stringify(defaultPerms))}
-            ],
+            admins: [{id: 999, name: 'مدير النظام', job: 'System Admin', login: 'admin', pass: 'admin123', status: 'active', access: 'allow', permissions: JSON.parse(JSON.stringify(defaultPerms))}],
+            senior: [{id: 1, name: 'علياء محمد مبارك الدوسري', job: 'مديرة المدرسة', phone: '39669118', login:'39669118', pass:'39669118', status: 'active', access: 'allow', permissions: JSON.parse(JSON.stringify(defaultPerms)), dateAdded: '2025/01/01', lastPassUpdate: '2026/1/1'},
+                     {id: 2, name: 'فاطمة علي', job: 'المديرة المساعدة', phone: '39000000', login:'fatima', pass:'123', status: 'active', access: 'allow', permissions: JSON.parse(JSON.stringify(defaultPerms)), dateAdded: '2025/01/01', lastPassUpdate: '2026/1/1'}],
+            middle: [{id: 3, name: 'سارة أحمد', job: 'معلم أول', phone: '33333333', login:'sara', pass:'123', status: 'active', access: 'allow', permissions: JSON.parse(JSON.stringify(defaultPerms)), dateAdded: '2025/01/01', lastPassUpdate: '2026/1/1'}],
+            teachers: [{id: 4, name: 'نورة عبدالله', dept: 'اللغة العربية', status: 'active', permissions: JSON.parse(JSON.stringify(defaultPerms))}],
             departments: [
                 {id: 1, name: 'اللغة العربية', order: 1, status: 'active'},
                 {id: 2, name: 'الرياضيات', order: 2, status: 'active'},
@@ -476,19 +416,30 @@
             ]
         };
 
-        // --- Core ---
+        let DB = {}; 
+        let CURRENT_USER = null;
+        let CURRENT_TAB = 'senior';
+        let EDITING_PERM_ID = null;
+        let importedDataTemp = [];
+
+        // === System Logic ===
         function loadSystemData() {
-            const storedUsers = localStorage.getItem('sys_usersData_Final');
+            const storedUsers = localStorage.getItem('sys_usersData_Final_V4');
             if(storedUsers) {
-                usersData = JSON.parse(storedUsers);
+                DB = JSON.parse(storedUsers);
             } else {
-                usersData = JSON.parse(JSON.stringify(defaultData));
+                DB = JSON.parse(JSON.stringify(defaultData));
                 saveSystemData();
             }
+            // Load Settings
             const sName = localStorage.getItem('sys_schoolName'); if(sName) document.getElementById('schoolNameInput').value = sName;
             const sYear = localStorage.getItem('sys_schoolYear'); if(sYear) document.getElementById('yearInput').value = sYear;
         }
-        function saveSystemData() { localStorage.setItem('sys_usersData_Final', JSON.stringify(usersData)); }
+
+        function saveSystemData() {
+            localStorage.setItem('sys_usersData_Final_V4', JSON.stringify(DB));
+        }
+
         function saveData(type) { 
             localStorage.setItem('sys_schoolName', document.getElementById('schoolNameInput').value); 
             localStorage.setItem('sys_schoolYear', document.getElementById('yearInput').value); 
@@ -499,9 +450,19 @@
             loadSystemData();
             const savedUserId = localStorage.getItem('currentUserId');
             if(localStorage.getItem('userLogged') && savedUserId) {
-                ['admins', 'senior', 'middle'].forEach(grp => { const found = usersData[grp].find(u => u.id == savedUserId); if(found) currentUser = found; });
-                if(currentUser) showApp();
+                let found = null;
+                ['admins', 'senior', 'middle'].forEach(grp => { 
+                    const u = DB[grp].find(x => x.id == savedUserId);
+                    if(u) found = u; 
+                });
+                if(found) {
+                    CURRENT_USER = found;
+                    showApp();
+                } else {
+                    document.getElementById('loginPage').style.display = 'flex';
+                }
             }
+
             renderUserTable(); renderDeptTable(); initDashboardChart();
 
             document.getElementById('loginForm').addEventListener('submit', (e) => {
@@ -514,22 +475,40 @@
 
                 let foundUser = null;
                 ['admins', 'senior', 'middle'].forEach(grp => { 
-                    const match = usersData[grp].find(usr => String(usr.login).trim() === u && String(usr.pass).trim() === p);
+                    const match = DB[grp].find(usr => String(usr.login).trim() === u && String(usr.pass).trim() === p);
                     if(match) foundUser = match;
                 });
 
                 if(foundUser) {
-                    if(foundUser.status === 'inactive') { errDisable.style.display = 'block'; }
-                    else { currentUser = foundUser; localStorage.setItem('userLogged', true); localStorage.setItem('currentUserId', currentUser.id); showApp(); }
-                } else { errFail.style.display = 'block'; }
+                    if(foundUser.status === 'inactive') { 
+                        errDisable.style.display = 'block'; 
+                    } else { 
+                        CURRENT_USER = foundUser; 
+                        localStorage.setItem('userLogged', true); 
+                        localStorage.setItem('currentUserId', CURRENT_USER.id); 
+                        showApp(); 
+                    }
+                } else { 
+                    errFail.style.display = 'block'; 
+                }
             });
-            document.getElementById('logoutBtn').addEventListener('click', () => { localStorage.removeItem('userLogged'); localStorage.removeItem('currentUserId'); location.reload(); });
+
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                localStorage.removeItem('userLogged'); localStorage.removeItem('currentUserId'); location.reload();
+            });
         });
 
-        // --- Permissions Fix ---
+        // === Navigation & Permissions ===
+        function showApp() {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('app').style.display = 'flex';
+            document.getElementById('headerUserName').innerText = CURRENT_USER.name;
+            applySidebarPermissions();
+            navigate('dashboard');
+        }
+
         function applySidebarPermissions() {
-            // Force apply logic based on Current User from DB
-            const perms = currentUser.permissions || defaultPerms;
+            const perms = CURRENT_USER.permissions || defaultPerms;
             sidebarItems.forEach(item => {
                 const li = document.getElementById('nav-' + item.id);
                 if(li) {
@@ -539,9 +518,89 @@
             });
         }
 
+        function navigate(pageId) {
+            const perms = CURRENT_USER.permissions || defaultPerms;
+            if (perms[pageId] && perms[pageId].view === false) return;
+
+            document.querySelectorAll('.section-card').forEach(d => d.classList.remove('active'));
+            document.querySelectorAll('.nav-links a').forEach(a => {
+                a.classList.remove('active');
+                if(a.parentElement.id === 'nav-' + pageId) a.classList.add('active');
+            });
+            
+            const target = document.getElementById(pageId);
+            if (target) target.classList.add('active');
+            
+            if(pageId === 'settings') {
+                document.getElementById('settings').style.display = 'block';
+            }
+        }
+
+        // === User CRUD ===
+        function switchUserTab(t, el) { 
+            CURRENT_TAB = t; 
+            document.querySelectorAll('.user-tab').forEach(x=>x.classList.remove('active')); 
+            el.classList.add('active'); 
+            const t1=document.getElementById('users-table-container'); 
+            const t2=document.getElementById('departments-table-container'); 
+            if(t==='departments'){
+                t1.style.display='none'; t2.style.display='block'; renderDeptTable();
+            } else {
+                t1.style.display='block'; t2.style.display='none'; 
+                document.getElementById('table-heading').innerText='إدارة '+ (t==='senior'?'القيادة العليا':(t==='middle'?'القيادة الوسطى':'المعلمات')); 
+                renderUserTable();
+            } 
+        }
+
+        function renderUserTable() {
+            const tbody = document.getElementById('usersTableBody'); 
+            const thead = document.getElementById('usersTableHead');
+            
+            if(CURRENT_TAB === 'teachers') {
+                thead.innerHTML = '<tr><th width="10%">الترتيب</th><th width="30%">الاسم</th><th width="30%">القسم</th><th width="30%">إدارة المستخدمين</th></tr>';
+            } else {
+                thead.innerHTML = '<tr><th width="10%">الترتيب</th><th width="25%">الاسم</th><th width="20%">الوظيفة</th><th width="15%">رقم الهاتف</th><th width="30%">إدارة المستخدمين</th></tr>';
+            }
+
+            tbody.innerHTML = '';
+            const data = DB[CURRENT_TAB] || [];
+            data.forEach((u, i) => {
+                const tr = document.createElement('tr');
+                let infoCols = CURRENT_TAB === 'teachers' 
+                    ? `<td>${u.name}</td><td>${u.dept}</td>` 
+                    : `<td>${u.name}</td><td>${u.job}</td><td>${u.phone}</td>`;
+                
+                tr.innerHTML = `<td>${i+1}</td>${infoCols}
+                <td><div class="action-btns">
+                    <button class="btn-xs view" onclick="viewUser(${u.id})">معاينة</button>
+                    <button class="btn-xs edit" onclick="editUser(${u.id})">تعديل</button>
+                    <button class="btn-xs delete" onclick="deleteUser(${u.id})">حذف</button>
+                    <button class="btn-xs status" style="background:${u.status==='active'?'#ffc107':'#28a745'}" onclick="toggleStatus(${u.id})">${u.status==='active'?'إلغاء التفعيل':'تفعيل'}</button>
+                    ${CURRENT_TAB!=='teachers'?`<button class="btn-xs access" onclick="openPermissions(${u.id})">صلاحيات</button>`:''}
+                </div></td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // === Permissions Management ===
+        function openPermissions(id) {
+            EDITING_PERM_ID = id;
+            const u = DB[CURRENT_TAB].find(x => x.id === id);
+            document.getElementById('permUserName').innerText = 'إدارة صلاحيات: ' + u.name;
+            const container = document.getElementById('permListContainer');
+            container.innerHTML = '';
+            const p = u.permissions || defaultPerms;
+            sidebarItems.forEach(item => {
+                const up = p[item.id] || {view: true, edit: false};
+                container.innerHTML += `<div class="perm-item"><span>${item.label}</span><div class="perm-checks"><label><input type="checkbox" class="perm-view" data-id="${item.id}" ${up.view?'checked':''}> معاينة</label><label><input type="checkbox" class="perm-edit" data-id="${item.id}" ${up.edit?'checked':''}> تعديل</label></div></div>`;
+            });
+            document.getElementById('permissionsModal').setAttribute('data-userid', id);
+            document.getElementById('permissionsModal').style.display = 'flex';
+        }
+
         function savePermissions() {
             const userId = parseInt(document.getElementById('permissionsModal').getAttribute('data-userid'));
-            const user = usersData[currentTab].find(u => u.id === userId);
+            const user = DB[CURRENT_TAB].find(u => u.id === userId);
             const checks = document.querySelectorAll('#permListContainer .perm-item');
             checks.forEach(div => {
                 const viewCheck = div.querySelector('.perm-view');
@@ -551,40 +610,17 @@
                 user.permissions[secId].view = viewCheck.checked;
                 user.permissions[secId].edit = editCheck.checked;
             });
-            saveSystemData(); 
-            // If editing SELF, apply immediately
-            if(currentUser && currentUser.id === userId) {
-                currentUser = user; 
-                applySidebarPermissions();
-                // Check if current page is still allowed
-                const currentSection = document.querySelector('.section-card.active').id;
-                if(user.permissions[currentSection] && user.permissions[currentSection].view === false) {
-                    navigate('dashboard');
-                }
-            }
-            alert('تم تحديث الصلاحيات بنجاح'); closeModal('permissionsModal');
+            saveSystemData();
+            if (CURRENT_USER.id === userId) { CURRENT_USER = user; applySidebarPermissions(); }
+            alert('تم تحديث الصلاحيات');
+            closeModal('permissionsModal');
         }
 
-        // --- Navigation ---
-        function showApp() { document.getElementById('loginPage').style.display = 'none'; document.getElementById('app').style.display = 'flex'; document.getElementById('headerUserName').innerText = currentUser.name; applySidebarPermissions(); navigate('dashboard'); }
-        function navigate(pageId) {
-            const perms = currentUser.permissions || defaultPerms;
-            if (perms[pageId] && perms[pageId].view === false) return;
-            document.querySelectorAll('.section-card').forEach(d => d.classList.remove('active'));
-            document.querySelectorAll('.nav-links a').forEach(a => { a.parentElement.style.background='transparent'; a.classList.remove('active'); });
-            document.getElementById(pageId).classList.add('active');
-            const link = document.querySelector(`#nav-${pageId} a`);
-            if(link) link.classList.add('active');
-            
-            // Fix Settings Display
-            if(pageId === 'settings') document.getElementById('settings').style.display = 'block';
-        }
-
-        // --- View User (Detailed) ---
+        // === Modals and Utils ===
         function viewUser(id) {
-            const u = usersData[currentTab].find(u => u.id === id);
-            const content = document.getElementById('viewUserContent');
-            content.innerHTML = `
+            const u = DB[CURRENT_TAB].find(x => x.id === id);
+            const c = document.getElementById('viewUserContent');
+            c.innerHTML = `
                 <div class="user-view-card"><div class="user-view-avatar">${u.name.charAt(0)}</div><h3 style="color:var(--primary); margin:0;">${u.name}</h3></div>
                 <div class="info-grid">
                     <div class="info-item"><label>الوظيفة</label><span>${u.job || u.dept || '-'}</span></div>
@@ -595,42 +631,74 @@
             document.getElementById('viewUserModal').style.display = 'flex';
         }
 
-        // --- Helper Functions ---
-        function renderUserTable() {
-            const tbody = document.getElementById('usersTableBody'); tbody.innerHTML = '';
-            const data = usersData[currentTab] || [];
-            data.forEach((u, i) => {
-                const tr = document.createElement('tr');
-                let infoCols = currentTab === 'teachers' ? `<td>${u.name}</td><td>${u.dept}</td><td>-</td>` : `<td>${u.name}</td><td>${u.job}</td><td>${u.phone}</td>`;
-                tr.innerHTML = `<td>${i+1}</td>${infoCols}
-                <td><div class="action-btns"><button class="btn-xs view" onclick="viewUser(${u.id})">معاينة</button><button class="btn-xs edit" onclick="editUser(${u.id})">تعديل</button><button class="btn-xs delete" onclick="deleteUser(${u.id})">حذف</button><button class="btn-xs status" onclick="toggleStatus(${u.id})">${u.status==='active'?'إلغاء التفعيل':'تفعيل'}</button>${currentTab!=='teachers'?`<button class="btn-xs access" onclick="openPermissions(${u.id})">صلاحيات</button>`:''}</div></td>`;
-                tbody.appendChild(tr);
-            });
+        function editUser(id) {
+            const u = DB[CURRENT_TAB].find(x => x.id === id);
+            document.getElementById('editUserId').value = id;
+            if(CURRENT_TAB === 'teachers') { alert('تعديل معلمة: '+u.name); } 
+            else {
+                document.getElementById('editUserName').value = u.name;
+                document.getElementById('editUserJob').value = u.job;
+                document.getElementById('editUserPhone').value = u.phone;
+                document.getElementById('editUserLogin').value = u.login;
+                document.getElementById('editUserPass').value = u.pass;
+                document.getElementById('lastPassUpdate').innerText = "تاريخ التحديث: " + (u.lastPassUpdate || '-');
+                document.getElementById('editUserModal').style.display = 'flex';
+            }
         }
-        function switchUserTab(t, el) { currentTab=t; document.querySelectorAll('.user-tab').forEach(x=>x.classList.remove('active')); el.classList.add('active'); const t1=document.getElementById('users-table-container'); const t2=document.getElementById('departments-table-container'); if(t==='departments'){t1.style.display='none';t2.style.display='block';renderDeptTable();}else{t1.style.display='block';t2.style.display='none'; document.getElementById('table-heading').innerText='إدارة '+ (t==='senior'?'القيادة العليا':(t==='middle'?'القيادة الوسطى':'المعلمات')); renderUserTable();} }
-        function openPermissions(id) { const u = usersData[currentTab].find(x => x.id === id); document.getElementById('permUserName').innerText = 'إدارة صلاحيات: ' + u.name; const c = document.getElementById('permListContainer'); c.innerHTML = ''; const p = u.permissions || defaultPerms; sidebarItems.forEach(item => { const up = p[item.id] || {view: true, edit: false}; c.innerHTML += `<div class="perm-item"><span>${item.label}</span><div class="perm-checks"><label><input type="checkbox" class="perm-view" data-id="${item.id}" ${up.view?'checked':''}> معاينة</label><label><input type="checkbox" class="perm-edit" data-id="${item.id}" ${up.edit?'checked':''}> تعديل</label></div></div>`; }); document.getElementById('permissionsModal').setAttribute('data-userid', id); document.getElementById('permissionsModal').style.display = 'flex'; }
-        function submitNewUser() { const name = document.getElementById('newUserName').value; if(name) { usersData[currentTab].push({ id: Date.now(), name: name, job: document.getElementById('newUserJob').value, phone: document.getElementById('newUserPhone').value, status: 'active', login: document.getElementById('newUserLogin').value, pass: document.getElementById('newUserPass').value, permissions: JSON.parse(JSON.stringify(defaultPerms)), dateAdded: new Date().toLocaleDateString('ar-BH') }); saveSystemData(); renderUserTable(); closeModal('addUserModal'); } }
-        function editUser(id) { const u = usersData[currentTab].find(x => x.id === id); document.getElementById('editUserId').value = id; if(currentTab === 'teachers') { alert('تعديل معلمة: '+u.name); } else { document.getElementById('editUserName').value = u.name; document.getElementById('editUserJob').value = u.job; document.getElementById('editUserPhone').value = u.phone; document.getElementById('editUserLogin').value = u.login; document.getElementById('editUserPass').value = u.pass; document.getElementById('lastPassUpdate').innerText = "تاريخ التحديث: " + (u.lastPassUpdate || '-'); document.getElementById('editUserModal').style.display = 'flex'; } }
-        function saveEditUser() { const id = parseInt(document.getElementById('editUserId').value); const u = usersData[currentTab].find(x => x.id === id); u.name = document.getElementById('editUserName').value; u.job = document.getElementById('editUserJob').value; u.phone = document.getElementById('editUserPhone').value; u.login = document.getElementById('editUserLogin').value; const np = document.getElementById('editUserPass').value; if(np !== u.pass) { u.pass = np; u.lastPassUpdate = new Date().toLocaleDateString('ar-BH'); } saveSystemData(); renderUserTable(); closeModal('editUserModal'); }
-        function renderDeptTable() { const b = document.getElementById('deptTableBody'); b.innerHTML=''; usersData.departments.forEach(d=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${d.order}</td><td>${d.name}</td><td>${d.status}</td><td><div class="action-btns"><button class="btn-xs edit">تعديل</button></div></td>`; b.appendChild(tr); }); }
-        
+
+        function saveEditUser() {
+            const id = parseInt(document.getElementById('editUserId').value);
+            const u = DB[CURRENT_TAB].find(x => x.id === id);
+            u.name = document.getElementById('editUserName').value;
+            u.job = document.getElementById('editUserJob').value;
+            u.phone = document.getElementById('editUserPhone').value;
+            u.login = document.getElementById('editUserLogin').value;
+            const np = document.getElementById('editUserPass').value;
+            if(np !== u.pass) { u.pass = np; u.lastPassUpdate = new Date().toLocaleDateString('ar-BH'); }
+            saveSystemData(); renderUserTable(); closeModal('editUserModal');
+        }
+
+        function submitNewUser() {
+            const name = document.getElementById('newUserName').value;
+            if(name) {
+                const pass = document.getElementById('newUserPass').value;
+                DB[CURRENT_TAB].push({
+                    id: Date.now(), name: name, job: document.getElementById('newUserJob').value, phone: document.getElementById('newUserPhone').value,
+                    status: 'active', login: document.getElementById('newUserLogin').value, pass: pass,
+                    permissions: JSON.parse(JSON.stringify(defaultPerms)), dateAdded: new Date().toLocaleDateString('en-GB'), lastPassUpdate: new Date().toLocaleDateString('ar-BH')
+                });
+                saveSystemData(); renderUserTable(); closeModal('addUserModal');
+            }
+        }
+
         // Utils
         function togglePass(id, icon) { const i = document.getElementById(id); if(i.type==='password'){i.type='text'; icon.className='fas fa-eye-slash password-icon';}else{i.type='password'; icon.className='fas fa-eye password-icon';} }
-        function handleAddUserClick() { currentTab==='teachers' ? openAddTeacherModal() : openAddUserModal(); }
+        function handleAddUserClick() { CURRENT_TAB==='teachers' ? openAddTeacherModal() : openAddUserModal(); }
         function openAddUserModal() { document.getElementById('addUserForm').reset(); document.getElementById('addUserModal').style.display='flex'; }
-        function openAddTeacherModal() { const s = document.getElementById('newTeacherDept'); s.innerHTML=''; usersData.departments.forEach(d=>{if(d.status==='active'){const o=document.createElement('option');o.value=d.name;o.innerText=d.name;s.appendChild(o)}}); document.getElementById('addTeacherModal').style.display='flex'; }
-        function submitNewTeacher() { const n = document.getElementById('newTeacherName').value; if(n){ usersData.teachers.push({id:Date.now(), name:n, dept:document.getElementById('newTeacherDept').value, status:'active', permissions:JSON.parse(JSON.stringify(defaultPerms)), dateAdded: new Date().toLocaleDateString('ar-BH')}); saveSystemData(); renderUserTable(); closeModal('addTeacherModal'); } }
-        function openAddDeptModal() { document.getElementById('addDeptModal').style.display='flex'; }
-        function submitNewDept() { const n=document.getElementById('newDeptName').value; if(n){ usersData.departments.push({id:Date.now(), name:n, order:document.getElementById('newDeptOrder').value, status:'active'}); saveSystemData(); renderDeptTable(); closeModal('addDeptModal'); } }
-        function toggleStatus(id) { const u = usersData[currentTab].find(u=>u.id===id); u.status = u.status==='active'?'inactive':'active'; saveSystemData(); renderUserTable(); }
-        function deleteUser(id) { if(confirm('حذف؟')) { usersData[currentTab] = usersData[currentTab].filter(u=>u.id!==id); saveSystemData(); renderUserTable(); } }
+        function openAddTeacherModal() { const s = document.getElementById('newTeacherDept'); s.innerHTML=''; DB.departments.forEach(d=>{if(d.status==='active'){const o=document.createElement('option');o.value=d.name;o.innerText=d.name;s.appendChild(o)}}); document.getElementById('addTeacherModal').style.display='flex'; }
+        function submitNewTeacher() { const n = document.getElementById('newTeacherName').value; if(n){ DB.teachers.push({id:Date.now(), name:n, dept:document.getElementById('newTeacherDept').value, status:'active', permissions:JSON.parse(JSON.stringify(defaultPerms)), dateAdded: new Date().toLocaleDateString('ar-BH')}); saveSystemData(); renderUserTable(); closeModal('addTeacherModal'); } }
+        function deleteUser(id) { if(confirm('حذف؟')) { DB[CURRENT_TAB] = DB[CURRENT_TAB].filter(u=>u.id!==id); saveSystemData(); renderUserTable(); } }
+        function toggleStatus(id) { const u = DB[CURRENT_TAB].find(u=>u.id===id); u.status = u.status==='active'?'inactive':'active'; saveSystemData(); renderUserTable(); }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
         function switchSettingTab(t,el) { document.querySelectorAll('.setting-tab-pane').forEach(p=>p.classList.remove('active')); document.getElementById(t).classList.add('active'); document.querySelectorAll('.settings-nav-item').forEach(i=>i.classList.remove('active')); el.classList.add('active'); }
         function triggerUpload(id) { document.getElementById(id).click(); }
         function previewImage(input, containerId) { if (input.files[0]) { const r = new FileReader(); r.onload = function(e) { const c = document.getElementById(containerId); c.querySelector('.upload-placeholder').style.display = 'none'; c.querySelector('.upload-preview-box').classList.add('has-image'); c.querySelector('img').src = e.target.result; }; r.readAsDataURL(input.files[0]); } }
         function removeImage(inputId, containerId) { document.getElementById(inputId).value = ""; const c = document.getElementById(containerId); c.querySelector('.upload-placeholder').style.display = 'block'; c.querySelector('.upload-preview-box').classList.remove('has-image'); c.querySelector('img').src = ""; }
         function expandImage(src) { document.getElementById('lightboxImg').src = src; document.getElementById('lightbox').style.display = 'flex'; }
-        function initDashboardChart() { const ctx = document.getElementById('dashboardChart').getContext('2d'); new Chart(ctx, {type:'bar',data:{labels:['A','B','C'],datasets:[{label:'Data',data:[10,20,30],backgroundColor:'#1e4078'}]}}); }
+        function openAddDeptModal() { document.getElementById('addDeptModal').style.display='flex'; }
+        function submitNewDept() { const n=document.getElementById('newDeptName').value; if(n){ DB.departments.push({id:Date.now(), name:n, order:document.getElementById('newDeptOrder').value, status:'active'}); saveSystemData(); renderDeptTable(); closeModal('addDeptModal'); } }
+        function renderDeptTable() { const b = document.getElementById('deptTableBody'); b.innerHTML=''; DB.departments.forEach(d=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${d.order}</td><td>${d.name}</td><td>${d.status}</td><td><div class="action-btns"><button class="btn-xs edit">تعديل</button></div></td>`; b.appendChild(tr); }); }
+        
+        // Chart
+        function initDashboardChart() { const ctx = document.getElementById('dashboardChart').getContext('2d'); new Chart(ctx, {type:'bar',data:{labels:['العربية','الرياضيات','العلوم'],datasets:[{label:'البيانات',data:[12,19,3],backgroundColor:'#1e4078'}]}}); }
+        
+        // Export/Import CSV
+        function exportCSV() { const data = DB[CURRENT_TAB]; let csv = "data:text/csv;charset=utf-8,\uFEFF"; if(CURRENT_TAB==='teachers'){csv+="Name,Dept\n";data.forEach(r=>{csv+=`"${r.name}","${r.dept}"\n`});}else{csv+="Name,Job,Phone,Login,Pass\n";data.forEach(r=>{csv+=`"${r.name}","${r.job}","${r.phone}","${r.login}","${r.pass}"\n`});} const link=document.createElement("a"); link.href=encodeURI(csv); link.download="users.csv"; document.body.appendChild(link); link.click(); }
+        function processCSV(input) { if(input.files[0]){ const r=new FileReader(); r.onload=function(e){ const rows=e.target.result.split('\n'); importedDataTemp=[]; const b=document.getElementById('csvPreviewBody'); b.innerHTML=''; for(let i=1;i<rows.length;i++){ const c=rows[i].split(','); if(c.length>1){ importedDataTemp.push(CURRENT_TAB==='teachers'?{name:c[0],dept:c[1]}:{name:c[0],job:c[1],phone:c[2],login:c[3],pass:c[4]}); b.innerHTML+=`<tr><td><input type="checkbox" class="import-check" value="${i-1}"></td><td>${c[0]}</td></tr>`; } } document.getElementById('importModal').style.display='flex'; input.value=''; }; r.readAsText(input.files[0]); } }
+        function toggleImportAll(s) { document.querySelectorAll('.import-check').forEach(c=>c.checked=s.checked); }
+        function confirmImport() { document.querySelectorAll('.import-check:checked').forEach(c=>{ DB[CURRENT_TAB].push({id:Date.now()+Math.random(), ...importedDataTemp[c.value], status:'active', permissions:JSON.parse(JSON.stringify(defaultPerms)), dateAdded:new Date().toLocaleDateString('en-GB')}); }); saveSystemData(); renderUserTable(); closeModal('importModal'); }
+        function bulkAction(a) { const s=document.querySelectorAll('#usersTableBody input:checked'); s.forEach(c=>{ const u=DB[CURRENT_TAB].find(x=>x.id==DB[CURRENT_TAB][c.parentElement.parentElement.rowIndex].id); if(a==='delete') DB[CURRENT_TAB]=DB[CURRENT_TAB].filter(x=>x.id!==u.id); else u.status=a==='activate'?'active':'inactive'; }); saveSystemData(); renderUserTable(); }
+        function toggleSelectAll(s,id) { document.querySelectorAll(`#${id} input`).forEach(c=>c.checked=s.checked); }
     </script>
 </body>
 </html>
