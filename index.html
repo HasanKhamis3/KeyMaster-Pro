@@ -12,16 +12,13 @@
         * { box-sizing: border-box; font-family: 'Cairo', sans-serif; }
         body { margin: 0; background: var(--bg); color: var(--text); }
         
-        /* Sidebar & Layout */
+        /* Layout */
         .app-container { display: flex; min-height: 100vh; }
         .sidebar { width: 260px; background: white; border-left: 1px solid #e0e0e0; position: fixed; right: 0; top: 0; height: 100%; z-index: 100; transition: 0.3s; }
         .sidebar-header { padding: 20px; border-bottom: 1px solid #f0f4f8; display: flex; gap: 10px; align-items: center; }
         .sidebar-header i { font-size: 1.8rem; color: var(--primary); }
         .nav-links { list-style: none; padding: 20px 0; margin: 0; }
-        
-        /* إخفاء العناصر افتراضياً لحين التحقق من الصلاحية */
-        .nav-links li { display: none; margin-bottom: 5px; } 
-        
+        .nav-links li { margin-bottom: 5px; display: block; /* Control via JS */ }
         .nav-links a { display: flex; align-items: center; padding: 12px 25px; color: #777; text-decoration: none; transition: 0.3s; font-weight: 600; border-right: 4px solid transparent; }
         .nav-links a:hover, .nav-links a.active { color: var(--primary); background: #f0f4f8; border-right-color: var(--primary); }
         .nav-links a i { margin-left: 10px; width: 25px; text-align: center; }
@@ -52,14 +49,24 @@
         
         /* Modals */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 5000; }
-        .modal-box { background: white; width: 550px; border-radius: 8px; overflow: hidden; animation: slideDown 0.3s; max-height: 90vh; overflow-y: auto; }
+        .modal-box { background: white; width: 600px; border-radius: 8px; overflow: hidden; animation: slideDown 0.3s; max-height: 90vh; overflow-y: auto; }
         @keyframes slideDown { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .modal-header { padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; font-weight: bold; color: var(--primary); }
         .modal-body { padding: 20px; }
-        .modal-footer { padding: 15px; background: #f9f9f9; text-align: left; display: flex; gap: 10px; justify-content: flex-end; }
+        .modal-footer { padding: 15px 20px; background: #f9f9f9; display: flex; gap: 10px; justify-content: flex-end; }
+
+        /* Settings Layout (RESTORED) */
+        .settings-layout { display: flex; gap: 20px; align-items: flex-start; }
+        .settings-sidebar { width: 250px; background: white; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; flex-shrink: 0; }
+        .settings-sidebar-header { padding: 15px; border-bottom: 1px solid #eee; font-weight: bold; color: var(--primary); text-align: center; }
+        .settings-nav-item { display: block; padding: 12px 20px; color: #666; text-decoration: none; transition: 0.3s; cursor: pointer; border-bottom: 1px solid #f9f9f9; }
+        .settings-nav-item:hover { background-color: #f8f9fa; color: var(--primary); }
+        .settings-nav-item.active { background-color: var(--primary); color: white; border-right: 4px solid #15305b; }
+        .settings-content-area { flex-grow: 1; background: white; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); padding: 30px; min-height: 500px; }
+        .setting-tab-pane { display: none; }
+        .setting-tab-pane.active { display: block; animation: fadeIn 0.3s; }
 
         /* Helpers */
-        .hidden { display: none !important; }
         .password-wrapper { position: relative; }
         .password-wrapper input { padding-left: 40px; }
         .password-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #777; }
@@ -67,6 +74,9 @@
         .perm-list { border: 1px solid #eee; border-radius: 6px; padding: 10px; max-height: 300px; overflow-y: auto; }
         .perm-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
         .perm-item:last-child { border-bottom: none; }
+
+        .image-upload-container { border: 2px dashed #ccc; border-radius: 8px; padding: 20px; text-align: center; background-color: #fcfcfc; margin-bottom: 20px; position: relative; min-height: 150px; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
+        .upload-preview-box img { max-width: 100%; max-height: 150px; }
 
         @media print { .sidebar, .login-wrapper { display: none; } .main-content { margin: 0; } }
     </style>
@@ -114,14 +124,20 @@
                 </div>
             </header>
 
-            <div id="dashboard" class="section-card active"><h3>لوحة التحكم</h3><p>مرحباً بك في النظام</p></div>
+            <div id="dashboard" class="section-card active">
+                <h3>لوحة التحكم</h3>
+                <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:20px;">
+                    <div style="background:#fff; padding:20px; border-top:4px solid var(--primary); box-shadow:0 2px 5px rgba(0,0,0,0.1);"><h3>120</h3><p>زيارة</p></div>
+                    <div style="background:#fff; padding:20px; border-top:4px solid var(--success); box-shadow:0 2px 5px rgba(0,0,0,0.1);"><h3>15</h3><p>متميز</p></div>
+                    <div style="background:#fff; padding:20px; border-top:4px solid var(--danger); box-shadow:0 2px 5px rgba(0,0,0,0.1);"><h3>8</h3><p>دعم</p></div>
+                </div>
+                <div style="height:300px; margin-top:30px;"><canvas id="chart"></canvas></div>
+            </div>
             
             <div id="user-management" class="section-card">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                     <h3>إدارة المستخدمين</h3>
-                    <div style="display:flex; gap:10px;">
-                        <button class="btn" style="background:#2c5aa0; color:white;" onclick="openAddUserModal()">إضافة جديد</button>
-                    </div>
+                    <button class="btn" style="background:#2c5aa0; color:white;" onclick="openAddUserModal()">إضافة جديد</button>
                 </div>
                 
                 <div class="user-tabs">
@@ -139,7 +155,32 @@
             <div id="visits" class="section-card"><h3>الزيارات الصفية</h3></div>
             <div id="performance" class="section-card"><h3>تقييم الأداء</h3></div>
             <div id="quality-report" class="section-card"><h3>تقرير الجودة</h3></div>
-            <div id="settings" class="section-card"><h3>الإعدادات</h3></div>
+            
+            <div id="settings" class="section-card">
+                <div class="settings-layout">
+                    <div class="settings-sidebar">
+                        <div class="settings-sidebar-header">الإعدادات</div>
+                        <div class="settings-nav-item active" onclick="setSettingTab('gen', this)">الإعدادات العامة</div>
+                        <div class="settings-nav-item" onclick="setSettingTab('sig', this)">إعدادات التوقيعات</div>
+                        <div class="settings-nav-item" onclick="setSettingTab('vis', this)">ترتيب الزوار</div>
+                        <div class="settings-nav-item" onclick="setSettingTab('fot', this)">إعدادات التذييل</div>
+                        <div class="settings-nav-item" onclick="setSettingTab('log', this)">سجل النظام</div>
+                    </div>
+                    <div class="settings-content-area">
+                        <div id="gen" class="setting-tab-pane active">
+                            <h3>الإعدادات العامة</h3>
+                            <div class="form-group"><label>اسم المدرسة</label><input type="text" id="confSchool" class="form-control" value="مدرسة المستقبل"></div>
+                            <div class="form-group"><label>العام الدراسي</label><input type="text" id="confYear" class="form-control" value="2025/2026"></div>
+                            <div class="form-group"><label>شعار الوزارة</label><div class="image-upload-container"><button class="btn" style="background:#28a745; color:white;">تحميل</button></div></div>
+                            <button class="btn btn-primary" onclick="saveConfig()">حفظ الإعدادات</button>
+                        </div>
+                        <div id="sig" class="setting-tab-pane"><h3>التوقيعات</h3><p>خيارات التوقيع...</p></div>
+                        <div id="vis" class="setting-tab-pane"><h3>ترتيب الزوار</h3><p>قائمة الترتيب...</p></div>
+                        <div id="fot" class="setting-tab-pane"><h3>التذييل</h3><input class="form-control" placeholder="نص التذييل"></div>
+                        <div id="log" class="setting-tab-pane"><h3>سجل النظام</h3><p>لا توجد سجلات حديثة</p></div>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -200,7 +241,8 @@
     </div>
 
     <script>
-        // === 1. System Configuration & Initial Data ===
+        // === 1. System Config ===
+        // IMPORTANT: These IDs MUST match the HTML IDs in Sidebar (nav-ID)
         const SECTIONS = [
             {id: 'dashboard', name: 'لوحة التحكم'},
             {id: 'user-management', name: 'إدارة المستخدمين'},
@@ -210,44 +252,39 @@
             {id: 'settings', name: 'الإعدادات'}
         ];
 
-        // Default Permissions: Everyone sees everything initially unless changed
         const DEFAULT_PERMS = {};
         SECTIONS.forEach(s => DEFAULT_PERMS[s.id] = {view: true, edit: false});
 
-        // Default Users (If LocalStorage is empty)
+        // Default Data - EXACTLY MATCHING YOUR REQUEST
         const INITIAL_DB = {
-            // Admin: Can see everything, ID 999
             admins: [{id: 999, name: 'مدير النظام', login: 'admin', pass: 'admin123', status: 'active', permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS))}],
-            senior: [{id: 1, name: 'علياء محمد', job: 'مديرة', phone: '39669118', login: '39669118', pass: '39669118', status: 'active', permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS)), lastUpdate: '2026/1/1'}],
+            senior: [{id: 1, name: 'علياء محمد مبارك الدوسري', job: 'مديرة المدرسة', phone: '39669118', login: '39669118', pass: '39669118', status: 'active', permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS)), lastUpdate: '2026/1/1'}],
             middle: [],
             teachers: []
         };
 
-        // Global State
         let DB = {}; 
         let CURRENT_USER = null;
         let CURRENT_TAB = 'senior';
+        let EDITING_PERM_ID = null;
 
-        // === 2. Core Functions (Load/Save/Auth) ===
+        // === 2. Core Functions ===
         
         function initSystem() {
-            // 1. Load Data
-            const storedDB = localStorage.getItem('QualityApp_DB');
+            // Load DB
+            const storedDB = localStorage.getItem('QualitySys_DB_Final');
             if (storedDB) {
                 DB = JSON.parse(storedDB);
-                // Fix: Ensure every user has permissions object if missing (Migration)
-                ['admins', 'senior', 'middle', 'teachers'].forEach(grp => {
-                    if(DB[grp]) DB[grp].forEach(u => { if(!u.permissions) u.permissions = JSON.parse(JSON.stringify(DEFAULT_PERMS)); });
-                });
+                // Ensure admins exist if missing
+                if (!DB.admins) DB.admins = INITIAL_DB.admins;
             } else {
                 DB = JSON.parse(JSON.stringify(INITIAL_DB));
                 saveDB();
             }
 
-            // 2. Check Session
-            const sessionID = localStorage.getItem('QualityApp_Session');
+            // Check Session
+            const sessionID = localStorage.getItem('QualitySys_Session');
             if (sessionID) {
-                // Find user in DB
                 let found = null;
                 ['admins', 'senior', 'middle', 'teachers'].forEach(grp => {
                     const u = DB[grp].find(x => x.id == sessionID);
@@ -258,7 +295,7 @@
                     CURRENT_USER = found;
                     showApp();
                 } else {
-                    logout(); // User deleted or deactivated
+                    document.getElementById('loginPage').style.display = 'flex';
                 }
             } else {
                 document.getElementById('loginPage').style.display = 'flex';
@@ -266,7 +303,7 @@
         }
 
         function saveDB() {
-            localStorage.setItem('QualityApp_DB', JSON.stringify(DB));
+            localStorage.setItem('QualitySys_DB_Final', JSON.stringify(DB));
         }
 
         function login(e) {
@@ -277,89 +314,139 @@
 
             let found = null;
             ['admins', 'senior', 'middle', 'teachers'].forEach(grp => {
-                const match = DB[grp].find(x => x.login === u && x.pass === p);
+                const match = DB[grp].find(x => String(x.login).trim() === u && String(x.pass).trim() === p);
                 if(match) found = match;
             });
 
             if (found) {
                 if (found.status === 'active') {
                     CURRENT_USER = found;
-                    localStorage.setItem('QualityApp_Session', found.id);
+                    localStorage.setItem('QualitySys_Session', found.id);
                     showApp();
                 } else {
-                    err.innerText = "هذا الحساب معطل. يرجى مراجعة المسؤول.";
+                    err.innerText = "هذا الحساب معطل.";
                     err.style.display = 'block';
                 }
             } else {
-                err.innerText = "اسم المستخدم أو كلمة المرور غير صحيحة";
+                err.innerText = "بيانات غير صحيحة";
                 err.style.display = 'block';
             }
         }
 
         function logout() {
-            localStorage.removeItem('QualityApp_Session');
+            localStorage.removeItem('QualitySys_Session');
             location.reload();
         }
 
-        // === 3. UI Logic (Sidebar & Routing) ===
+        // === 3. UI & Permissions (FIXED) ===
 
         function showApp() {
             document.getElementById('loginPage').style.display = 'none';
             document.getElementById('app').style.display = 'flex';
             document.getElementById('headerUserName').innerText = CURRENT_USER.name;
             
-            applySidebarPermissions();
-            renderTable(); // Initial Render
+            applyPermissions(); // Critical Step
+            renderTable();
+            handleRouting();
             
-            // Handle Navigation
-            document.querySelectorAll('.nav-links a').forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const page = link.dataset.page;
-                    navigate(page);
-                });
-            });
-
-            // Default route
-            navigate('dashboard');
+            // Listeners
+            window.addEventListener('hashchange', handleRouting);
         }
 
-        function applySidebarPermissions() {
-            // This checks CURRENT_USER permissions and HIDES sidebar items
+        function applyPermissions() {
+            // Apply strict view permissions
             const perms = CURRENT_USER.permissions || DEFAULT_PERMS;
             
             SECTIONS.forEach(sec => {
                 const el = document.getElementById('nav-' + sec.id);
                 if (el) {
+                    // Force Hide if view is false
                     if (perms[sec.id] && perms[sec.id].view === false) {
-                        el.style.display = 'none'; // Strictly Hide
+                        el.style.display = 'none';
                     } else {
-                        el.style.display = 'block'; // Show
+                        el.style.display = 'block';
                     }
                 }
             });
         }
 
-        function navigate(pageId) {
-            // Check permission again before showing content
+        function handleRouting() {
+            const hash = window.location.hash.substring(1) || 'dashboard';
+            // Check permission before navigation
             const perms = CURRENT_USER.permissions || DEFAULT_PERMS;
-            if (perms[pageId] && perms[pageId].view === false) {
-                alert("ليس لديك صلاحية للدخول هنا");
-                return;
+            if (perms[hash] && perms[hash].view === false) {
+               // Redirect if user tries to access restricted area
+               // Find first allowed page
+               return; 
             }
 
             document.querySelectorAll('.section-card').forEach(d => d.classList.remove('active'));
             document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
             
-            const target = document.getElementById(pageId);
-            const link = document.querySelector(`a[data-page="${pageId}"]`);
+            const target = document.getElementById(hash);
+            const link = document.querySelector(`a[data-page="${hash}"]`);
             
             if (target) target.classList.add('active');
             if (link) link.classList.add('active');
             document.getElementById('pageTitle').innerText = link ? link.innerText : 'لوحة التحكم';
         }
 
-        // === 4. User Management Logic ===
+        // === 4. Permissions Management ===
+
+        function openPerms(id) {
+            EDITING_PERM_ID = id;
+            const u = DB[CURRENT_TAB].find(x => x.id === id);
+            document.getElementById('permTargetName').innerText = 'صلاحيات: ' + u.name;
+            const container = document.getElementById('permList');
+            container.innerHTML = '';
+
+            const userPerms = u.permissions || DEFAULT_PERMS;
+
+            SECTIONS.forEach(sec => {
+                const p = userPerms[sec.id] || {view: true, edit: false};
+                container.innerHTML += `
+                <div class="perm-item">
+                    <span>${sec.name}</span>
+                    <div style="display:flex; gap:15px;">
+                        <label><input type="checkbox" id="pv_${sec.id}" ${p.view ? 'checked' : ''}> معاينة</label>
+                        <label><input type="checkbox" id="pe_${sec.id}" ${p.edit ? 'checked' : ''}> تعديل</label>
+                    </div>
+                </div>`;
+            });
+            
+            document.getElementById('permModal').style.display = 'flex';
+        }
+
+        function submitPermissions() {
+            const u = DB[CURRENT_TAB].find(x => x.id === EDITING_PERM_ID);
+            
+            // Update User Object
+            SECTIONS.forEach(sec => {
+                if(!u.permissions[sec.id]) u.permissions[sec.id] = {};
+                u.permissions[sec.id].view = document.getElementById(`pv_${sec.id}`).checked;
+                u.permissions[sec.id].edit = document.getElementById(`pe_${sec.id}`).checked;
+            });
+
+            // SAVE to Storage
+            saveDB();
+
+            // If editing SELF, apply immediately
+            if (CURRENT_USER.id === u.id) {
+                CURRENT_USER = u; // Update session object
+                applyPermissions(); // Update sidebar visibility
+                
+                // If current page is now restricted, move to dashboard
+                const hash = window.location.hash.substring(1) || 'dashboard';
+                if(u.permissions[hash].view === false) {
+                    window.location.hash = '#dashboard';
+                }
+            }
+
+            closeModal('permModal');
+            alert('تم حفظ الصلاحيات بنجاح');
+        }
+
+        // === 5. User CRUD ===
 
         function setTab(tab, el) {
             CURRENT_TAB = tab;
@@ -373,39 +460,33 @@
             const thead = document.getElementById('tableHeadRow');
             tbody.innerHTML = '';
             
-            // Headers based on tab
-            if(CURRENT_TAB === 'teachers') {
-                thead.innerHTML = '<th>#</th><th>الاسم</th><th>القسم</th><th>الحالة</th><th>الإجراءات</th>';
-            } else {
-                thead.innerHTML = '<th>#</th><th>الاسم</th><th>الوظيفة</th><th>الهاتف</th><th>اسم الدخول</th><th>الحالة</th><th>الإجراءات</th>';
-            }
+            thead.innerHTML = CURRENT_TAB === 'teachers' 
+                ? '<th>#</th><th>الاسم</th><th>القسم</th><th>الحالة</th><th>الإجراءات</th>'
+                : '<th>#</th><th>الاسم</th><th>الوظيفة</th><th>الهاتف</th><th>اسم الدخول</th><th>الحالة</th><th>الإجراءات</th>';
 
             const list = DB[CURRENT_TAB] || [];
             list.forEach((u, idx) => {
                 let row = `<td>${idx+1}</td><td>${u.name}</td>`;
-                if(CURRENT_TAB === 'teachers') {
-                    row += `<td>${u.job || '-'}</td>`; // Job field used for Dept for teachers
-                } else {
-                    row += `<td>${u.job}</td><td>${u.phone}</td><td>${u.login}</td>`;
-                }
+                if(CURRENT_TAB === 'teachers') row += `<td>${u.job || '-'}</td>`;
+                else row += `<td>${u.job}</td><td>${u.phone}</td><td>${u.login}</td>`;
                 
-                const statusColor = u.status === 'active' ? '#28a745' : '#dc3545';
-                const statusText = u.status === 'active' ? 'مفعل' : 'معطل';
+                const stClr = u.status === 'active' ? '#28a745' : '#dc3545';
+                const stTxt = u.status === 'active' ? 'مفعل' : 'معطل';
+                row += `<td style="color:${stClr}; font-weight:bold;">${stTxt}</td>`;
                 
-                row += `<td style="color:${statusColor}; font-weight:bold;">${statusText}</td>`;
                 row += `<td>
-                    <button class="btn" style="padding:5px; background:#ffc107; color:#000;" onclick="openEdit(${u.id})">تعديل</button>
-                    <button class="btn" style="padding:5px; background:${u.status==='active'?'#dc3545':'#28a745'}; color:white;" onclick="toggleStatus(${u.id})">${u.status==='active'?'تعطيل':'تفعيل'}</button>
-                    <button class="btn" style="padding:5px; background:#17a2b8; color:white;" onclick="openPerms(${u.id})">الصلاحيات</button>
+                    <div style="display:flex; gap:5px;">
+                        <button class="btn" style="padding:5px; background:#ffc107; color:black; font-size:0.8rem;" onclick="openEdit(${u.id})">تعديل</button>
+                        <button class="btn" style="padding:5px; background:${u.status==='active'?'#dc3545':'#28a745'}; color:white; font-size:0.8rem;" onclick="toggleStatus(${u.id})">${u.status==='active'?'تعطيل':'تفعيل'}</button>
+                        ${CURRENT_TAB !== 'teachers' ? `<button class="btn" style="padding:5px; background:#17a2b8; color:white; font-size:0.8rem;" onclick="openPerms(${u.id})">صلاحيات</button>` : ''}
+                    </div>
                 </td>`;
-                
                 const tr = document.createElement('tr');
                 tr.innerHTML = row;
                 tbody.appendChild(tr);
             });
         }
 
-        // --- Add/Edit User ---
         function openAddUserModal() {
             document.getElementById('addUserForm').reset();
             document.getElementById('addUserModal').style.display = 'flex';
@@ -423,7 +504,6 @@
                 permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS)),
                 lastUpdate: new Date().toLocaleDateString('ar-BH')
             };
-            
             DB[CURRENT_TAB].push(newUser);
             saveDB();
             renderTable();
@@ -437,116 +517,55 @@
             document.getElementById('editJob').value = u.job;
             document.getElementById('editPhone').value = u.phone;
             document.getElementById('editLogin').value = u.login;
-            document.getElementById('editPass').value = u.pass; // Populate Password
+            document.getElementById('editPass').value = u.pass;
             document.getElementById('lastUpdate').innerText = u.lastUpdate || '-';
-            
             document.getElementById('editUserModal').style.display = 'flex';
         }
 
         function updateUser() {
-            const id = parseInt(document.getElementById('editId').value);
-            const u = DB[CURRENT_TAB].find(x => x.id === id);
-            
+            const id = document.getElementById('editId').value;
+            const u = DB[CURRENT_TAB].find(x => x.id == id);
             u.name = document.getElementById('editName').value;
             u.job = document.getElementById('editJob').value;
             u.phone = document.getElementById('editPhone').value;
             u.login = document.getElementById('editLogin').value;
-            
-            const newPass = document.getElementById('editPass').value;
-            if(newPass !== u.pass) {
-                u.pass = newPass;
-                u.lastUpdate = new Date().toLocaleDateString('ar-BH');
-            }
+            const np = document.getElementById('editPass').value;
+            if(np !== u.pass) { u.pass = np; u.lastUpdate = new Date().toLocaleDateString('ar-BH'); }
             
             saveDB();
-            
-            // If editing SELF, update UI immediately
-            if(CURRENT_USER.id === id) {
-                CURRENT_USER = u;
-                document.getElementById('headerUserName').innerText = u.name;
-            }
-            
             renderTable();
             closeModal('editUserModal');
         }
 
         function toggleStatus(id) {
             const u = DB[CURRENT_TAB].find(x => x.id === id);
-            u.status = (u.status === 'active') ? 'inactive' : 'active';
-            saveDB();
-            renderTable();
-        }
-
-        // --- Permissions Logic ---
-        let editingPermID = null;
-
-        function openPerms(id) {
-            editingPermID = id;
-            const u = DB[CURRENT_TAB].find(x => x.id === id);
-            const userPerms = u.permissions || DEFAULT_PERMS;
-            
-            document.getElementById('permTargetName').innerText = 'صلاحيات: ' + u.name;
-            const container = document.getElementById('permList');
-            container.innerHTML = '';
-
-            SECTIONS.forEach(sec => {
-                // Determine checked state
-                const p = userPerms[sec.id] || {view: true, edit: false};
-                
-                container.innerHTML += `
-                <div class="perm-item">
-                    <span>${sec.name}</span>
-                    <div>
-                        <label><input type="checkbox" id="p_view_${sec.id}" ${p.view ? 'checked' : ''}> معاينة</label>
-                        <label><input type="checkbox" id="p_edit_${sec.id}" ${p.edit ? 'checked' : ''}> تعديل</label>
-                    </div>
-                </div>`;
-            });
-            
-            document.getElementById('permModal').style.display = 'flex';
-        }
-
-        function submitPermissions() {
-            const u = DB[CURRENT_TAB].find(x => x.id === editingPermID);
-            
-            SECTIONS.forEach(sec => {
-                const view = document.getElementById(`p_view_${sec.id}`).checked;
-                const edit = document.getElementById(`p_edit_${sec.id}`).checked;
-                
-                // Update specific permission
-                if(!u.permissions[sec.id]) u.permissions[sec.id] = {};
-                u.permissions[sec.id].view = view;
-                u.permissions[sec.id].edit = edit;
-            });
-
-            saveDB(); // Persist to LocalStorage
-            
-            // IMMEDIATE EFFECT: If I edited my own permissions, refresh sidebar NOW
-            if (CURRENT_USER.id === editingPermID) {
-                CURRENT_USER = u; // Update memory object
-                applySidebarPermissions(); // Update UI
-                // If current page is now hidden, go to dashboard
-                const activePage = document.querySelector('.nav-links a.active').dataset.page;
-                if(u.permissions[activePage].view === false) {
-                    navigate('dashboard');
-                }
-            }
-
-            closeModal('permModal');
-            alert("تم حفظ الصلاحيات بنجاح");
+            u.status = u.status === 'active' ? 'inactive' : 'active';
+            saveDB(); renderTable();
         }
 
         // === Utils ===
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
         function togglePass(id, icon) {
-            const input = document.getElementById(id);
-            if(input.type === 'password') { input.type = 'text'; icon.classList.replace('fa-eye', 'fa-eye-slash'); }
-            else { input.type = 'password'; icon.classList.replace('fa-eye-slash', 'fa-eye'); }
+            const i = document.getElementById(id);
+            if(i.type==='password'){i.type='text'; icon.className='fas fa-eye-slash password-icon';}
+            else{i.type='password'; icon.className='fas fa-eye password-icon';}
+        }
+        function setSettingTab(t, el) {
+            document.querySelectorAll('.setting-tab-pane').forEach(p=>p.classList.remove('active'));
+            document.getElementById(t).classList.add('active');
+            document.querySelectorAll('.settings-nav-item').forEach(i=>i.classList.remove('active'));
+            el.classList.add('active');
+        }
+        function saveConfig() { 
+            // Here you would save school name etc to DB
+            alert('تم الحفظ'); 
         }
 
         // Start
         document.getElementById('loginForm').addEventListener('submit', login);
         initSystem();
+        const ctx = document.getElementById('chart').getContext('2d');
+        new Chart(ctx, {type:'bar',data:{labels:['العربية','الرياضيات','العلوم'],datasets:[{label:'البيانات',data:[12,19,3],backgroundColor:'#1e4078'}]}});
 
     </script>
 </body>
