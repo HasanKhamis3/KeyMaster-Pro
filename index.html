@@ -71,14 +71,14 @@
             transition: 0.2s;
             display: inline-flex;
             align-items: center;
-            gap: 5px; /* Space between icon and text */
+            gap: 5px;
             font-weight: 600;
         }
         .btn-view { background: #ffc107; color: #333; }
         .btn-edit { background: #17a2b8; }
         .btn-delete { background: #dc3545; }
         .btn-perm { background: #343a40; }
-        .btn-toggle { background: #28a745; }
+        .btn-toggle { background: #28a745; min-width: 80px; justify-content: center; }
         .btn-toggle.off { background: #6c757d; }
         .action-btn:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 
@@ -173,11 +173,12 @@
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
                     <h3>إدارة المستخدمين</h3>
                     
-                    <div id="userActionButtons" style="display:flex; gap:10px;">
+                    <div id="userActionButtons" style="display:flex; gap:10px; flex-wrap:wrap;">
                         <button id="addBtnMain" class="btn" style="background:#2c5aa0; color:white;" onclick="openAddUserModal()"><i class="fas fa-plus"></i> إضافة جديد</button>
                         <button class="btn" style="background:#17a2b8; color:white;" onclick="exportCSV()"><i class="fas fa-file-export"></i> تصدير CSV</button>
                         <button class="btn" style="background:#dc3545; color:white;" onclick="deleteSelected()"><i class="fas fa-trash"></i> حذف المحدد</button>
                         <button class="btn" style="background:#6c757d; color:white;" onclick="toggleStatusSelected()"><i class="fas fa-toggle-on"></i> تفعيل/إلغاء المحدد</button>
+                        <button id="bulkPermBtn" class="btn" style="background:#343a40; color:white;" onclick="openBulkPerms()"><i class="fas fa-key"></i> صلاحيات المحدد</button>
                     </div>
                     <div id="noEditPermissionMsg" style="display:none; color:red; font-weight:bold;">(وضع القراءة فقط)</div>
                 </div>
@@ -237,9 +238,7 @@
             <div class="modal-body">
                 <form id="addUserForm">
                     <input type="hidden" id="editUserId">
-                    
                     <label>الاسم الكامل / اسم القسم</label><input type="text" id="addName" class="form-control" required>
-                    
                     <div id="userFields">
                         <label>الوظيفة</label><input type="text" id="addJob" class="form-control">
                         <label>رقم الهاتف</label><input type="text" id="addPhone" class="form-control">
@@ -305,17 +304,14 @@
         let CURRENT_USER = null;
         let CURRENT_TAB = 'senior';
         let EDITING_PERM_ID = null;
+        let IS_BULK_PERM_MODE = false;
 
         // === Core Functions ===
         function initSystem() {
             const storedDB = localStorage.getItem('QualitySys_DB_V2');
             if (storedDB) {
                 DB = JSON.parse(storedDB);
-                
-                // Ensure departments array exists
                 if(!DB.departments) DB.departments = [];
-
-                // Cleanup and ensure permissions
                 ['admins', 'senior', 'middle', 'teachers', 'departments'].forEach(grp => {
                     if(DB[grp]) {
                         DB[grp].forEach(u => { 
@@ -329,18 +325,11 @@
                     }
                 });
                 
-                // Force Admin Login & Permissions
                 if(!DB.admins) DB.admins = JSON.parse(JSON.stringify(INITIAL_DB.admins));
                 const adm = DB.admins.find(u => u.login === 'admin');
                 if(adm) { 
-                    adm.pass = 'Hasan@12';
-                    adm.job = 'مدير النظام';
-                    adm.status = 'active'; 
-                    SECTIONS.forEach(sec => {
-                        if(!adm.permissions[sec.id]) adm.permissions[sec.id] = {};
-                        adm.permissions[sec.id].view = true;
-                        adm.permissions[sec.id].edit = true;
-                    });
+                    adm.pass = 'Hasan@12'; adm.job = 'مدير النظام'; adm.status = 'active'; 
+                    SECTIONS.forEach(sec => { if(!adm.permissions[sec.id]) adm.permissions[sec.id] = {}; adm.permissions[sec.id].view = true; adm.permissions[sec.id].edit = true; });
                 } else { 
                     const newAdmin = JSON.parse(JSON.stringify(INITIAL_DB.admins[0]));
                     SECTIONS.forEach(sec => { newAdmin.permissions[sec.id] = {view: true, edit: true}; });
@@ -361,16 +350,9 @@
                     const u = DB[grp].find(x => x.id == sessionID);
                     if(u) found = u;
                 });
-                
-                if (found && found.status === 'active') {
-                    CURRENT_USER = found;
-                    showApp();
-                } else {
-                    document.getElementById('loginPage').style.display = 'flex';
-                }
-            } else {
-                document.getElementById('loginPage').style.display = 'flex';
-            }
+                if (found && found.status === 'active') { CURRENT_USER = found; showApp(); }
+                else { document.getElementById('loginPage').style.display = 'flex'; }
+            } else { document.getElementById('loginPage').style.display = 'flex'; }
         }
 
         function saveDB() { localStorage.setItem('QualitySys_DB_V2', JSON.stringify(DB)); }
@@ -406,11 +388,7 @@
             }
         }
 
-        function logout() {
-            localStorage.removeItem('QualitySys_Session');
-            location.reload();
-        }
-
+        function logout() { localStorage.removeItem('QualitySys_Session'); location.reload(); }
         function resetSystem() {
             if(confirm('تحذير: سيتم حذف كافة البيانات. هل أنت متأكد؟')) {
                 localStorage.removeItem('QualitySys_DB_V2');
@@ -419,13 +397,9 @@
             }
         }
 
-        // === Permissions System ===
         function navigate(pageId) {
             const perms = CURRENT_USER.permissions || DEFAULT_PERMS;
-            if (perms[pageId] && perms[pageId].view === false) {
-                alert("عذراً، ليس لديك صلاحية للوصول إلى هذه الصفحة.");
-                return;
-            }
+            if (perms[pageId] && perms[pageId].view === false) { alert("عذراً، ليس لديك صلاحية للوصول إلى هذه الصفحة."); return; }
             document.querySelectorAll('.section-card').forEach(d => d.classList.remove('active'));
             document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
             const target = document.getElementById(pageId);
@@ -466,6 +440,7 @@
             const headRow = document.getElementById('tableHeadRow');
             const tbody = document.getElementById('usersTableBody');
             const addBtn = document.getElementById('addBtnMain');
+            const bulkPermBtn = document.getElementById('bulkPermBtn');
             
             tbody.innerHTML = '';
             
@@ -483,7 +458,6 @@
                 noEditMsg.style.display = 'block';
             }
 
-            // Headers
             if (CURRENT_TAB === 'departments') {
                 headRow.innerHTML = `
                     <th width="5%"><input type="checkbox" id="selectAll" class="custom-checkbox" onchange="toggleSelectAll(this)"></th>
@@ -494,6 +468,7 @@
                 `;
                 addBtn.innerText = "إضافة قسم جديد";
                 addBtn.setAttribute('onclick', 'openAddUserModal()'); 
+                if(bulkPermBtn) bulkPermBtn.style.display = 'none'; // No bulk perms for departments
             } else {
                 headRow.innerHTML = `
                     <th width="5%"><input type="checkbox" id="selectAll" class="custom-checkbox" onchange="toggleSelectAll(this)"></th>
@@ -505,6 +480,7 @@
                 `;
                 addBtn.innerText = "إضافة اسم جديد";
                 addBtn.setAttribute('onclick', 'openAddUserModal()');
+                if(bulkPermBtn) bulkPermBtn.style.display = 'inline-flex';
             }
 
             const list = DB[CURRENT_TAB] || [];
@@ -522,28 +498,23 @@
                 }
                 
                 row += `<td>${statusBadge}</td>`;
-                row += `<td><div style="display:flex; justify-content:center; gap:5px; flex-wrap:wrap;">`;
+                row += `<td><div style="display:flex; justify-content:center; gap:2px; flex-wrap:wrap;">`;
                 
-                // Dept Actions
                 if (CURRENT_TAB === 'departments') {
                     if(canEdit) {
                         row += `<button class="action-btn btn-toggle ${isActive?'':'off'}" onclick="toggleStatus(${u.id})"><i class="fas fa-power-off"></i> ${isActive?'تعطيل':'تفعيل'}</button>
                                 <button class="action-btn btn-edit" onclick="editUser(${u.id})"><i class="fas fa-edit"></i> تعديل</button>
                                 <button class="action-btn btn-delete" onclick="deleteUser(${u.id})"><i class="fas fa-trash"></i> حذف</button>`;
-                    } else {
-                        row += `<span style="color:#999; font-size:0.8rem;">لا توجد صلاحية</span>`;
-                    }
+                    } else { row += `<span style="color:#999; font-size:0.8rem;">لا توجد صلاحية</span>`; }
                 } else {
-                    // User Actions
                     row += `<button class="action-btn btn-view" onclick="viewUser(${u.id})"><i class="fas fa-eye"></i> معاينة</button>`;
                     if (canEdit) {
-                        row += `<button class="action-btn btn-toggle ${isActive?'':'off'}" onclick="toggleStatus(${u.id})"><i class="fas fa-power-off"></i></button>
+                        row += `<button class="action-btn btn-toggle ${isActive?'':'off'}" onclick="toggleStatus(${u.id})"><i class="fas fa-power-off"></i> ${isActive?'تعطيل':'تفعيل'}</button>
                                 <button class="action-btn btn-edit" onclick="editUser(${u.id})"><i class="fas fa-edit"></i> تعديل</button>
                                 <button class="action-btn btn-delete" onclick="deleteUser(${u.id})"><i class="fas fa-trash"></i> حذف</button>
                                 <button class="action-btn btn-perm" onclick="openPerms(${u.id})"><i class="fas fa-key"></i> صلاحيات</button>`;
                     }
                 }
-                
                 row += `</div></td>`;
                 const tr = document.createElement('tr');
                 tr.innerHTML = row;
@@ -551,10 +522,7 @@
             });
         }
 
-        // --- Bulk Actions ---
-        function toggleSelectAll(source) {
-            document.querySelectorAll('.user-select-cb').forEach(cb => { if(!cb.disabled) cb.checked = source.checked; });
-        }
+        function toggleSelectAll(source) { document.querySelectorAll('.user-select-cb').forEach(cb => { if(!cb.disabled) cb.checked = source.checked; }); }
 
         function deleteSelected() {
             const checkboxes = document.querySelectorAll('.user-select-cb:checked');
@@ -581,11 +549,7 @@
 
         function toggleStatus(id) {
             const u = DB[CURRENT_TAB].find(x => x.id === id);
-            if(u) {
-                u.status = (u.status === 'active') ? 'inactive' : 'active';
-                saveDB();
-                renderTable();
-            }
+            if(u) { u.status = (u.status === 'active') ? 'inactive' : 'active'; saveDB(); renderTable(); }
         }
 
         function exportCSV() {
@@ -594,14 +558,10 @@
             let csvContent = "";
             if (CURRENT_TAB === 'departments') {
                 csvContent = "الترتيب,اسم القسم,الحالة\n";
-                list.forEach((row, idx) => {
-                    csvContent += `${idx+1},"${row.name}","${row.status}"\n`;
-                });
+                list.forEach((row, idx) => { csvContent += `${idx+1},"${row.name}","${row.status}"\n`; });
             } else {
                 csvContent = "الاسم الكامل,الوظيفة,رقم الهاتف,اسم المستخدم,كلمة المرور,تاريخ الإضافة,الحالة\n";
-                list.forEach(row => {
-                    csvContent += `"${row.name}","${row.job||row.dept}","${row.phone}","${row.login}","${row.pass}","${row.dateAdded}","${row.status}"\n`;
-                });
+                list.forEach(row => { csvContent += `"${row.name}","${row.job||row.dept}","${row.phone}","${row.login}","${row.pass}","${row.dateAdded}","${row.status}"\n`; });
             }
             const bom = "\uFEFF";
             const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -614,84 +574,57 @@
             document.body.removeChild(link);
         }
 
-        // === Modal Logic (Add / Edit) ===
         function openAddUserModal() { 
             const isDept = (CURRENT_TAB === 'departments');
             document.getElementById('userFields').style.display = isDept ? 'none' : 'block';
             document.getElementById('addUserModalTitle').innerText = isDept ? 'إضافة قسم جديد' : 'إضافة مستخدم جديد';
-            
-            // Clear input for new add
             document.getElementById('editUserId').value = ''; 
             document.getElementById('addUserForm').reset();
-            
             document.getElementById('addUserModal').style.display = 'flex'; 
         }
 
         function editUser(id) {
             const u = DB[CURRENT_TAB].find(x => x.id === id);
             if(!u) return;
-
-            // Pre-fill data
             document.getElementById('editUserId').value = u.id;
             document.getElementById('addName').value = u.name;
-            
             const isDept = (CURRENT_TAB === 'departments');
             document.getElementById('userFields').style.display = isDept ? 'none' : 'block';
-            
             if(!isDept) {
                 document.getElementById('addJob').value = u.job || u.dept || '';
                 document.getElementById('addPhone').value = u.phone || '';
                 document.getElementById('addLogin').value = u.login || '';
                 document.getElementById('addPass').value = u.pass || '';
             }
-
             document.getElementById('addUserModalTitle').innerText = 'تعديل البيانات';
             document.getElementById('addUserModal').style.display = 'flex'; 
         }
 
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
         
-        // Combined Save/Update Function
         function saveUserForm() {
             const name = document.getElementById('addName').value.trim();
             if(!name) { alert("يرجى إدخال الاسم"); return; }
-
             const editId = document.getElementById('editUserId').value;
             const isEdit = editId !== '';
-
-            // Identify object to update or create new
             let targetUser;
-            
             if (isEdit) {
                 targetUser = DB[CURRENT_TAB].find(u => u.id == editId);
-                // If editing, update existing properties
                 targetUser.name = name;
             } else {
-                // If adding, create new
-                targetUser = {
-                    id: Date.now(),
-                    name: name,
-                    status: 'active'
-                };
+                targetUser = { id: Date.now(), name: name, status: 'active' };
                 if (CURRENT_TAB !== 'departments') {
                     targetUser.dateAdded = new Date().toLocaleDateString('en-GB');
                     targetUser.permissions = JSON.parse(JSON.stringify(DEFAULT_PERMS));
                 }
             }
-
-            // Update user-specific fields
             if (CURRENT_TAB !== 'departments') {
                 targetUser.job = document.getElementById('addJob').value.trim();
                 targetUser.phone = document.getElementById('addPhone').value.trim();
                 targetUser.login = document.getElementById('addLogin').value.trim();
                 targetUser.pass = document.getElementById('addPass').value.trim();
             }
-
-            // If new, push to array
-            if (!isEdit) {
-                DB[CURRENT_TAB].push(targetUser);
-            }
-
+            if (!isEdit) DB[CURRENT_TAB].push(targetUser);
             saveDB();
             renderTable();
             closeModal('addUserModal');
@@ -723,8 +656,34 @@
             document.getElementById('viewUserModal').style.display = 'flex';
         }
 
+        // --- Bulk Permissions Logic ---
+        function openBulkPerms() {
+            const checkboxes = document.querySelectorAll('.user-select-cb:checked');
+            if(checkboxes.length === 0) { alert('لم يتم تحديد أي مستخدم.'); return; }
+            IS_BULK_PERM_MODE = true;
+            document.getElementById('permTargetName').innerText = `تعديل صلاحيات (${checkboxes.length}) مستخدم`;
+            // Reset modal checks to empty/unchecked or default to avoid confusion
+            document.querySelectorAll('#permList input[type="checkbox"]').forEach(cb => cb.checked = false);
+            
+            // Build the perm list UI similar to openPerms but without pre-checking
+            const container = document.getElementById('permList');
+            container.innerHTML = '';
+            SECTIONS.forEach(sec => {
+                container.innerHTML += `
+                <div class="perm-item">
+                    <span>${sec.name}</span>
+                    <div style="display:flex; gap:15px;">
+                        <label><input type="checkbox" id="pv_${sec.id}"> معاينة</label>
+                        <label><input type="checkbox" id="pe_${sec.id}"> تعديل</label>
+                    </div>
+                </div>`;
+            });
+            document.getElementById('permModal').style.display = 'flex';
+        }
+
         function openPerms(id) {
             if (CURRENT_TAB === 'departments') return;
+            IS_BULK_PERM_MODE = false;
             EDITING_PERM_ID = id;
             const u = DB[CURRENT_TAB].find(x => x.id === id);
             document.getElementById('permTargetName').innerText = 'صلاحيات: ' + u.name;
@@ -746,18 +705,38 @@
         }
 
         function submitPermissions() {
-            const u = DB[CURRENT_TAB].find(x => x.id === EDITING_PERM_ID);
-            SECTIONS.forEach(sec => {
-                if(!u.permissions[sec.id]) u.permissions[sec.id] = {};
-                u.permissions[sec.id].view = document.getElementById(`pv_${sec.id}`).checked;
-                u.permissions[sec.id].edit = document.getElementById(`pe_${sec.id}`).checked;
-            });
-            saveDB();
-            if (CURRENT_USER.id === u.id) { 
-                CURRENT_USER = u; 
-                applySidebarPermissions(); 
-                renderTable();
+            if (IS_BULK_PERM_MODE) {
+                // Bulk Save
+                const checkboxes = document.querySelectorAll('.user-select-cb:checked');
+                const ids = Array.from(checkboxes).map(cb => parseInt(cb.value));
+                
+                // Get the new permission state from modal
+                const newPerms = {};
+                SECTIONS.forEach(sec => {
+                    newPerms[sec.id] = {
+                        view: document.getElementById(`pv_${sec.id}`).checked,
+                        edit: document.getElementById(`pe_${sec.id}`).checked
+                    };
+                });
+
+                DB[CURRENT_TAB].forEach(u => {
+                    if (ids.includes(u.id)) {
+                        // Apply permissions. Note: We clone to avoid reference issues
+                        u.permissions = JSON.parse(JSON.stringify(newPerms));
+                    }
+                });
+                alert('تم تحديث صلاحيات المستخدمين المحددين بنجاح.');
+            } else {
+                // Single Save
+                const u = DB[CURRENT_TAB].find(x => x.id === EDITING_PERM_ID);
+                SECTIONS.forEach(sec => {
+                    if(!u.permissions[sec.id]) u.permissions[sec.id] = {};
+                    u.permissions[sec.id].view = document.getElementById(`pv_${sec.id}`).checked;
+                    u.permissions[sec.id].edit = document.getElementById(`pe_${sec.id}`).checked;
+                });
+                if (CURRENT_USER.id === u.id) { CURRENT_USER = u; applySidebarPermissions(); renderTable(); }
             }
+            saveDB();
             closeModal('permModal');
         }
 
