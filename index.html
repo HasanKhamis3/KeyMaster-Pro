@@ -140,6 +140,10 @@
         .btn-add-visitor { background-color: var(--primary); color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; }
         .btn-add-visitor:hover { opacity: 0.9; }
 
+        /* --- System Log Styles --- */
+        .log-table-wrapper { max-height: 400px; overflow-y: auto; border: 1px solid #eee; border-radius: 6px; }
+        .log-details { font-size: 0.85rem; color: #666; max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
         /* Picker Modal List */
         .picker-list { max-height: 300px; overflow-y: auto; border: 1px solid #eee; border-radius: 6px; }
         .picker-item { padding: 10px 15px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
@@ -327,29 +331,23 @@
 
                 <div id="sig" class="setting-content-pane">
                     <p style="margin-bottom:20px; color:#666;">تحديد الأشخاص المسؤولين عن توقيع التقرير من القيادة العليا</p>
-                    
                     <div class="signature-grid">
                         <div class="signature-card">
                             <div class="signature-title">مدير/ة المدرسة</div>
                             <div class="form-group">
                                 <label style="display:block; text-align:right; margin-bottom:5px; color:#777;">اختر مدير/ة المدرسة</label>
-                                <select id="sig_director" class="form-control">
-                                    <option value="">اختر مدير المدرسة</option>
-                                </select>
+                                <select id="sig_director" class="form-control"><option value="">اختر مدير المدرسة</option></select>
                             </div>
                             <div style="display:flex; gap:10px; justify-content:center; margin-top:20px;">
                                 <button class="btn btn-primary" style="min-width:100px;" onclick="saveSignatureSettings()">حفظ</button>
                                 <button class="btn" style="background:#dc3545; color:white; min-width:100px;" onclick="clearSignature('sig_director')">إزالة</button>
                             </div>
                         </div>
-
                         <div class="signature-card">
                             <div class="signature-title">المدير/ة المساعد/ة</div>
                             <div class="form-group">
                                 <label style="display:block; text-align:right; margin-bottom:5px; color:#777;">اختر المدير/ة المساعد/ة</label>
-                                <select id="sig_assistant" class="form-control">
-                                    <option value="">اختر المدير المساعد</option>
-                                </select>
+                                <select id="sig_assistant" class="form-control"><option value="">اختر المدير المساعد</option></select>
                             </div>
                             <div style="display:flex; gap:10px; justify-content:center; margin-top:20px;">
                                 <button class="btn btn-primary" style="min-width:100px;" onclick="saveSignatureSettings()">حفظ</button>
@@ -361,30 +359,69 @@
 
                 <div id="vis" class="setting-content-pane">
                     <p style="margin-bottom:20px; color:#666;">حدد ترتيب ظهور أسماء الزوار في تقرير الزيارات الصفية</p>
-                    
                     <div class="visitor-section">
                         <div class="visitor-section-title">القيادة العليا</div>
-                        <ul id="list_visitor_senior" class="visitor-list">
-                            <li class="empty-list-msg">لم يتم إضافة زوار بعد</li>
-                        </ul>
+                        <ul id="list_visitor_senior" class="visitor-list"><li class="empty-list-msg">لم يتم إضافة زوار بعد</li></ul>
                         <button class="btn-add-visitor" onclick="openVisitorPicker('senior')">+ إضافة زائر من القيادة العليا</button>
                     </div>
-
                     <div class="visitor-section">
                         <div class="visitor-section-title">القيادة الوسطى</div>
-                        <ul id="list_visitor_middle" class="visitor-list">
-                            <li class="empty-list-msg">لم يتم إضافة زوار بعد</li>
-                        </ul>
+                        <ul id="list_visitor_middle" class="visitor-list"><li class="empty-list-msg">لم يتم إضافة زوار بعد</li></ul>
                         <button class="btn-add-visitor" onclick="openVisitorPicker('middle')">+ إضافة زائر من القيادة الوسطى</button>
                     </div>
-
                     <div style="text-align: left; margin-top: 20px;">
                         <button class="btn btn-toggle" onclick="saveVisitorOrder()">حفظ الترتيب</button>
                     </div>
                 </div>
 
-                <div id="fot" class="setting-content-pane"><h3>إعدادات التذييل</h3></div>
-                <div id="log" class="setting-content-pane"><h3>سجل النظام</h3></div>
+                <div id="fot" class="setting-content-pane">
+                    <h4 style="color:var(--primary); margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">نصوص تذييل التقرير</h4>
+                    <p style="color:#666; font-size:0.9rem; margin-bottom:20px;">يمكنك تخصيص النصوص التي تظهر أسفل كل صفحة في التقارير المطبوعة.</p>
+                    
+                    <div style="display:flex; gap:20px; flex-wrap:wrap;">
+                        <div class="form-group" style="flex:1;">
+                            <label>النص في اليمين</label>
+                            <input type="text" id="footer_right" class="form-control" placeholder="مثال: وزارة التربية والتعليم">
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label>النص في الوسط</label>
+                            <input type="text" id="footer_center" class="form-control" placeholder="مثال: نظام جودة التعليم">
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label>النص في اليسار</label>
+                            <input type="text" id="footer_left" class="form-control" placeholder="مثال: رقم الصفحة">
+                        </div>
+                    </div>
+
+                    <div style="margin-top:20px; border-top:1px solid #eee; padding-top:20px; text-align:left;">
+                        <button class="btn btn-primary" style="width:150px;" onclick="saveFooterSettings()">حفظ التذييل</button>
+                    </div>
+                </div>
+
+                <div id="log" class="setting-content-pane">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <h4 style="color:var(--primary); margin:0;">سجل العمليات (Audit Log)</h4>
+                        <div>
+                            <button class="btn" style="background:#17a2b8; color:white; font-size:0.8rem;" onclick="loadSystemLogs()"><i class="fas fa-sync"></i> تحديث</button>
+                            <button class="btn" style="background:#dc3545; color:white; font-size:0.8rem;" onclick="clearSystemLogs()"><i class="fas fa-trash"></i> مسح السجل</button>
+                        </div>
+                    </div>
+                    
+                    <div class="log-table-wrapper">
+                        <table class="custom-table" style="font-size:0.9rem;">
+                            <thead>
+                                <tr>
+                                    <th width="20%">التاريخ والوقت</th>
+                                    <th width="20%">المستخدم</th>
+                                    <th width="20%">الحدث</th>
+                                    <th width="40%">التفاصيل</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logTableBody">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
@@ -426,7 +463,6 @@
             <div class="modal-header">إدارة الصلاحيات <span onclick="closeModal('permModal')" style="cursor:pointer;">&times;</span></div>
             <div class="modal-body">
                 <h4 id="permTargetName" style="margin-top:0; color:var(--primary); margin-bottom:15px;"></h4>
-                
                 <div class="perm-header">
                     <span>تحديد الكل</span>
                     <div style="display:flex; gap:15px;">
@@ -434,7 +470,6 @@
                         <label><input type="checkbox" onchange="toggleAllPerms('edit', this)"> الكل تعديل</label>
                     </div>
                 </div>
-
                 <div class="perm-list" id="permList"></div>
             </div>
             <div class="modal-footer">
@@ -490,13 +525,16 @@
                 ministryLogo: '',
                 schoolLogo: '',
                 schoolStamp: '',
-                // Signatures
                 signature_director_id: '',
                 signature_assistant_id: '',
-                // Visitor Orders (storing IDs)
                 visitor_order_senior: [],
-                visitor_order_middle: []
-            }
+                visitor_order_middle: [],
+                // Footer Settings
+                footer_right: 'وزارة التربية والتعليم',
+                footer_center: '',
+                footer_left: ''
+            },
+            logs: [] // System Audit Logs
         };
 
         let DB = {}; 
@@ -504,7 +542,7 @@
         let CURRENT_TAB = 'senior';
         let EDITING_PERM_ID = null;
         let IS_BULK_PERM_MODE = false;
-        let CURRENT_PICKER_TYPE = null; // 'senior' or 'middle'
+        let CURRENT_PICKER_TYPE = null;
 
         // === Core Functions ===
         function initSystem() {
@@ -512,9 +550,10 @@
             if (storedDB) {
                 DB = JSON.parse(storedDB);
                 if(!DB.departments) DB.departments = [];
-                // Ensure settings exist and merge with default structure
                 if(!DB.settings) DB.settings = {};
+                // Merge new settings keys if missing
                 DB.settings = {...INITIAL_DB.settings, ...DB.settings};
+                if(!DB.logs) DB.logs = [];
 
                 ['admins', 'senior', 'middle', 'teachers', 'departments'].forEach(grp => {
                     if(DB[grp] && Array.isArray(DB[grp])) {
@@ -563,6 +602,22 @@
 
         function saveDB() { localStorage.setItem('QualitySys_DB_V2', JSON.stringify(DB)); }
 
+        // --- Logger Helper ---
+        function addSystemLog(action, details) {
+            const logEntry = {
+                id: Date.now(),
+                date: new Date().toLocaleString('en-GB'),
+                user: CURRENT_USER ? CURRENT_USER.name : 'النظام/زائر',
+                action: action,
+                details: details
+            };
+            if(!DB.logs) DB.logs = [];
+            DB.logs.unshift(logEntry); // Add to top
+            // Limit log size to 500 entries to prevent localStorage bloat
+            if(DB.logs.length > 500) DB.logs = DB.logs.slice(0, 500);
+            saveDB();
+        }
+
         function login(e) {
             e.preventDefault();
             const errBox = document.getElementById('loginError');
@@ -584,18 +639,24 @@
                 if (userFound.status === 'active') {
                     CURRENT_USER = userFound;
                     localStorage.setItem('QualitySys_Session', userFound.id);
+                    addSystemLog('تسجيل دخول', `المستخدم: ${userFound.name}`);
                     showApp();
                 } else {
-                    errBox.innerText = "نعتذر منك، الحساب غير نشط حالياً.\nيرجى مراجعة إدارة النظام للمساعدة.";
+                    errBox.innerText = "نعتذر منك، الحساب غير نشط حالياً.";
                     errBox.style.display = 'block';
                 }
             } else {
-                errBox.innerText = "بيانات غير صحيحة. يرجى التأكد من اسم المستخدم وكلمة المرور.";
+                errBox.innerText = "بيانات غير صحيحة.";
                 errBox.style.display = 'block';
             }
         }
 
-        function logout() { localStorage.removeItem('QualitySys_Session'); location.reload(); }
+        function logout() { 
+            if(CURRENT_USER) addSystemLog('تسجيل خروج', `المستخدم: ${CURRENT_USER.name}`);
+            localStorage.removeItem('QualitySys_Session'); 
+            location.reload(); 
+        }
+
         function resetSystem() {
             if(confirm('تحذير: سيتم حذف كافة البيانات. هل أنت متأكد؟')) {
                 localStorage.removeItem('QualitySys_DB_V2');
@@ -614,9 +675,7 @@
             if (target) target.classList.add('active');
             if (link) link.classList.add('active');
             
-            if(pageId === 'settings') {
-                loadSettings();
-            }
+            if(pageId === 'settings') loadSettings();
         }
 
         function showApp() {
@@ -640,7 +699,6 @@
         function setTab(tab, el) {
             CURRENT_TAB = tab;
             document.querySelectorAll('.custom-tab').forEach(t => {
-                // Only remove active from user management tabs
                 if(t.parentElement.previousElementSibling && t.parentElement.previousElementSibling.firstElementChild && t.parentElement.previousElementSibling.firstElementChild.innerText.includes('إدارة المستخدمين'))
                     t.classList.remove('active');
             });
@@ -655,22 +713,15 @@
             const tbody = document.getElementById('usersTableBody');
             const addBtn = document.getElementById('addBtnMain');
             const bulkPermBtn = document.getElementById('bulkPermBtn');
-            
             tbody.innerHTML = '';
             
             const userPerms = CURRENT_USER.permissions['user-management'] || {view:true, edit:false};
             const canEdit = userPerms.edit === true;
-
             const actionButtons = document.getElementById('userActionButtons');
             const noEditMsg = document.getElementById('noEditPermissionMsg');
             
-            if(canEdit) {
-                actionButtons.style.display = 'flex';
-                noEditMsg.style.display = 'none';
-            } else {
-                actionButtons.style.display = 'none';
-                noEditMsg.style.display = 'block';
-            }
+            if(canEdit) { actionButtons.style.display = 'flex'; noEditMsg.style.display = 'none'; } 
+            else { actionButtons.style.display = 'none'; noEditMsg.style.display = 'block'; }
 
             if (CURRENT_TAB === 'departments') {
                 headRow.innerHTML = `
@@ -700,25 +751,16 @@
             const list = DB[CURRENT_TAB] || [];
             list.forEach((u, idx) => {
                 const isActive = u.status === 'active';
-                const statusBadge = isActive 
-                    ? `<span class="status-badge status-active">مفعل</span>`
-                    : `<span class="status-badge status-inactive">معطل</span>`;
-
+                const statusBadge = isActive ? `<span class="status-badge status-active">مفعل</span>` : `<span class="status-badge status-inactive">معطل</span>`;
                 let row = `<td><input type="checkbox" class="custom-checkbox user-select-cb" value="${u.id}" ${canEdit ? '' : 'disabled'}></td>`;
                 row += `<td>${idx+1}</td><td>${u.name}</td>`;
-                
-                if (CURRENT_TAB !== 'departments') {
-                    row += `<td>${u.job || (CURRENT_TAB === 'teachers' ? u.dept : '-')}</td>`;
-                }
-                
+                if (CURRENT_TAB !== 'departments') row += `<td>${u.job || (CURRENT_TAB === 'teachers' ? u.dept : '-')}</td>`;
                 row += `<td>${statusBadge}</td>`;
                 row += `<td><div style="display:flex; justify-content:center; gap:2px; flex-wrap:wrap;">`;
-                
                 if(canEdit) {
                     row += `<button class="action-btn btn-move" onclick="moveUser(${u.id}, 'up')" title="نقل لأعلى"><i class="fas fa-arrow-up"></i></button>`;
                     row += `<button class="action-btn btn-move" onclick="moveUser(${u.id}, 'down')" title="نقل لأسفل"><i class="fas fa-arrow-down"></i></button>`;
                 }
-
                 if (CURRENT_TAB === 'departments') {
                     if(canEdit) {
                         row += `<button class="action-btn btn-toggle ${isActive?'':'off'}" onclick="toggleStatus(${u.id})"><i class="fas fa-power-off"></i> ${isActive?'تعطيل':'تفعيل'}</button>
@@ -741,22 +783,16 @@
             });
         }
 
-        // --- Reordering Logic ---
         function moveUser(id, direction) {
             const list = DB[CURRENT_TAB];
             const index = list.findIndex(u => u.id === id);
             if (index === -1) return;
-
-            if (direction === 'up' && index > 0) {
-                [list[index], list[index - 1]] = [list[index - 1], list[index]];
-            } else if (direction === 'down' && index < list.length - 1) {
-                [list[index], list[index + 1]] = [list[index + 1], list[index]];
-            }
+            if (direction === 'up' && index > 0) { [list[index], list[index - 1]] = [list[index - 1], list[index]]; } 
+            else if (direction === 'down' && index < list.length - 1) { [list[index], list[index + 1]] = [list[index + 1], list[index]]; }
             saveDB();
             renderTable();
         }
 
-        // --- Bulk Actions ---
         function toggleSelectAll(source) { document.querySelectorAll('.user-select-cb').forEach(cb => { if(!cb.disabled) cb.checked = source.checked; }); }
 
         function deleteSelected() {
@@ -765,6 +801,7 @@
             if(confirm(`هل أنت متأكد من حذف ${checkboxes.length} عنصر؟`)) {
                 const idsToDelete = Array.from(checkboxes).map(cb => parseInt(cb.value));
                 DB[CURRENT_TAB] = DB[CURRENT_TAB].filter(u => !idsToDelete.includes(u.id));
+                addSystemLog('حذف جماعي', `حذف ${idsToDelete.length} عنصر من ${CURRENT_TAB}`);
                 saveDB();
                 renderTable();
                 document.getElementById('selectAll').checked = false;
@@ -775,16 +812,19 @@
             const checkboxes = document.querySelectorAll('.user-select-cb:checked');
             if(checkboxes.length === 0) { alert('لم يتم تحديد أي عنصر.'); return; }
             const idsToToggle = Array.from(checkboxes).map(cb => parseInt(cb.value));
-            DB[CURRENT_TAB].forEach(u => {
-                if(idsToToggle.includes(u.id)) u.status = (u.status === 'active') ? 'inactive' : 'active';
-            });
+            DB[CURRENT_TAB].forEach(u => { if(idsToToggle.includes(u.id)) u.status = (u.status === 'active') ? 'inactive' : 'active'; });
+            addSystemLog('تغيير حالة جماعي', `تعديل ${idsToToggle.length} عنصر في ${CURRENT_TAB}`);
             saveDB();
             renderTable();
         }
 
         function toggleStatus(id) {
             const u = DB[CURRENT_TAB].find(x => x.id === id);
-            if(u) { u.status = (u.status === 'active') ? 'inactive' : 'active'; saveDB(); renderTable(); }
+            if(u) { 
+                u.status = (u.status === 'active') ? 'inactive' : 'active'; 
+                addSystemLog('تغيير حالة', `المستخدم/القسم: ${u.name} - الحالة الجديدة: ${u.status}`);
+                saveDB(); renderTable(); 
+            }
         }
 
         function exportCSV() {
@@ -807,9 +847,9 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+            addSystemLog('تصدير بيانات', `تصدير قائمة ${CURRENT_TAB}`);
         }
 
-        // === Modal Logic ===
         function openAddUserModal() { 
             const isDept = (CURRENT_TAB === 'departments');
             document.getElementById('userFields').style.display = isDept ? 'none' : 'block';
@@ -847,12 +887,14 @@
             if (isEdit) {
                 targetUser = DB[CURRENT_TAB].find(u => u.id == editId);
                 targetUser.name = name;
+                addSystemLog('تعديل مستخدم', `تعديل بيانات: ${name}`);
             } else {
                 targetUser = { id: Date.now(), name: name, status: 'active' };
                 if (CURRENT_TAB !== 'departments') {
                     targetUser.dateAdded = new Date().toLocaleDateString('en-GB');
                     targetUser.permissions = JSON.parse(JSON.stringify(DEFAULT_PERMS));
                 }
+                addSystemLog('إضافة مستخدم', `إضافة جديد: ${name} في ${CURRENT_TAB}`);
             }
             if (CURRENT_TAB !== 'departments') {
                 targetUser.job = document.getElementById('addJob').value.trim();
@@ -867,7 +909,9 @@
         }
 
         function deleteUser(id) {
+            const u = DB[CURRENT_TAB].find(x => x.id === id);
             if(confirm('هل أنت متأكد من الحذف؟')) {
+                addSystemLog('حذف مستخدم', `حذف: ${u ? u.name : id}`);
                 DB[CURRENT_TAB] = DB[CURRENT_TAB].filter(u => u.id !== id);
                 saveDB();
                 renderTable();
@@ -892,27 +936,17 @@
             document.getElementById('viewUserModal').style.display = 'flex';
         }
 
-        // --- Bulk Permissions ---
         function openBulkPerms() {
             const checkboxes = document.querySelectorAll('.user-select-cb:checked');
             if(checkboxes.length === 0) { alert('لم يتم تحديد أي مستخدم.'); return; }
             IS_BULK_PERM_MODE = true;
             document.getElementById('permTargetName').innerText = `تعديل صلاحيات (${checkboxes.length}) مستخدم`;
-            // Uncheck master toggles
             const masters = document.querySelectorAll('.perm-header input');
             if(masters) masters.forEach(m => m.checked = false);
-
             const container = document.getElementById('permList');
             container.innerHTML = '';
             SECTIONS.forEach(sec => {
-                container.innerHTML += `
-                <div class="perm-item">
-                    <span>${sec.name}</span>
-                    <div style="display:flex; gap:15px;">
-                        <label><input type="checkbox" id="pv_${sec.id}" class="perm-view-cb"> معاينة</label>
-                        <label><input type="checkbox" id="pe_${sec.id}" class="perm-edit-cb"> تعديل</label>
-                    </div>
-                </div>`;
+                container.innerHTML += `<div class="perm-item"><span>${sec.name}</span><div style="display:flex; gap:15px;"><label><input type="checkbox" id="pv_${sec.id}" class="perm-view-cb"> معاينة</label><label><input type="checkbox" id="pe_${sec.id}" class="perm-edit-cb"> تعديل</label></div></div>`;
             });
             document.getElementById('permModal').style.display = 'flex';
         }
@@ -923,24 +957,14 @@
             EDITING_PERM_ID = id;
             const u = DB[CURRENT_TAB].find(x => x.id === id);
             document.getElementById('permTargetName').innerText = 'صلاحيات: ' + u.name;
-            
-            // Uncheck master toggles
             const masters = document.querySelectorAll('.perm-header input');
             if(masters) masters.forEach(m => m.checked = false);
-
             const container = document.getElementById('permList');
             container.innerHTML = '';
             const userPerms = u.permissions || DEFAULT_PERMS;
             SECTIONS.forEach(sec => {
                 const p = userPerms[sec.id] || {view: true, edit: false};
-                container.innerHTML += `
-                <div class="perm-item">
-                    <span>${sec.name}</span>
-                    <div style="display:flex; gap:15px;">
-                        <label><input type="checkbox" id="pv_${sec.id}" class="perm-view-cb" ${p.view ? 'checked' : ''}> معاينة</label>
-                        <label><input type="checkbox" id="pe_${sec.id}" class="perm-edit-cb" ${p.edit ? 'checked' : ''}> تعديل</label>
-                    </div>
-                </div>`;
+                container.innerHTML += `<div class="perm-item"><span>${sec.name}</span><div style="display:flex; gap:15px;"><label><input type="checkbox" id="pv_${sec.id}" class="perm-view-cb" ${p.view ? 'checked' : ''}> معاينة</label><label><input type="checkbox" id="pe_${sec.id}" class="perm-edit-cb" ${p.edit ? 'checked' : ''}> تعديل</label></div></div>`;
             });
             document.getElementById('permModal').style.display = 'flex';
         }
@@ -956,17 +980,11 @@
                 const ids = Array.from(checkboxes).map(cb => parseInt(cb.value));
                 const newPerms = {};
                 SECTIONS.forEach(sec => {
-                    newPerms[sec.id] = {
-                        view: document.getElementById(`pv_${sec.id}`).checked,
-                        edit: document.getElementById(`pe_${sec.id}`).checked
-                    };
+                    newPerms[sec.id] = { view: document.getElementById(`pv_${sec.id}`).checked, edit: document.getElementById(`pe_${sec.id}`).checked };
                 });
-                DB[CURRENT_TAB].forEach(u => {
-                    if (ids.includes(u.id)) {
-                        u.permissions = JSON.parse(JSON.stringify(newPerms));
-                    }
-                });
-                alert('تم تحديث صلاحيات المستخدمين المحددين بنجاح.');
+                DB[CURRENT_TAB].forEach(u => { if (ids.includes(u.id)) { u.permissions = JSON.parse(JSON.stringify(newPerms)); } });
+                addSystemLog('صلاحيات', `تعديل صلاحيات ${ids.length} مستخدم`);
+                alert('تم تحديث الصلاحيات بنجاح.');
             } else {
                 const u = DB[CURRENT_TAB].find(x => x.id === EDITING_PERM_ID);
                 SECTIONS.forEach(sec => {
@@ -975,6 +993,7 @@
                     u.permissions[sec.id].edit = document.getElementById(`pe_${sec.id}`).checked;
                 });
                 if (CURRENT_USER.id === u.id) { CURRENT_USER = u; applySidebarPermissions(); renderTable(); }
+                addSystemLog('صلاحيات', `تعديل صلاحيات المستخدم: ${u.name}`);
             }
             saveDB();
             closeModal('permModal');
@@ -995,13 +1014,14 @@
             
             if (t === 'sig') loadSignatureSettings();
             if (t === 'vis') loadVisitorSettings();
+            if (t === 'fot') loadFooterSettings();
+            if (t === 'log') loadSystemLogs();
         }
 
         function loadSettings() {
             const s = DB.settings;
             document.getElementById('confSchool').value = s.schoolName || '';
             document.getElementById('confYear').value = s.schoolYear || '';
-            
             showImagePreview('preview_ministry', 'preview_wrap_ministry', 'btn_wrap_ministry', s.ministryLogo);
             showImagePreview('preview_school', 'preview_wrap_school', 'btn_wrap_school', s.schoolLogo);
             showImagePreview('preview_stamp', 'preview_wrap_stamp', 'btn_wrap_stamp', s.schoolStamp);
@@ -1011,14 +1031,8 @@
             const img = document.getElementById(imgId);
             const wrap = document.getElementById(wrapId);
             const btn = document.getElementById(btnId);
-            if (src) {
-                img.src = src;
-                wrap.style.display = 'inline-block';
-                btn.style.display = 'none';
-            } else {
-                wrap.style.display = 'none';
-                btn.style.display = 'block';
-            }
+            if (src) { img.src = src; wrap.style.display = 'inline-block'; btn.style.display = 'none'; } 
+            else { wrap.style.display = 'none'; btn.style.display = 'block'; }
         }
 
         function triggerFileSelect(inputId) { document.getElementById(inputId).click(); }
@@ -1054,15 +1068,13 @@
         function saveGeneralSettings() {
             DB.settings.schoolName = document.getElementById('confSchool').value;
             DB.settings.schoolYear = document.getElementById('confYear').value;
-            
             const minSrc = document.getElementById('preview_ministry').getAttribute('src');
             const schSrc = document.getElementById('preview_school').getAttribute('src');
             const stmSrc = document.getElementById('preview_stamp').getAttribute('src');
-            
             DB.settings.ministryLogo = (minSrc && minSrc.startsWith('data:')) ? minSrc : ''; 
             DB.settings.schoolLogo = (schSrc && schSrc.startsWith('data:')) ? schSrc : ''; 
             DB.settings.schoolStamp = (stmSrc && stmSrc.startsWith('data:')) ? stmSrc : ''; 
-            
+            addSystemLog('إعدادات', 'تحديث الإعدادات العامة');
             saveDB();
             alert('تم حفظ الإعدادات بنجاح');
         }
@@ -1075,23 +1087,18 @@
 
         // --- Signature Settings Logic ---
         function loadSignatureSettings() {
-            // Populate Dropdowns from Senior Leadership
             const seniors = DB.senior || [];
             const dirSelect = document.getElementById('sig_director');
             const asstSelect = document.getElementById('sig_assistant');
-            
-            // Helper to populate
             const populate = (sel, selectedVal) => {
                 sel.innerHTML = '<option value="">اختر...</option>';
                 seniors.forEach(u => {
                     const opt = document.createElement('option');
-                    opt.value = u.id;
-                    opt.innerText = u.name;
+                    opt.value = u.id; opt.innerText = u.name;
                     if(u.id == selectedVal) opt.selected = true;
                     sel.appendChild(opt);
                 });
             };
-
             populate(dirSelect, DB.settings.signature_director_id);
             populate(asstSelect, DB.settings.signature_assistant_id);
         }
@@ -1099,46 +1106,28 @@
         function saveSignatureSettings() {
             DB.settings.signature_director_id = document.getElementById('sig_director').value;
             DB.settings.signature_assistant_id = document.getElementById('sig_assistant').value;
+            addSystemLog('إعدادات', 'تحديث إعدادات التوقيعات');
             saveDB();
             alert('تم حفظ التوقيعات');
         }
 
-        function clearSignature(elemId) {
-            document.getElementById(elemId).value = "";
-            saveSignatureSettings();
-        }
+        function clearSignature(elemId) { document.getElementById(elemId).value = ""; saveSignatureSettings(); }
 
         // --- Visitor Order Logic ---
-        function loadVisitorSettings() {
-            renderVisitorList('senior');
-            renderVisitorList('middle');
-        }
+        function loadVisitorSettings() { renderVisitorList('senior'); renderVisitorList('middle'); }
 
         function renderVisitorList(type) {
             const listContainer = document.getElementById(`list_visitor_${type}`);
             const orderIds = type === 'senior' ? DB.settings.visitor_order_senior : DB.settings.visitor_order_middle;
             const sourceDB = type === 'senior' ? DB.senior : DB.middle;
-            
             listContainer.innerHTML = '';
-
-            if(!orderIds || orderIds.length === 0) {
-                listContainer.innerHTML = '<li class="empty-list-msg">لم يتم إضافة زوار بعد</li>';
-                return;
-            }
-
+            if(!orderIds || orderIds.length === 0) { listContainer.innerHTML = '<li class="empty-list-msg">لم يتم إضافة زوار بعد</li>'; return; }
             orderIds.forEach((id, index) => {
                 const user = sourceDB.find(u => u.id == id);
                 if(user) {
                     const li = document.createElement('li');
                     li.className = 'visitor-list-item';
-                    li.innerHTML = `
-                        <span class="visitor-name">${user.name}</span>
-                        <div class="visitor-controls">
-                            <button class="action-btn btn-move" onclick="moveVisitorItem('${type}', ${index}, 'up')" title="للأعلى"><i class="fas fa-arrow-up"></i></button>
-                            <button class="action-btn btn-move" onclick="moveVisitorItem('${type}', ${index}, 'down')" title="للأسفل"><i class="fas fa-arrow-down"></i></button>
-                            <button class="action-btn btn-delete" onclick="removeVisitorItem('${type}', ${index})"><i class="fas fa-trash"></i></button>
-                        </div>
-                    `;
+                    li.innerHTML = `<span class="visitor-name">${user.name}</span><div class="visitor-controls"><button class="action-btn btn-move" onclick="moveVisitorItem('${type}', ${index}, 'up')" title="للأعلى"><i class="fas fa-arrow-up"></i></button><button class="action-btn btn-move" onclick="moveVisitorItem('${type}', ${index}, 'down')" title="للأسفل"><i class="fas fa-arrow-down"></i></button><button class="action-btn btn-delete" onclick="removeVisitorItem('${type}', ${index})"><i class="fas fa-trash"></i></button></div>`;
                     listContainer.appendChild(li);
                 }
             });
@@ -1155,41 +1144,25 @@
             const query = document.getElementById('visitorSearch').value.toLowerCase();
             const listDiv = document.getElementById('pickerList');
             listDiv.innerHTML = '';
-
             const type = CURRENT_PICKER_TYPE;
             const sourceDB = type === 'senior' ? DB.senior : DB.middle;
             const currentOrder = type === 'senior' ? DB.settings.visitor_order_senior : DB.settings.visitor_order_middle;
-
-            // Filter out already added users
             const availableUsers = sourceDB.filter(u => !currentOrder.includes(u.id));
-
             availableUsers.forEach(u => {
                 if(u.name.toLowerCase().includes(query)) {
                     const item = document.createElement('div');
                     item.className = 'picker-item';
-                    item.innerHTML = `
-                        <div>
-                            <div class="picker-item-name">${u.name}</div>
-                            <div class="picker-item-job">${u.job || u.dept || ''}</div>
-                        </div>
-                        <i class="fas fa-plus-circle" style="color:var(--success);"></i>
-                    `;
+                    item.innerHTML = `<div><div class="picker-item-name">${u.name}</div><div class="picker-item-job">${u.job || u.dept || ''}</div></div><i class="fas fa-plus-circle" style="color:var(--success);"></i>`;
                     item.onclick = () => addVisitorToOrder(u.id);
                     listDiv.appendChild(item);
                 }
             });
-
             if(listDiv.innerHTML === '') listDiv.innerHTML = '<div style="padding:15px; text-align:center; color:#888;">لا توجد أسماء متاحة</div>';
         }
 
         function addVisitorToOrder(id) {
-            if(CURRENT_PICKER_TYPE === 'senior') {
-                if(!DB.settings.visitor_order_senior) DB.settings.visitor_order_senior = [];
-                DB.settings.visitor_order_senior.push(id);
-            } else {
-                if(!DB.settings.visitor_order_middle) DB.settings.visitor_order_middle = [];
-                DB.settings.visitor_order_middle.push(id);
-            }
+            if(CURRENT_PICKER_TYPE === 'senior') { if(!DB.settings.visitor_order_senior) DB.settings.visitor_order_senior = []; DB.settings.visitor_order_senior.push(id); } 
+            else { if(!DB.settings.visitor_order_middle) DB.settings.visitor_order_middle = []; DB.settings.visitor_order_middle.push(id); }
             closeModal('visitorPickerModal');
             renderVisitorList(CURRENT_PICKER_TYPE);
         }
@@ -1202,17 +1175,58 @@
 
         function moveVisitorItem(type, index, direction) {
             const arr = type === 'senior' ? DB.settings.visitor_order_senior : DB.settings.visitor_order_middle;
-            if (direction === 'up' && index > 0) {
-                [arr[index], arr[index - 1]] = [arr[index - 1], arr[index]];
-            } else if (direction === 'down' && index < arr.length - 1) {
-                [arr[index], arr[index + 1]] = [arr[index + 1], arr[index]];
-            }
+            if (direction === 'up' && index > 0) { [arr[index], arr[index - 1]] = [arr[index - 1], arr[index]]; } 
+            else if (direction === 'down' && index < arr.length - 1) { [arr[index], arr[index + 1]] = [arr[index + 1], arr[index]]; }
             renderVisitorList(type);
         }
 
-        function saveVisitorOrder() {
+        function saveVisitorOrder() { addSystemLog('إعدادات', 'تحديث ترتيب الزوار'); saveDB(); alert('تم حفظ ترتيب الزوار بنجاح'); }
+
+        // --- Footer Settings Logic ---
+        function loadFooterSettings() {
+            const s = DB.settings;
+            document.getElementById('footer_right').value = s.footer_right || '';
+            document.getElementById('footer_center').value = s.footer_center || '';
+            document.getElementById('footer_left').value = s.footer_left || '';
+        }
+
+        function saveFooterSettings() {
+            DB.settings.footer_right = document.getElementById('footer_right').value;
+            DB.settings.footer_center = document.getElementById('footer_center').value;
+            DB.settings.footer_left = document.getElementById('footer_left').value;
+            addSystemLog('إعدادات', 'تحديث تذييل التقرير');
             saveDB();
-            alert('تم حفظ ترتيب الزوار بنجاح');
+            alert('تم حفظ إعدادات التذييل');
+        }
+
+        // --- System Logs Logic ---
+        function loadSystemLogs() {
+            const tbody = document.getElementById('logTableBody');
+            tbody.innerHTML = '';
+            const logs = DB.logs || [];
+            if(logs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#888;">لا توجد سجلات</td></tr>';
+                return;
+            }
+            logs.forEach(log => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-size:0.85rem;">${log.date}</td>
+                    <td style="font-weight:bold;">${log.user}</td>
+                    <td><span class="status-badge" style="background:#e2e3e5; color:#383d41;">${log.action}</span></td>
+                    <td><div class="log-details" title="${log.details}">${log.details}</div></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function clearSystemLogs() {
+            if(confirm('هل أنت متأكد من مسح كافة السجلات؟ لا يمكن التراجع عن هذه العملية.')) {
+                DB.logs = [];
+                addSystemLog('سجل النظام', 'مسح كافة السجلات السابقة');
+                saveDB();
+                loadSystemLogs();
+            }
         }
 
         document.getElementById('loginForm').addEventListener('submit', login);
