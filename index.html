@@ -9,7 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
-        :root { --primary: #1e4078; --text: #333; --bg: #f7f9fc; --danger: #da291c; --success: #28a745; --warning: #ffc107; }
+        :root { --primary: #1e4078; --text: #333; --bg: #f7f9fc; --danger: #da291c; --success: #28a745; --warning: #ffc107; --disabled: #e9ecef; }
         * { box-sizing: border-box; font-family: 'Cairo', sans-serif; }
         body { margin: 0; background: var(--bg); color: var(--text); }
         
@@ -37,6 +37,7 @@
         .login-wrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: linear-gradient(135deg, var(--primary), #2b2b2b); display: flex; justify-content: center; align-items: center; z-index: 9999; }
         .login-box { background: white; padding: 40px; border-radius: 12px; width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
         .form-control { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 15px; font-family: inherit; }
+        .form-control:disabled { background-color: var(--disabled); cursor: not-allowed; color: #666; }
         textarea.form-control { resize: vertical; }
         .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.3s; }
         .btn-primary { background: var(--primary); color: white; width: 100%; }
@@ -87,7 +88,6 @@
         .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
         .modal-footer { padding: 15px 20px; background: #f9f9f9; display: flex; gap: 10px; justify-content: flex-end; }
         
-        /* Updated Footer in View Modals */
         .view-footer-info { margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee; font-size: 0.8rem; color: #777; display: flex; justify-content: space-between; background: #fafafa; padding: 10px; border-radius: 5px; }
 
         /* --- Settings Specific Styles --- */
@@ -164,7 +164,7 @@
         .info-item label { display: block; color: #777; font-size: 0.85rem; margin-bottom: 5px; }
         .info-item span { font-weight: bold; color: #333; }
 
-        /* Distinguished/Qualitative Section Table Title */
+        /* Table Title */
         .table-section-title { font-weight: bold; color: #555; margin-bottom: 10px; margin-top: 20px; border-right: 4px solid var(--primary); padding-right: 10px; }
 
         @media print { .sidebar, .login-wrapper { display: none; } .main-content { margin: 0; } }
@@ -211,7 +211,8 @@
 
         <main class="main-content">
             <header class="top-header">
-                <h2 id="pageTitle">...</h2> <div class="user-profile">
+                <h2 id="pageTitle">...</h2>
+                <div class="user-profile">
                     <div class="user-info-text">
                         <span id="headerUserName" class="user-name">المستخدم</span>
                         <span id="headerUserJob" class="user-job">الوظيفة</span>
@@ -225,7 +226,7 @@
             <div id="visits" class="section-card">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                     <h3 style="color:var(--primary);">سجل الزيارات الصفية</h3>
-                    <button class="btn btn-primary" style="width:auto;" onclick="openAddVisitModal()"><i class="fas fa-plus"></i> إضافة زيارة جديدة</button>
+                    <button class="btn btn-primary btn-restricted" style="width:auto;" onclick="openAddVisitModal()"><i class="fas fa-plus"></i> إضافة زيارة جديدة</button>
                 </div>
 
                 <div class="filter-container">
@@ -317,7 +318,7 @@
                     </select>
                 </div>
 
-                <div style="display:flex; gap:15px; margin-bottom:25px;">
+                <div class="btn-group-restricted" style="display:flex; gap:15px; margin-bottom:25px;">
                     <button class="btn" style="background:#2c5aa0; color:white;" onclick="openDistinguishedModal('distinguished')">
                         <i class="fas fa-plus-circle"></i> إضافة معلم متميز
                     </button>
@@ -329,13 +330,13 @@
                 <div class="table-section-title">المعلمين المتميزين</div>
                 <table class="custom-table">
                     <thead>
-                        <tr>
+                        <tr id="distHeadRow">
                             <th width="5%">#</th>
                             <th width="20%">اسم المعلم/ة</th>
                             <th width="15%">القسم</th>
                             <th width="10%">التقدير</th>
                             <th width="30%">المبررات</th>
-                            <th width="20%">الإجراء</th>
+                            <th width="20%" class="col-actions">الإجراء</th>
                         </tr>
                     </thead>
                     <tbody id="distinguishedTableBody">
@@ -345,13 +346,13 @@
                 <div class="table-section-title" style="margin-top:40px;">المعلمين الأولى بالرعاية</div>
                 <table class="custom-table">
                     <thead>
-                        <tr>
+                        <tr id="careHeadRow">
                             <th width="5%">#</th>
                             <th width="20%">اسم المعلم/ة</th>
                             <th width="15%">القسم</th>
                             <th width="10%">التقدير</th>
                             <th width="30%">المبررات</th>
-                            <th width="20%">الإجراء</th>
+                            <th width="20%" class="col-actions">الإجراء</th>
                         </tr>
                     </thead>
                     <tbody id="careTableBody">
@@ -362,7 +363,7 @@
             <div id="qualitative" class="section-card">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                     <h3 style="color:var(--primary);">التقرير النوعي</h3>
-                    <button class="btn btn-primary" style="width:auto;" onclick="openQualitativeModal()"><i class="fas fa-plus"></i> إضافة تقرير</button>
+                    <button class="btn btn-primary btn-restricted" style="width:auto;" onclick="openQualitativeModal()"><i class="fas fa-plus"></i> إضافة تقرير</button>
                 </div>
 
                 <div class="filter-container">
@@ -391,7 +392,7 @@
                             <th width="15%">الأقسام الأكاديمية</th>
                             <th width="30%">جوانب القوة</th>
                             <th width="30%">جوانب بحاجة إلى تطوير</th>
-                            <th width="20%">الإجراء</th>
+                            <th width="20%" class="col-actions">الإجراء</th>
                         </tr>
                     </thead>
                     <tbody id="qualitativeTableBody">
@@ -456,40 +457,40 @@
                         <label class="upload-label">شعار الوزارة</label>
                         <input type="file" id="file_ministry" hidden accept="image/*" onchange="handleFileUpload(this, 'preview_ministry', 'ministryLogo')">
                         <div class="upload-btn-wrapper" id="btn_wrap_ministry">
-                            <button type="button" class="upload-btn-custom" onclick="triggerFileSelect('file_ministry')"><i class="fas fa-upload"></i> تحميل شعار الوزارة</button>
+                            <button type="button" class="upload-btn-custom setting-edit-btn" onclick="triggerFileSelect('file_ministry')"><i class="fas fa-upload"></i> تحميل شعار الوزارة</button>
                             <span class="upload-hint">الحجم المقترح: 200x80 بكسل</span>
                         </div>
                         <div id="preview_wrap_ministry" style="display:none;" class="image-preview-wrapper">
                             <img id="preview_ministry" class="image-preview" onclick="openImageModal(this.src)">
-                            <button class="remove-img-btn" onclick="removeImage('preview_ministry', 'ministryLogo', 'file_ministry')"><i class="fas fa-times"></i></button>
+                            <button class="remove-img-btn setting-edit-btn" onclick="removeImage('preview_ministry', 'ministryLogo', 'file_ministry')"><i class="fas fa-times"></i></button>
                         </div>
                     </div>
                     <div class="upload-container">
                         <label class="upload-label">شعار المدرسة</label>
                         <input type="file" id="file_school" hidden accept="image/*" onchange="handleFileUpload(this, 'preview_school', 'schoolLogo')">
                         <div class="upload-btn-wrapper" id="btn_wrap_school">
-                            <button type="button" class="upload-btn-custom" onclick="triggerFileSelect('file_school')"><i class="fas fa-upload"></i> تحميل شعار المدرسة</button>
+                            <button type="button" class="upload-btn-custom setting-edit-btn" onclick="triggerFileSelect('file_school')"><i class="fas fa-upload"></i> تحميل شعار المدرسة</button>
                             <span class="upload-hint">الحجم المقترح: 200x200 بكسل</span>
                         </div>
                         <div id="preview_wrap_school" style="display:none;" class="image-preview-wrapper">
                             <img id="preview_school" class="image-preview" onclick="openImageModal(this.src)">
-                            <button class="remove-img-btn" onclick="removeImage('preview_school', 'schoolLogo', 'file_school')"><i class="fas fa-times"></i></button>
+                            <button class="remove-img-btn setting-edit-btn" onclick="removeImage('preview_school', 'schoolLogo', 'file_school')"><i class="fas fa-times"></i></button>
                         </div>
                     </div>
                     <div class="upload-container">
                         <label class="upload-label">ختم المدرسة</label>
                         <input type="file" id="file_stamp" hidden accept="image/*" onchange="handleFileUpload(this, 'preview_stamp', 'schoolStamp')">
                         <div class="upload-btn-wrapper" id="btn_wrap_stamp">
-                            <button type="button" class="upload-btn-custom" onclick="triggerFileSelect('file_stamp')"><i class="fas fa-upload"></i> تحميل ختم المدرسة</button>
+                            <button type="button" class="upload-btn-custom setting-edit-btn" onclick="triggerFileSelect('file_stamp')"><i class="fas fa-upload"></i> تحميل ختم المدرسة</button>
                             <span class="upload-hint">يستخدم في التقارير الرسمية</span>
                         </div>
                         <div id="preview_wrap_stamp" style="display:none;" class="image-preview-wrapper">
                             <img id="preview_stamp" class="image-preview" onclick="openImageModal(this.src)">
-                            <button class="remove-img-btn" onclick="removeImage('preview_stamp', 'schoolStamp', 'file_stamp')"><i class="fas fa-times"></i></button>
+                            <button class="remove-img-btn setting-edit-btn" onclick="removeImage('preview_stamp', 'schoolStamp', 'file_stamp')"><i class="fas fa-times"></i></button>
                         </div>
                     </div>
                     <div style="text-align: left; border-top: 1px solid #eee; padding-top: 20px;">
-                        <button class="btn btn-primary" style="width: 200px;" onclick="saveGeneralSettings()">حفظ الإعدادات</button>
+                        <button class="btn btn-primary setting-edit-btn" style="width: 200px;" onclick="saveGeneralSettings()">حفظ الإعدادات</button>
                     </div>
                 </div>
 
@@ -503,8 +504,8 @@
                                 <select id="sig_director" class="form-control"><option value="">اختر مدير المدرسة</option></select>
                             </div>
                             <div style="display:flex; gap:10px; justify-content:center; margin-top:20px;">
-                                <button class="btn btn-primary" style="min-width:100px;" onclick="saveSignatureSettings()">حفظ</button>
-                                <button class="btn" style="background:#dc3545; color:white; min-width:100px;" onclick="clearSignature('sig_director')">إزالة</button>
+                                <button class="btn btn-primary setting-edit-btn" style="min-width:100px;" onclick="saveSignatureSettings()">حفظ</button>
+                                <button class="btn setting-edit-btn" style="background:#dc3545; color:white; min-width:100px;" onclick="clearSignature('sig_director')">إزالة</button>
                             </div>
                         </div>
                         <div class="signature-card">
@@ -514,8 +515,8 @@
                                 <select id="sig_assistant" class="form-control"><option value="">اختر المدير المساعد</option></select>
                             </div>
                             <div style="display:flex; gap:10px; justify-content:center; margin-top:20px;">
-                                <button class="btn btn-primary" style="min-width:100px;" onclick="saveSignatureSettings()">حفظ</button>
-                                <button class="btn" style="background:#dc3545; color:white; min-width:100px;" onclick="clearSignature('sig_assistant')">إزالة</button>
+                                <button class="btn btn-primary setting-edit-btn" style="min-width:100px;" onclick="saveSignatureSettings()">حفظ</button>
+                                <button class="btn setting-edit-btn" style="background:#dc3545; color:white; min-width:100px;" onclick="clearSignature('sig_assistant')">إزالة</button>
                             </div>
                         </div>
                     </div>
@@ -545,7 +546,7 @@
                         </select>
                     </div>
                     <div style="text-align:left; margin-top:20px;">
-                        <button class="btn" style="background:#28a745; color:white; font-weight:bold;" onclick="saveFooterSettings()">حفظ إعدادات التذييل</button>
+                        <button class="btn setting-edit-btn" style="background:#28a745; color:white; font-weight:bold;" onclick="saveFooterSettings()">حفظ إعدادات التذييل</button>
                     </div>
                 </div>
 
@@ -553,7 +554,7 @@
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
                         <h3>الزيارة الصفية</h3>
                         <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                            <button class="btn" style="background:#2c5aa0; color:white;" onclick="openAddEvalModal()"><i class="fas fa-plus"></i> إضافة تقييم</button>
+                            <button class="btn setting-edit-btn" style="background:#2c5aa0; color:white;" onclick="openAddEvalModal()"><i class="fas fa-plus"></i> إضافة تقييم</button>
                         </div>
                     </div>
                     <table class="custom-table">
@@ -574,15 +575,15 @@
                     <div class="visitor-section">
                         <div class="visitor-section-title">القيادة العليا</div>
                         <ul id="list_visitor_senior" class="visitor-list"><li class="empty-list-msg">لم يتم إضافة زوار بعد</li></ul>
-                        <button class="btn-add-visitor" onclick="openVisitorPicker('senior')">+ إضافة زائر من القيادة العليا</button>
+                        <button class="btn-add-visitor setting-edit-btn" onclick="openVisitorPicker('senior')">+ إضافة زائر من القيادة العليا</button>
                     </div>
                     <div class="visitor-section">
                         <div class="visitor-section-title">القيادة الوسطى</div>
                         <ul id="list_visitor_middle" class="visitor-list"><li class="empty-list-msg">لم يتم إضافة زوار بعد</li></ul>
-                        <button class="btn-add-visitor" onclick="openVisitorPicker('middle')">+ إضافة زائر من القيادة الوسطى</button>
+                        <button class="btn-add-visitor setting-edit-btn" onclick="openVisitorPicker('middle')">+ إضافة زائر من القيادة الوسطى</button>
                     </div>
                     <div style="text-align: left; margin-top: 20px;">
-                        <button class="btn btn-toggle" onclick="saveVisitorOrder()">حفظ الترتيب</button>
+                        <button class="btn btn-toggle setting-edit-btn" onclick="saveVisitorOrder()">حفظ الترتيب</button>
                     </div>
                 </div>
 
@@ -591,7 +592,7 @@
                         <h4 style="color:var(--primary); margin:0;">سجل العمليات (Audit Log)</h4>
                         <div>
                             <button class="btn" style="background:#17a2b8; color:white; font-size:0.8rem;" onclick="loadSystemLogs()"><i class="fas fa-sync"></i> تحديث</button>
-                            <button class="btn" style="background:#dc3545; color:white; font-size:0.8rem;" onclick="clearSystemLogs()"><i class="fas fa-trash"></i> مسح السجل</button>
+                            <button class="btn setting-edit-btn" style="background:#dc3545; color:white; font-size:0.8rem;" onclick="clearSystemLogs()"><i class="fas fa-trash"></i> مسح السجل</button>
                         </div>
                     </div>
                     <div class="log-table-wrapper">
@@ -876,6 +877,14 @@
         let CURRENT_PICKER_TYPE = null;
         let performanceChartInstance = null; 
 
+        // === Helper Logic to enforce Edit Permissions ===
+        function canEdit(pageId) {
+            if(!CURRENT_USER) return false;
+            // Admin always true or based on perms
+            const p = CURRENT_USER.permissions || DEFAULT_PERMS;
+            return (p[pageId] && p[pageId].edit === true);
+        }
+
         // === Core Functions ===
         function initSystem() {
             const storedDB = localStorage.getItem('QualitySys_DB_V2');
@@ -900,7 +909,7 @@
                                 u.login = String(u.login).trim().replace(/[\uFEFF\x00-\x1F\s]/g, '');
                                 u.pass = String(u.pass).trim().replace(/[\uFEFF\x00-\x1F\s]/g, '');
                             }
-                            if(!u.status) u.status = 'active'; 
+                            if(!u.status) u.status = 'active'; // This defaults legacy users, but we respect existing status
                         });
                     }
                 });
@@ -926,14 +935,22 @@
             const sessionID = localStorage.getItem('QualitySys_Session');
             if (sessionID) {
                 let found = null;
+                // We must re-fetch from DB to ensure status is fresh
                 ['admins', 'senior', 'middle', 'teachers'].forEach(grp => {
                     if(DB[grp]) {
                         const u = DB[grp].find(x => x.id == sessionID);
                         if(u) found = u;
                     }
                 });
-                if (found && found.status === 'active') { CURRENT_USER = found; showApp(); }
-                else { document.getElementById('loginPage').style.display = 'flex'; }
+                // STRICT CHECK: user must exist and be active
+                if (found && found.status === 'active') { 
+                    CURRENT_USER = found; 
+                    showApp(); 
+                } else { 
+                    // Kick out if disabled
+                    localStorage.removeItem('QualitySys_Session');
+                    document.getElementById('loginPage').style.display = 'flex'; 
+                }
             } else { document.getElementById('loginPage').style.display = 'flex'; }
         }
 
@@ -968,15 +985,16 @@
                 }
             });
             if (userFound) {
-                if (userFound.status === 'active') {
-                    CURRENT_USER = userFound;
-                    localStorage.setItem('QualitySys_Session', userFound.id);
-                    addSystemLog('تسجيل دخول', `المستخدم: ${userFound.name}`);
-                    showApp();
-                } else {
-                    errBox.innerText = "نعتذر منك، الحساب غير نشط حالياً.";
+                // STRICT STATUS CHECK
+                if (userFound.status !== 'active') {
+                    errBox.innerText = "عذراً، لا يمكنك تسجيل الدخول. الحساب معطل. يرجى التواصل مع المشرف.";
                     errBox.style.display = 'block';
+                    return;
                 }
+                CURRENT_USER = userFound;
+                localStorage.setItem('QualitySys_Session', userFound.id);
+                addSystemLog('تسجيل دخول', `المستخدم: ${userFound.name}`);
+                showApp();
             } else {
                 errBox.innerText = "بيانات غير صحيحة.";
                 errBox.style.display = 'block';
@@ -999,6 +1017,7 @@
 
         function navigate(pageId) {
             const perms = CURRENT_USER.permissions || DEFAULT_PERMS;
+            // STRICT VIEW CHECK
             if (perms[pageId] && perms[pageId].view === false) { alert("عذراً، ليس لديك صلاحية للوصول إلى هذه الصفحة."); return; }
             document.querySelectorAll('.section-card').forEach(d => d.classList.remove('active'));
             document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
@@ -1036,6 +1055,7 @@
             const perms = CURRENT_USER.permissions || DEFAULT_PERMS;
             SECTIONS.forEach(sec => {
                 const el = document.getElementById('nav-' + sec.id);
+                // STRICT HIDE IF NO VIEW
                 if(el) el.style.display = (perms[sec.id] && perms[sec.id].view === false) ? 'none' : 'block';
             });
         }
@@ -1059,19 +1079,19 @@
             const bulkPermBtn = document.getElementById('bulkPermBtn');
             tbody.innerHTML = '';
             
-            const userPerms = CURRENT_USER.permissions['user-management'] || {view:true, edit:false};
-            const canEdit = userPerms.edit === true;
+            // Edit Check
+            const canEditUsers = canEdit('user-management');
             const actionButtons = document.getElementById('userActionButtons');
             const noEditMsg = document.getElementById('noEditPermissionMsg');
             
-            if(canEdit) { actionButtons.style.display = 'flex'; noEditMsg.style.display = 'none'; } 
+            if(canEditUsers) { actionButtons.style.display = 'flex'; noEditMsg.style.display = 'none'; } 
             else { actionButtons.style.display = 'none'; noEditMsg.style.display = 'block'; }
 
             if (CURRENT_TAB === 'departments') {
-                headRow.innerHTML = `<th width="5%"><input type="checkbox" id="selectAll" class="custom-checkbox" onchange="toggleSelectAll(this)"></th><th width="10%">الترتيب</th><th width="40%">اسم القسم</th><th width="15%">الحالة</th><th width="30%">الإدارة</th>`;
+                headRow.innerHTML = `<th width="5%"><input type="checkbox" id="selectAll" class="custom-checkbox" onchange="toggleSelectAll(this)" ${canEditUsers?'':'disabled'}></th><th width="10%">الترتيب</th><th width="40%">اسم القسم</th><th width="15%">الحالة</th><th width="30%">الإدارة</th>`;
                 addBtn.innerText = "إضافة قسم جديد"; addBtn.setAttribute('onclick', 'openAddUserModal()'); if(bulkPermBtn) bulkPermBtn.style.display = 'none'; 
             } else {
-                headRow.innerHTML = `<th width="5%"><input type="checkbox" id="selectAll" class="custom-checkbox" onchange="toggleSelectAll(this)"></th><th width="5%">#</th><th width="25%">الاسم</th><th width="15%">الوظيفة</th><th width="15%">الحالة</th><th width="35%">الإجراءات</th>`;
+                headRow.innerHTML = `<th width="5%"><input type="checkbox" id="selectAll" class="custom-checkbox" onchange="toggleSelectAll(this)" ${canEditUsers?'':'disabled'}></th><th width="5%">#</th><th width="25%">الاسم</th><th width="15%">الوظيفة</th><th width="15%">الحالة</th><th width="35%">الإجراءات</th>`;
                 addBtn.innerText = "إضافة اسم جديد"; addBtn.setAttribute('onclick', 'openAddUserModal()'); if(bulkPermBtn) bulkPermBtn.style.display = 'inline-flex';
             }
 
@@ -1079,34 +1099,44 @@
             list.forEach((u, idx) => {
                 const isActive = u.status === 'active';
                 const statusBadge = isActive ? `<span class="status-badge status-active">مفعل</span>` : `<span class="status-badge status-inactive">معطل</span>`;
-                let row = `<td><input type="checkbox" class="custom-checkbox user-select-cb" value="${u.id}" ${canEdit ? '' : 'disabled'}></td><td>${idx+1}</td><td>${u.name}</td>`;
+                let row = `<td><input type="checkbox" class="custom-checkbox user-select-cb" value="${u.id}" ${canEditUsers ? '' : 'disabled'}></td><td>${idx+1}</td><td>${u.name}</td>`;
                 if (CURRENT_TAB !== 'departments') row += `<td>${u.job || (CURRENT_TAB === 'teachers' ? u.dept : '-')}</td>`;
                 row += `<td>${statusBadge}</td><td><div style="display:flex; justify-content:center; gap:2px; flex-wrap:wrap;">`;
-                if(canEdit) { row += `<button class="action-btn btn-move" onclick="moveUser(${u.id}, 'up')" title="نقل لأعلى"><i class="fas fa-arrow-up"></i></button><button class="action-btn btn-move" onclick="moveUser(${u.id}, 'down')" title="نقل لأسفل"><i class="fas fa-arrow-down"></i></button>`; }
+                
+                // Only show actions if can edit
+                if(canEditUsers) { 
+                    row += `<button class="action-btn btn-move" onclick="moveUser(${u.id}, 'up')" title="نقل لأعلى"><i class="fas fa-arrow-up"></i></button><button class="action-btn btn-move" onclick="moveUser(${u.id}, 'down')" title="نقل لأسفل"><i class="fas fa-arrow-down"></i></button>`; 
+                }
+                
                 if (CURRENT_TAB === 'departments') {
-                    if(canEdit) { row += `<button class="action-btn btn-toggle ${isActive?'':'off'}" onclick="toggleStatus(${u.id})"><i class="fas fa-power-off"></i> ${isActive?'تعطيل':'تفعيل'}</button><button class="action-btn btn-edit" onclick="editUser(${u.id})"><i class="fas fa-edit"></i> تعديل</button><button class="action-btn btn-delete" onclick="deleteUser(${u.id})"><i class="fas fa-trash"></i> حذف</button>`; }
+                    if(canEditUsers) { row += `<button class="action-btn btn-toggle ${isActive?'':'off'}" onclick="toggleStatus(${u.id})"><i class="fas fa-power-off"></i> ${isActive?'تعطيل':'تفعيل'}</button><button class="action-btn btn-edit" onclick="editUser(${u.id})"><i class="fas fa-edit"></i> تعديل</button><button class="action-btn btn-delete" onclick="deleteUser(${u.id})"><i class="fas fa-trash"></i> حذف</button>`; }
                 } else {
                     row += `<button class="action-btn btn-view" onclick="viewUser(${u.id})"><i class="fas fa-eye"></i> معاينة</button>`;
-                    if (canEdit) { row += `<button class="action-btn btn-toggle ${isActive?'':'off'}" onclick="toggleStatus(${u.id})"><i class="fas fa-power-off"></i> ${isActive?'تعطيل':'تفعيل'}</button><button class="action-btn btn-edit" onclick="editUser(${u.id})"><i class="fas fa-edit"></i> تعديل</button><button class="action-btn btn-delete" onclick="deleteUser(${u.id})"><i class="fas fa-trash"></i> حذف</button><button class="action-btn btn-perm" onclick="openPerms(${u.id})"><i class="fas fa-key"></i> صلاحيات</button>`; }
+                    if (canEditUsers) { row += `<button class="action-btn btn-toggle ${isActive?'':'off'}" onclick="toggleStatus(${u.id})"><i class="fas fa-power-off"></i> ${isActive?'تعطيل':'تفعيل'}</button><button class="action-btn btn-edit" onclick="editUser(${u.id})"><i class="fas fa-edit"></i> تعديل</button><button class="action-btn btn-delete" onclick="deleteUser(${u.id})"><i class="fas fa-trash"></i> حذف</button><button class="action-btn btn-perm" onclick="openPerms(${u.id})"><i class="fas fa-key"></i> صلاحيات</button>`; }
                 }
                 row += `</div></td>`;
                 const tr = document.createElement('tr'); tr.innerHTML = row; tbody.appendChild(tr);
             });
         }
 
-        // ... [Include standard User/Perm/Settings functions: moveUser, toggleSelectAll, deleteSelected, toggleStatusSelected, toggleStatus, exportCSV, openAddUserModal, editUser, closeModal, saveUserForm, deleteUser, openBulkPerms, openPerms, toggleAllPerms, submitPermissions, togglePass, setSettingTab] ...
-        
+        // ... [Standard Functions] ...
         function moveUser(id, d) { const l=DB[CURRENT_TAB]; const i=l.findIndex(u=>u.id===id); if(i===-1)return; if(d==='up'&&i>0)[l[i],l[i-1]]=[l[i-1],l[i]]; if(d==='down'&&i<l.length-1)[l[i],l[i+1]]=[l[i+1],l[i]]; saveDB(); renderTable(); }
         function toggleSelectAll(s) { document.querySelectorAll('.user-select-cb').forEach(c=>{if(!c.disabled)c.checked=s.checked}); }
         function deleteSelected() { const c=document.querySelectorAll('.user-select-cb:checked'); if(c.length===0)return alert('حدد عناصر'); if(confirm('حذف؟')){const ids=Array.from(c).map(x=>parseInt(x.value)); DB[CURRENT_TAB]=DB[CURRENT_TAB].filter(u=>!ids.includes(u.id)); addSystemLog('حذف جماعي', `حذف ${ids.length}`); saveDB(); renderTable(); document.getElementById('selectAll').checked=false;} }
         function toggleStatusSelected() { const c=document.querySelectorAll('.user-select-cb:checked'); if(c.length===0)return alert('حدد عناصر'); const ids=Array.from(c).map(x=>parseInt(x.value)); DB[CURRENT_TAB].forEach(u=>{if(ids.includes(u.id))u.status=u.status==='active'?'inactive':'active'}); addSystemLog('تغيير حالة جماعي', `تعديل ${ids.length}`); saveDB(); renderTable(); }
         function toggleStatus(id) { const u=DB[CURRENT_TAB].find(x=>x.id===id); if(u){u.status=u.status==='active'?'inactive':'active'; addSystemLog('تغيير حالة', u.name); saveDB(); renderTable();} }
         function exportCSV() { const l=DB[CURRENT_TAB]||[]; if(l.length===0)return alert('لا بيانات'); let c=(CURRENT_TAB==='departments')?"ترتيب,اسم,حالة\n":"اسم,وظيفة,هاتف,دخول,مرور,تاريخ,حالة\n"; l.forEach((r,i)=>{if(CURRENT_TAB==='departments')c+=`${i+1},"${r.name}","${r.status}"\n`; else c+=`"${r.name}","${r.job||r.dept}","${r.phone}","${r.login}","${r.pass}","${r.dateAdded}","${r.status}"\n`;}); const b=new Blob(["\uFEFF"+c],{type:'text/csv;charset=utf-8;'}); const k=document.createElement("a"); k.href=URL.createObjectURL(b); k.download=`${CURRENT_TAB}.csv`; document.body.appendChild(k); k.click(); document.body.removeChild(k); }
-        function openAddUserModal() { document.getElementById('editUserId').value=''; document.getElementById('addUserForm').reset(); document.getElementById('addUserModal').style.display='flex'; const d=(CURRENT_TAB==='departments'), t=(CURRENT_TAB==='teachers'); if(d){document.getElementById('addUserModalTitle').innerText='إضافة قسم'; document.getElementById('userFields').style.display='none'; document.getElementById('deptWrapper').style.display='none';} else if(t){document.getElementById('addUserModalTitle').innerText='إضافة معلمة'; document.getElementById('userFields').style.display='none'; document.getElementById('deptWrapper').style.display='block'; const s=document.getElementById('addDept'); s.innerHTML='<option value="">اختر...</option>'; (DB.departments||[]).forEach(x=>s.innerHTML+=`<option value="${x.name}">${x.name}</option>`);} else {document.getElementById('addUserModalTitle').innerText='إضافة مستخدم'; document.getElementById('userFields').style.display='block'; document.getElementById('deptWrapper').style.display='none';} }
-        function editUser(id) { const u=DB[CURRENT_TAB].find(x=>x.id===id); if(!u)return; document.getElementById('editUserId').value=u.id; document.getElementById('addName').value=u.name; openAddUserModal(); document.getElementById('addUserModalTitle').innerText='تعديل'; if(CURRENT_TAB==='teachers'){document.getElementById('addDept').value=u.dept;} else if(CURRENT_TAB!=='departments'){document.getElementById('addJob').value=u.job||''; document.getElementById('addPhone').value=u.phone||''; document.getElementById('addLogin').value=u.login||''; document.getElementById('addPass').value=u.pass||'';} }
+        function openAddUserModal() { 
+            if(!canEdit('user-management')) return alert('ليس لديك صلاحية لإضافة مستخدمين');
+            document.getElementById('editUserId').value=''; document.getElementById('addUserForm').reset(); document.getElementById('addUserModal').style.display='flex'; const d=(CURRENT_TAB==='departments'), t=(CURRENT_TAB==='teachers'); if(d){document.getElementById('addUserModalTitle').innerText='إضافة قسم'; document.getElementById('userFields').style.display='none'; document.getElementById('deptWrapper').style.display='none';} else if(t){document.getElementById('addUserModalTitle').innerText='إضافة معلمة'; document.getElementById('userFields').style.display='none'; document.getElementById('deptWrapper').style.display='block'; const s=document.getElementById('addDept'); s.innerHTML='<option value="">اختر...</option>'; (DB.departments||[]).forEach(x=>s.innerHTML+=`<option value="${x.name}">${x.name}</option>`);} else {document.getElementById('addUserModalTitle').innerText='إضافة مستخدم'; document.getElementById('userFields').style.display='block'; document.getElementById('deptWrapper').style.display='none';} 
+        }
+        function editUser(id) { 
+            if(!canEdit('user-management')) return;
+            const u=DB[CURRENT_TAB].find(x=>x.id===id); if(!u)return; document.getElementById('editUserId').value=u.id; document.getElementById('addName').value=u.name; openAddUserModal(); document.getElementById('addUserModalTitle').innerText='تعديل'; if(CURRENT_TAB==='teachers'){document.getElementById('addDept').value=u.dept;} else if(CURRENT_TAB!=='departments'){document.getElementById('addJob').value=u.job||''; document.getElementById('addPhone').value=u.phone||''; document.getElementById('addLogin').value=u.login||''; document.getElementById('addPass').value=u.pass||'';} 
+        }
         function closeModal(id) { document.getElementById(id).style.display='none'; }
         function saveUserForm() { const n=document.getElementById('addName').value.trim(); if(!n)return alert('الاسم مطلوب'); const id=document.getElementById('editUserId').value; const edit=id!==''; let u; if(edit){u=DB[CURRENT_TAB].find(x=>x.id==id); u.name=n; u.lastUpdated=new Date().toLocaleString('en-GB'); u.lastUpdatedBy=CURRENT_USER.name;} else {u={id:Date.now(), name:n, status:'active', lastUpdated:new Date().toLocaleString('en-GB'), lastUpdatedBy:CURRENT_USER.name}; if(CURRENT_TAB!=='departments'){u.dateAdded=new Date().toLocaleDateString('en-GB'); u.permissions=JSON.parse(JSON.stringify(DEFAULT_PERMS));}} if(CURRENT_TAB==='teachers') u.dept=document.getElementById('addDept').value; else if(CURRENT_TAB!=='departments'){u.job=document.getElementById('addJob').value; u.phone=document.getElementById('addPhone').value; u.login=document.getElementById('addLogin').value; u.pass=document.getElementById('addPass').value;} if(!edit)DB[CURRENT_TAB].push(u); saveDB(); renderTable(); closeModal('addUserModal'); }
-        function deleteUser(id) { if(confirm('حذف؟')){DB[CURRENT_TAB]=DB[CURRENT_TAB].filter(u=>u.id!==id); saveDB(); renderTable();} }
+        function deleteUser(id) { if(!canEdit('user-management')) return; if(confirm('حذف؟')){DB[CURRENT_TAB]=DB[CURRENT_TAB].filter(u=>u.id!==id); saveDB(); renderTable();} }
         
         function viewUser(id) {
             const u = DB[CURRENT_TAB].find(x => x.id === id);
@@ -1118,51 +1148,79 @@
             document.getElementById('viewUserModal').style.display = 'flex';
         }
 
-        // ... [Standard Perms & Setting Tabs Logic] ...
-        function openBulkPerms(){/*...*/} function openPerms(id){/*...*/} function toggleAllPerms(t,s){/*...*/} function submitPermissions(){/*...*/} function togglePass(id,i){/*...*/} function setSettingTab(t,el){ document.querySelectorAll('.setting-content-pane').forEach(p=>p.classList.remove('active')); document.getElementById(t).classList.add('active'); el.parentElement.querySelectorAll('.custom-tab').forEach(c=>c.classList.remove('active')); el.classList.add('active'); if(t==='eval')loadEvaluationSettings(); /* other loads */ }
+        // ... [Perms] ...
+        function openBulkPerms(){ if(!canEdit('user-management')) return; const chk = document.querySelectorAll('.user-select-cb:checked'); if(chk.length===0){alert('حدد مستخدمين');return;} IS_BULK_PERM_MODE = true; document.getElementById('permTargetName').innerText = `تعديل (${chk.length})`; document.getElementById('permList').innerHTML = ''; SECTIONS.forEach(s => document.getElementById('permList').innerHTML += `<div class="perm-item"><span>${s.name}</span><div><input type="checkbox" id="pv_${s.id}"> معاينة <input type="checkbox" id="pe_${s.id}"> تعديل</div></div>`); document.getElementById('permModal').style.display = 'flex'; }
+        function openPerms(id) { if(!canEdit('user-management')) return; if(CURRENT_TAB==='departments')return; IS_BULK_PERM_MODE=false; EDITING_PERM_ID=id; const u=DB[CURRENT_TAB].find(x=>x.id===id); document.getElementById('permTargetName').innerText=u.name; document.getElementById('permList').innerHTML=''; const p=u.permissions||DEFAULT_PERMS; SECTIONS.forEach(s=>{const up=p[s.id]||{view:true,edit:false}; document.getElementById('permList').innerHTML+=`<div class="perm-item"><span>${s.name}</span><div><input type="checkbox" id="pv_${s.id}" ${up.view?'checked':''}> معاينة <input type="checkbox" id="pe_${s.id}" ${up.edit?'checked':''}> تعديل</div></div>`}); document.getElementById('permModal').style.display='flex'; }
+        function toggleAllPerms(t,s){ document.querySelectorAll(t==='view'?'[id^="pv_"]':'[id^="pe_"]').forEach(c=>c.checked=s.checked); }
+        function submitPermissions() {
+            const newP = {}; SECTIONS.forEach(s => newP[s.id] = {view:document.getElementById(`pv_${s.id}`).checked, edit:document.getElementById(`pe_${s.id}`).checked});
+            if(IS_BULK_PERM_MODE) { const ids = Array.from(document.querySelectorAll('.user-select-cb:checked')).map(c=>parseInt(c.value)); DB[CURRENT_TAB].forEach(u=>{if(ids.includes(u.id)) u.permissions=JSON.parse(JSON.stringify(newP));}); } 
+            else { const u=DB[CURRENT_TAB].find(x=>x.id===EDITING_PERM_ID); u.permissions=newP; if(CURRENT_USER.id===u.id){CURRENT_USER=u; applySidebarPermissions(); renderTable();} }
+            saveDB(); closeModal('permModal'); alert('تم التحديث');
+        }
+        function togglePass(id,icon) { const i=document.getElementById(id); i.type=i.type==='password'?'text':'password'; icon.className=i.type==='password'?'fas fa-eye password-icon':'fas fa-eye-slash password-icon'; }
+        
+        // --- Settings Logic (Protected) ---
+        function setSettingTab(t,el){ 
+            document.querySelectorAll('.setting-content-pane').forEach(p=>p.classList.remove('active')); document.getElementById(t).classList.add('active'); el.parentElement.querySelectorAll('.custom-tab').forEach(c=>c.classList.remove('active')); el.classList.add('active'); 
+            // Disable Inputs if no edit perm
+            const editable = canEdit('settings');
+            const inputs = document.querySelectorAll('#settings input, #settings textarea, #settings select');
+            inputs.forEach(i => i.disabled = !editable);
+            const editBtns = document.querySelectorAll('.setting-edit-btn');
+            editBtns.forEach(b => b.style.display = editable ? 'inline-block' : 'none');
 
-        // --- Settings Logic (Updated for School Name Update) ---
-        function loadSettings(){ const s=DB.settings; document.getElementById('confSchool').value=s.schoolName||''; document.getElementById('confYear').value=s.schoolYear||''; /* logos logic */ }
+            if(t==='eval')loadEvaluationSettings(); 
+            // ... (other loads) ... 
+            if(t==='sig')loadSignatureSettings(); if(t==='vis')loadVisitorSettings(); if(t==='fot')loadFooterSettings(); if(t==='log')loadSystemLogs();
+        }
+
+        function loadSettings(){ const s=DB.settings; document.getElementById('confSchool').value=s.schoolName||''; document.getElementById('confYear').value=s.schoolYear||''; showImagePreview('preview_ministry','preview_wrap_ministry','btn_wrap_ministry',s.ministryLogo); showImagePreview('preview_school','preview_wrap_school','btn_wrap_school',s.schoolLogo); showImagePreview('preview_stamp','preview_wrap_stamp','btn_wrap_stamp',s.schoolStamp); }
         function saveGeneralSettings(){ 
+            if(!canEdit('settings')) return;
             const newName = document.getElementById('confSchool').value;
             DB.settings.schoolName = newName;
             DB.settings.schoolYear = document.getElementById('confYear').value;
-            // ... (Logo saving logic remains) ...
-            document.getElementById('sidebarSchoolName').innerText = newName; // Update Sidebar Immediately
+            document.getElementById('sidebarSchoolName').innerText = newName; 
             saveDB(); alert('تم الحفظ'); 
         }
         
-        // --- Evaluation Settings (Updated for Arabic Status & Text Buttons) ---
+        // --- Evaluation Settings (Protected) ---
         function loadEvaluationSettings(){ 
             const b=document.getElementById('evalTableBody'); b.innerHTML=''; 
+            const editable = canEdit('settings');
             (DB.settings.evaluation_criteria||[]).forEach((e,i)=>{
                 const statusText = e.status === 'active' ? 'مفعل' : 'معطل';
                 const statusClass = e.status === 'active' ? 'status-active' : 'status-inactive';
-                b.innerHTML+=`
-                    <tr>
-                        <td>${i+1}</td><td>${e.name}</td>
-                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-                        <td>
-                            <div style="display:flex; justify-content:center; gap:2px; flex-wrap:wrap;">
-                                <button class="action-btn btn-move" onclick="moveEval(${e.id},'up')"><i class="fas fa-arrow-up"></i></button>
-                                <button class="action-btn btn-move" onclick="moveEval(${e.id},'down')"><i class="fas fa-arrow-down"></i></button>
-                                <button class="action-btn btn-toggle" onclick="toggleEvalStatus(${e.id})"><i class="fas fa-power-off"></i> تبديل</button>
-                                <button class="action-btn btn-edit" onclick="openAddEvalModal(${e.id})"><i class="fas fa-edit"></i> تعديل</button>
-                                <button class="action-btn btn-delete" onclick="deleteEval(${e.id})"><i class="fas fa-trash"></i> حذف</button>
-                            </div>
-                        </td>
-                    </tr>`;
+                let row = `<tr><td>${i+1}</td><td>${e.name}</td><td><span class="status-badge ${statusClass}">${statusText}</span></td>`;
+                row += `<td><div style="display:flex; justify-content:center; gap:2px; flex-wrap:wrap;">`;
+                if(editable) {
+                    row += `<button class="action-btn btn-move" onclick="moveEval(${e.id},'up')"><i class="fas fa-arrow-up"></i></button>
+                            <button class="action-btn btn-move" onclick="moveEval(${e.id},'down')"><i class="fas fa-arrow-down"></i></button>
+                            <button class="action-btn btn-toggle" onclick="toggleEvalStatus(${e.id})"><i class="fas fa-power-off"></i> تبديل</button>
+                            <button class="action-btn btn-edit" onclick="openAddEvalModal(${e.id})"><i class="fas fa-edit"></i> تعديل</button>
+                            <button class="action-btn btn-delete" onclick="deleteEval(${e.id})"><i class="fas fa-trash"></i> حذف</button>`;
+                }
+                row += `</div></td></tr>`;
+                b.innerHTML+=row;
             }); 
         }
-        // ... (Eval add/edit/save/delete logic standard) ...
-        function openAddEvalModal(id){ document.getElementById('addEvalForm').reset(); document.getElementById('editEvalId').value=''; if(id){const e=DB.settings.evaluation_criteria.find(x=>x.id===id); document.getElementById('editEvalId').value=e.id; document.getElementById('evalName').value=e.name;} document.getElementById('addEvalModal').style.display='flex'; }
-        function saveEvalForm(){ const n=document.getElementById('evalName').value; const id=document.getElementById('editEvalId').value; if(!n)return; if(id){const e=DB.settings.evaluation_criteria.find(x=>x.id==id); e.name=n;} else {DB.settings.evaluation_criteria.push({id:Date.now(), name:n, status:'active'});} saveDB(); loadEvaluationSettings(); closeModal('addEvalModal'); }
-        function deleteEval(id){ if(confirm('حذف؟')){DB.settings.evaluation_criteria=DB.settings.evaluation_criteria.filter(x=>x.id!==id); saveDB(); loadEvaluationSettings();} }
-        function toggleEvalStatus(id){ const e=DB.settings.evaluation_criteria.find(x=>x.id===id); e.status=e.status==='active'?'inactive':'active'; saveDB(); loadEvaluationSettings(); }
-        function moveEval(id,d){ const l=DB.settings.evaluation_criteria; const i=l.findIndex(x=>x.id===id); if(d==='up'&&i>0)[l[i],l[i-1]]=[l[i-1],l[i]]; if(d==='down'&&i<l.length-1)[l[i],l[i+1]]=[l[i+1],l[i]]; saveDB(); loadEvaluationSettings(); }
+        function openAddEvalModal(id){ if(!canEdit('settings'))return; document.getElementById('addEvalForm').reset(); document.getElementById('editEvalId').value=''; if(id){const e=DB.settings.evaluation_criteria.find(x=>x.id===id); document.getElementById('editEvalId').value=e.id; document.getElementById('evalName').value=e.name;} document.getElementById('addEvalModal').style.display='flex'; }
+        function saveEvalForm(){ if(!canEdit('settings'))return; const n=document.getElementById('evalName').value; const id=document.getElementById('editEvalId').value; if(!n)return; if(id){const e=DB.settings.evaluation_criteria.find(x=>x.id==id); e.name=n;} else {DB.settings.evaluation_criteria.push({id:Date.now(), name:n, status:'active'});} saveDB(); loadEvaluationSettings(); closeModal('addEvalModal'); }
+        function deleteEval(id){ if(!canEdit('settings'))return; if(confirm('حذف؟')){DB.settings.evaluation_criteria=DB.settings.evaluation_criteria.filter(x=>x.id!==id); saveDB(); loadEvaluationSettings();} }
+        function toggleEvalStatus(id){ if(!canEdit('settings'))return; const e=DB.settings.evaluation_criteria.find(x=>x.id===id); e.status=e.status==='active'?'inactive':'active'; saveDB(); loadEvaluationSettings(); }
+        function moveEval(id,d){ if(!canEdit('settings'))return; const l=DB.settings.evaluation_criteria; const i=l.findIndex(x=>x.id===id); if(d==='up'&&i>0)[l[i],l[i-1]]=[l[i-1],l[i]]; if(d==='down'&&i<l.length-1)[l[i],l[i+1]]=[l[i+1],l[i]]; saveDB(); loadEvaluationSettings(); }
 
-        // --- Distinguished Logic (Updated for Last Updated) ---
-        function renderDistinguishedTables() { /* ... (Same filtering logic) ... */ 
+        // --- Distinguished Logic (Protected) ---
+        function renderDistinguishedTables() { 
+            const editable = canEdit('distinguished');
+            
+            // Hide/Show Add Buttons
+            document.querySelectorAll('.btn-group-restricted button').forEach(b => b.style.display = editable ? 'inline-block' : 'none');
+            
+            // Hide/Show Action Columns Header
+            document.querySelectorAll('.col-actions').forEach(c => c.style.display = editable ? 'table-cell' : 'none');
+
             const filterMonth = document.getElementById('distMonthFilter').value;
             const renderTableBody = (list, elementId, type) => {
                 const body = document.getElementById(elementId); body.innerHTML = '';
@@ -1172,16 +1230,32 @@
                 else {
                     filteredList.forEach((item, idx) => {
                         const statusClass = type === 'distinguished' ? 'status-active' : 'status-inactive';
-                        body.innerHTML += `<tr><td>${idx + 1}</td><td>${item.teacherName}</td><td>${item.dept}</td><td><span class="status-badge ${statusClass}">${item.eval}</span></td><td class="reason-cell">${item.reason}</td><td><div style="display:flex; justify-content:center; gap:2px; flex-wrap:wrap;"><button class="action-btn btn-view" onclick="viewDistinguished('${type}', ${item.id})"><i class="fas fa-eye"></i> معاينة</button><button class="action-btn btn-edit" onclick="editDistinguished('${type}', ${item.id})"><i class="fas fa-edit"></i> تعديل</button><button class="action-btn btn-delete" onclick="deleteDistinguished('${type}', ${item.id})"><i class="fas fa-trash"></i> حذف</button></div></td></tr>`;
+                        let row = `<tr><td>${idx + 1}</td><td>${item.teacherName}</td><td>${item.dept}</td><td><span class="status-badge ${statusClass}">${item.eval}</span></td><td class="reason-cell">${item.reason}</td>`;
+                        if(editable) {
+                            row += `<td><div style="display:flex; justify-content:center; gap:2px; flex-wrap:wrap;"><button class="action-btn btn-view" onclick="viewDistinguished('${type}', ${item.id})"><i class="fas fa-eye"></i> معاينة</button><button class="action-btn btn-edit" onclick="editDistinguished('${type}', ${item.id})"><i class="fas fa-edit"></i> تعديل</button><button class="action-btn btn-delete" onclick="deleteDistinguished('${type}', ${item.id})"><i class="fas fa-trash"></i> حذف</button></div></td>`;
+                        } else {
+                            // If readonly, user might want to View details only? Usually view button is fine, but edit/delete forbidden. 
+                            // Request said "if view only, cannot edit/add". Let's show View button only if permitted, or just hide actions if we treat "Actions" as edit actions.
+                            // The instruction says "If view only... cannot add or edit". 
+                            // I will keep "View" button available if view=true, but inside the Actions column.
+                            // But previous styling hides column. Let's make "Action" column visible but only containing View button if edit=false.
+                            row += `<td><button class="action-btn btn-view" onclick="viewDistinguished('${type}', ${item.id})"><i class="fas fa-eye"></i> معاينة</button></td>`;
+                        }
+                        row += `</tr>`;
+                        body.innerHTML += row;
                     });
                 }
             };
+            
+            // Re-enable column header for View button sake
+            document.querySelectorAll('.col-actions').forEach(c => c.style.display = 'table-cell');
+
             renderTableBody(DB.distinguished || [], 'distinguishedTableBody', 'distinguished');
             renderTableBody(DB.care_needed || [], 'careTableBody', 'care');
         }
 
         function saveDistinguishedEntry() {
-            /* ... valdiation ... */
+            if(!canEdit('distinguished')) return;
             const type = document.getElementById('distType').value; const editId = document.getElementById('distEditId').value;
             const dept = document.getElementById('distDept').value; const teacher = document.getElementById('distTeacher').value;
             const ev = document.getElementById('distEval').value; const reason = document.getElementById('distReason').value;
@@ -1209,19 +1283,30 @@
             document.getElementById('viewDetailsModal').style.display = 'flex';
         }
 
-        // --- Qualitative Report Logic (Updated for Last Updated) ---
-        function renderQualitativeTable() { /* ... same render logic ... */ 
+        // --- Qualitative Report Logic (Protected) ---
+        function renderQualitativeTable() { 
+            const editable = canEdit('qualitative');
+            const btn = document.querySelector('#qualitative .btn-primary');
+            if(btn) btn.style.display = editable ? 'inline-block' : 'none';
+
             const tbody = document.getElementById('qualitativeTableBody'); tbody.innerHTML=''; const f = document.getElementById('qualMonthFilter').value;
             let list = DB.qualitative_reports || [];
             if(f!=='all') list = list.filter(i=> i.date && i.date.split('-')[1]===f);
             if(list.length===0){tbody.innerHTML='<tr><td colspan="5">لا يوجد</td></tr>';} else {
                 list.forEach((item, idx) => {
-                    tbody.innerHTML += `<tr><td>${idx+1}</td><td>${item.dept}</td><td class="reason-cell">${item.strengths}</td><td class="reason-cell">${item.improvements}</td><td><div style="display:flex; justify-content:center; gap:2px; flex-wrap:wrap;"><button class="action-btn btn-view" onclick="viewQualitative(${item.id})"><i class="fas fa-eye"></i> معاينة</button><button class="action-btn btn-edit" onclick="editQualitative(${item.id})"><i class="fas fa-edit"></i> تعديل</button><button class="action-btn btn-delete" onclick="deleteQualitative(${item.id})"><i class="fas fa-trash"></i> حذف</button></div></td></tr>`;
+                    let row = `<tr><td>${idx+1}</td><td>${item.dept}</td><td class="reason-cell">${item.strengths}</td><td class="reason-cell">${item.improvements}</td><td><div style="display:flex; justify-content:center; gap:2px; flex-wrap:wrap;">`;
+                    row += `<button class="action-btn btn-view" onclick="viewQualitative(${item.id})"><i class="fas fa-eye"></i> معاينة</button>`;
+                    if(editable) {
+                        row += `<button class="action-btn btn-edit" onclick="editQualitative(${item.id})"><i class="fas fa-edit"></i> تعديل</button><button class="action-btn btn-delete" onclick="deleteQualitative(${item.id})"><i class="fas fa-trash"></i> حذف</button>`;
+                    }
+                    row += `</div></td></tr>`;
+                    tbody.innerHTML += row;
                 });
             }
         }
 
         function saveQualitative() {
+            if(!canEdit('qualitative')) return;
             const editId = document.getElementById('qualEditId').value;
             const dept = document.getElementById('qualDept').value;
             const st = document.getElementById('qualStrength').value;
@@ -1248,42 +1333,48 @@
         }
 
         // --- Helper functions for other sections ---
-        function onDistinguishedDeptChange() { /* ... populate teacher ... */ const d=document.getElementById('distDept').value; const t=document.getElementById('distTeacher'); t.innerHTML='<option value="">اختر...</option>'; (DB.teachers||[]).filter(x=>x.dept===d).forEach(x=>t.innerHTML+=`<option value="${x.name}">${x.name}</option>`); }
-        function openDistinguishedModal(t){ /* ... reset & open ... */ document.getElementById('distinguishedForm').reset(); document.getElementById('distEditId').value=''; document.getElementById('distType').value=t; document.getElementById('distinguishedModal').style.display='flex'; const d=document.getElementById('distDept'); d.innerHTML='<option value="">اختر...</option>'; (DB.departments||[]).forEach(x=>d.innerHTML+=`<option value="${x.name}">${x.name}</option>`); document.getElementById('distTeacher').innerHTML='<option value="">اختر...</option>'; const e=document.getElementById('distEval'); e.innerHTML='<option value="">اختر...</option>'; (DB.settings.evaluation_criteria||[]).filter(x=>x.status==='active').forEach(x=>e.innerHTML+=`<option value="${x.name}">${x.name}</option>`); }
-        function editDistinguished(t,id){ const l=t==='distinguished'?DB.distinguished:DB.care_needed; const i=l.find(x=>x.id===id); if(!i)return; openDistinguishedModal(t); document.getElementById('distEditId').value=id; document.getElementById('distDept').value=i.dept; onDistinguishedDeptChange(); document.getElementById('distTeacher').value=i.teacherName; document.getElementById('distEval').value=i.eval; document.getElementById('distReason').value=i.reason; }
-        function deleteDistinguished(t,id){ if(confirm('حذف؟')){if(t==='distinguished')DB.distinguished=DB.distinguished.filter(x=>x.id!==id); else DB.care_needed=DB.care_needed.filter(x=>x.id!==id); saveDB(); renderDistinguishedTables();} }
-        function openQualitativeModal(){ document.getElementById('qualitativeForm').reset(); document.getElementById('qualEditId').value=''; const d=document.getElementById('qualDept'); d.innerHTML='<option value="">اختر...</option>'; (DB.departments||[]).forEach(x=>d.innerHTML+=`<option value="${x.name}">${x.name}</option>`); document.getElementById('addQualitativeModal').style.display='flex'; }
-        function editQualitative(id){ const i=DB.qualitative_reports.find(x=>x.id===id); if(!i)return; openQualitativeModal(); document.getElementById('qualEditId').value=id; document.getElementById('qualDept').value=i.dept; document.getElementById('qualStrength').value=i.strengths; document.getElementById('qualImprove').value=i.improvements; }
-        function deleteQualitative(id){ if(confirm('حذف؟')){DB.qualitative_reports=DB.qualitative_reports.filter(x=>x.id!==id); saveDB(); renderQualitativeTable();} }
+        function onDistinguishedDeptChange() { const d=document.getElementById('distDept').value; const t=document.getElementById('distTeacher'); t.innerHTML='<option value="">اختر...</option>'; (DB.teachers||[]).filter(x=>x.dept===d).forEach(x=>t.innerHTML+=`<option value="${x.name}">${x.name}</option>`); }
+        function openDistinguishedModal(t){ if(!canEdit('distinguished'))return; document.getElementById('distinguishedForm').reset(); document.getElementById('distEditId').value=''; document.getElementById('distType').value=t; document.getElementById('distinguishedModal').style.display='flex'; const d=document.getElementById('distDept'); d.innerHTML='<option value="">اختر...</option>'; (DB.departments||[]).forEach(x=>d.innerHTML+=`<option value="${x.name}">${x.name}</option>`); document.getElementById('distTeacher').innerHTML='<option value="">اختر...</option>'; const e=document.getElementById('distEval'); e.innerHTML='<option value="">اختر...</option>'; (DB.settings.evaluation_criteria||[]).filter(x=>x.status==='active').forEach(x=>e.innerHTML+=`<option value="${x.name}">${x.name}</option>`); }
+        function editDistinguished(t,id){ if(!canEdit('distinguished'))return; const l=t==='distinguished'?DB.distinguished:DB.care_needed; const i=l.find(x=>x.id===id); if(!i)return; openDistinguishedModal(t); document.getElementById('distEditId').value=id; document.getElementById('distDept').value=i.dept; onDistinguishedDeptChange(); document.getElementById('distTeacher').value=i.teacherName; document.getElementById('distEval').value=i.eval; document.getElementById('distReason').value=i.reason; }
+        function deleteDistinguished(t,id){ if(!canEdit('distinguished'))return; if(confirm('حذف؟')){if(t==='distinguished')DB.distinguished=DB.distinguished.filter(x=>x.id!==id); else DB.care_needed=DB.care_needed.filter(x=>x.id!==id); saveDB(); renderDistinguishedTables();} }
+        function openQualitativeModal(){ if(!canEdit('qualitative'))return; document.getElementById('qualitativeForm').reset(); document.getElementById('qualEditId').value=''; const d=document.getElementById('qualDept'); d.innerHTML='<option value="">اختر...</option>'; (DB.departments||[]).forEach(x=>d.innerHTML+=`<option value="${x.name}">${x.name}</option>`); document.getElementById('addQualitativeModal').style.display='flex'; }
+        function editQualitative(id){ if(!canEdit('qualitative'))return; const i=DB.qualitative_reports.find(x=>x.id===id); if(!i)return; openQualitativeModal(); document.getElementById('qualEditId').value=id; document.getElementById('qualDept').value=i.dept; document.getElementById('qualStrength').value=i.strengths; document.getElementById('qualImprove').value=i.improvements; }
+        function deleteQualitative(id){ if(!canEdit('qualitative'))return; if(confirm('حذف؟')){DB.qualitative_reports=DB.qualitative_reports.filter(x=>x.id!==id); saveDB(); renderQualitativeTable();} }
 
-        // Standard Functions (Visits, etc - assumed present as before but ensuring saveVisit tracks time)
-        function saveVisit(){ const d=document.getElementById('visitDept').value; const t=document.getElementById('visitTeacher').value; const date=document.getElementById('visitDate').value; const ev=document.getElementById('visitEval').value; if(!d||!t||!date||!ev)return alert('اكمل'); const v={id:Date.now(), dept:d, teacher:t, date:date, eval:ev, visitorName:CURRENT_USER.name, visitorId:CURRENT_USER.id, lastUpdated: new Date().toLocaleString('en-GB'), lastUpdatedBy: CURRENT_USER.name}; if(DB.middle.some(u=>u.id===CURRENT_USER.id)) { if(!DB.visits_middle)DB.visits_middle=[]; DB.visits_middle.push(v); } else { if(!DB.visits_senior)DB.visits_senior=[]; DB.visits_senior.push(v); } saveDB(); renderVisitsTable(); closeModal('addVisitModal'); alert('تم'); }
-        // ... (Other funcs: openAddVisitModal, onVisitDeptChange, renderVisitsTable, renderPerformanceChart, etc from previous version) ...
+        // Standard Functions
+        function saveVisit(){ if(!canEdit('visits'))return; const d=document.getElementById('visitDept').value; const t=document.getElementById('visitTeacher').value; const date=document.getElementById('visitDate').value; const ev=document.getElementById('visitEval').value; if(!d||!t||!date||!ev)return alert('اكمل'); const v={id:Date.now(), dept:d, teacher:t, date:date, eval:ev, visitorName:CURRENT_USER.name, visitorId:CURRENT_USER.id, lastUpdated: new Date().toLocaleString('en-GB'), lastUpdatedBy: CURRENT_USER.name}; if(DB.middle.some(u=>u.id===CURRENT_USER.id)) { if(!DB.visits_middle)DB.visits_middle=[]; DB.visits_middle.push(v); } else { if(!DB.visits_senior)DB.visits_senior=[]; DB.visits_senior.push(v); } saveDB(); renderVisitsTable(); closeModal('addVisitModal'); alert('تم'); }
         function onVisitDeptChange(){ const d=document.getElementById('visitDept').value; const t=document.getElementById('visitTeacher'); t.innerHTML='<option value="">اختر...</option>'; (DB.teachers||[]).filter(x=>x.dept===d&&x.status==='active').forEach(x=>t.innerHTML+=`<option value="${x.name}">${x.name}</option>`); }
-        function renderVisitsTable(){ const b=document.getElementById('visitsTableBody'); b.innerHTML=''; const f=document.getElementById('visitMonthFilter').value; let l=CURRENT_VISIT_TAB==='senior'?(DB.visits_senior||[]):(DB.visits_middle||[]); if(f!=='all') l=l.filter(v=>v.date.split('-')[1]===f); if(l.length===0){b.innerHTML='<tr><td colspan="6">لا يوجد</td></tr>';return;} l.sort((x,y)=>y.id-x.id); l.forEach(v=>{b.innerHTML+=`<tr><td>${v.date}</td><td>${v.dept}</td><td>${v.teacher}</td><td>${v.eval}</td><td>${v.visitorName}</td><td>${getLatestJobTitle(v.visitorId)}</td></tr>`;}); }
+        function renderVisitsTable(){ 
+            const editable = canEdit('visits');
+            const btn = document.querySelector('#visits .btn-restricted');
+            if(btn) btn.style.display = editable ? 'inline-block' : 'none';
+
+            const b=document.getElementById('visitsTableBody'); b.innerHTML=''; const f=document.getElementById('visitMonthFilter').value; let l=CURRENT_VISIT_TAB==='senior'?(DB.visits_senior||[]):(DB.visits_middle||[]); if(f!=='all') l=l.filter(v=>v.date.split('-')[1]===f); if(l.length===0){b.innerHTML='<tr><td colspan="6">لا يوجد</td></tr>';return;} l.sort((x,y)=>y.id-x.id); l.forEach(v=>{b.innerHTML+=`<tr><td>${v.date}</td><td>${v.dept}</td><td>${v.teacher}</td><td>${v.eval}</td><td>${v.visitorName}</td><td>${getLatestJobTitle(v.visitorId)}</td></tr>`;}); 
+        }
         function getLatestJobTitle(uid){ for(let g of ['admins','senior','middle','teachers']) if(DB[g]){const f=DB[g].find(x=>x.id==uid); if(f)return f.job||f.dept||'-';} return '-'; }
-        function openAddVisitModal(){ document.getElementById('addVisitForm').reset(); const d=document.getElementById('visitDept'); d.innerHTML='<option value="">اختر...</option>'; (DB.departments||[]).forEach(x=>d.innerHTML+=`<option value="${x.name}">${x.name}</option>`); const e=document.getElementById('visitEval'); e.innerHTML='<option value="">اختر...</option>'; (DB.settings.evaluation_criteria||[]).filter(x=>x.status==='active').forEach(x=>e.innerHTML+=`<option value="${x.name}">${x.name}</option>`); document.getElementById('visitTeacher').innerHTML='<option value="">اختر...</option>'; document.getElementById('addVisitModal').style.display='flex'; }
+        function openAddVisitModal(){ if(!canEdit('visits'))return; document.getElementById('addVisitForm').reset(); const d=document.getElementById('visitDept'); d.innerHTML='<option value="">اختر...</option>'; (DB.departments||[]).forEach(x=>d.innerHTML+=`<option value="${x.name}">${x.name}</option>`); const e=document.getElementById('visitEval'); e.innerHTML='<option value="">اختر...</option>'; (DB.settings.evaluation_criteria||[]).filter(x=>x.status==='active').forEach(x=>e.innerHTML+=`<option value="${x.name}">${x.name}</option>`); document.getElementById('visitTeacher').innerHTML='<option value="">اختر...</option>'; document.getElementById('addVisitModal').style.display='flex'; }
         function renderPerformanceChart(){ const f=document.getElementById('perfMonthFilter').value; const ctx=document.getElementById('perfChart').getContext('2d'); let l=[...(DB.visits_senior||[]), ...(DB.visits_middle||[])]; if(f!=='all') l=l.filter(v=>v.date.split('-')[1]===f); const depts=[...new Set(l.map(x=>x.dept))]; let crits=(DB.settings.evaluation_criteria||[]).filter(x=>x.status==='active').map(x=>x.name); l.forEach(v=>{if(!crits.includes(v.eval))crits.push(v.eval)}); const ds=crits.map((c,i)=>({label:c, data:depts.map(d=>l.filter(x=>x.dept===d&&x.eval===c).length), backgroundColor:['#28a745','#17a2b8','#ffc107','#dc3545'][i%4]})); if(performanceChartInstance)performanceChartInstance.destroy(); performanceChartInstance=new Chart(ctx,{type:'bar',data:{labels:depts.length?depts:['no data'], datasets:ds}}); }
         
-        // Load Logs/Sigs/etc logic from previous iteration...
         function showImagePreview(i,w,b,s){ const img=document.getElementById(i); if(s){img.src=s; document.getElementById(w).style.display='inline-block'; document.getElementById(b).style.display='none';} else {document.getElementById(w).style.display='none'; document.getElementById(b).style.display='block';} }
-        function triggerFileSelect(id){ document.getElementById(id).click(); }
+        function triggerFileSelect(id){ if(canEdit('settings')) document.getElementById(id).click(); }
         function handleFileUpload(inp,pId,k){ if(inp.files&&inp.files[0]){const r=new FileReader(); r.onload=function(e){const d=e.target.result; document.getElementById(pId).src=d; document.getElementById(pId.replace('preview_','preview_wrap_')).style.display='inline-block'; document.getElementById(pId.replace('preview_','btn_wrap_')).style.display='none';}; r.readAsDataURL(inp.files[0]);} }
-        function removeImage(pId,k,inpId){ if(confirm('حذف؟')){document.getElementById(pId).src=''; document.getElementById(inpId).value=''; document.getElementById(pId.replace('preview_','preview_wrap_')).style.display='none'; document.getElementById(pId.replace('preview_','btn_wrap_')).style.display='block';} }
+        function removeImage(pId,k,inpId){ if(!canEdit('settings'))return; if(confirm('حذف؟')){document.getElementById(pId).src=''; document.getElementById(inpId).value=''; document.getElementById(pId.replace('preview_','preview_wrap_')).style.display='none'; document.getElementById(pId.replace('preview_','btn_wrap_')).style.display='block';} }
         function openImageModal(s){ if(!s)return; document.getElementById('fullImage').src=s; document.getElementById('imageViewModal').style.display='flex'; }
         function loadSignatureSettings(){ const sel=[document.getElementById('sig_director'), document.getElementById('sig_assistant')]; sel.forEach(s=>{s.innerHTML='<option value="">اختر...</option>'; (DB.senior||[]).forEach(u=>{s.innerHTML+=`<option value="${u.id}">${u.name}</option>`})}); document.getElementById('sig_director').value=DB.settings.signature_director_id; document.getElementById('sig_assistant').value=DB.settings.signature_assistant_id; }
-        function saveSignatureSettings(){ DB.settings.signature_director_id=document.getElementById('sig_director').value; DB.settings.signature_assistant_id=document.getElementById('sig_assistant').value; saveDB(); alert('تم الحفظ'); }
-        function clearSignature(id){ document.getElementById(id).value=''; saveSignatureSettings(); }
+        function saveSignatureSettings(){ if(!canEdit('settings'))return; DB.settings.signature_director_id=document.getElementById('sig_director').value; DB.settings.signature_assistant_id=document.getElementById('sig_assistant').value; saveDB(); alert('تم الحفظ'); }
+        function clearSignature(id){ if(!canEdit('settings'))return; document.getElementById(id).value=''; saveSignatureSettings(); }
         function loadVisitorSettings(){ renderVisitorList('senior'); renderVisitorList('middle'); }
         function renderVisitorList(t){ const l=document.getElementById(`list_visitor_${t}`); const o=t==='senior'?DB.settings.visitor_order_senior:DB.settings.visitor_order_middle; const src=t==='senior'?DB.senior:DB.middle; l.innerHTML=''; if(!o||o.length===0){l.innerHTML='<li class="empty-list-msg">فارغ</li>';return;} o.forEach((id,i)=>{const u=src.find(x=>x.id==id); if(u) l.innerHTML+=`<li class="visitor-list-item"><span class="visitor-name">${u.name}</span><div class="visitor-controls"><button class="action-btn btn-move" onclick="moveVisitorItem('${t}',${i},'up')"><i class="fas fa-arrow-up"></i></button><button class="action-btn btn-move" onclick="moveVisitorItem('${t}',${i},'down')"><i class="fas fa-arrow-down"></i></button><button class="action-btn btn-delete" onclick="removeVisitorItem('${t}',${i})"><i class="fas fa-trash"></i></button></div></li>`;}); }
-        function openVisitorPicker(t){ CURRENT_PICKER_TYPE=t; document.getElementById('visitorSearch').value=''; filterPickerList(); document.getElementById('visitorPickerModal').style.display='flex'; }
+        function openVisitorPicker(t){ if(!canEdit('settings'))return; CURRENT_PICKER_TYPE=t; document.getElementById('visitorSearch').value=''; filterPickerList(); document.getElementById('visitorPickerModal').style.display='flex'; }
         function filterPickerList(){ const q=document.getElementById('visitorSearch').value.toLowerCase(); const l=document.getElementById('pickerList'); l.innerHTML=''; const src=CURRENT_PICKER_TYPE==='senior'?DB.senior:DB.middle; const o=CURRENT_PICKER_TYPE==='senior'?DB.settings.visitor_order_senior:DB.settings.visitor_order_middle; src.filter(u=>!o.includes(u.id)).forEach(u=>{if(u.name.toLowerCase().includes(q)) l.innerHTML+=`<div class="picker-item" onclick="addVisitorToOrder(${u.id})"><div><div class="picker-item-name">${u.name}</div></div><i class="fas fa-plus-circle" style="color:var(--success);"></i></div>`;}); }
         function addVisitorToOrder(id){ const k=CURRENT_PICKER_TYPE==='senior'?'visitor_order_senior':'visitor_order_middle'; if(!DB.settings[k])DB.settings[k]=[]; DB.settings[k].push(id); closeModal('visitorPickerModal'); renderVisitorList(CURRENT_PICKER_TYPE); }
-        function removeVisitorItem(t,i){ const k=t==='senior'?'visitor_order_senior':'visitor_order_middle'; DB.settings[k].splice(i,1); renderVisitorList(t); }
-        function moveVisitorItem(t,i,d){ const k=t==='senior'?'visitor_order_senior':'visitor_order_middle'; const a=DB.settings[k]; if(d==='up'&&i>0)[a[i],a[i-1]]=[a[i-1],a[i]]; if(d==='down'&&i<a.length-1)[a[i],a[i+1]]=[a[i+1],a[i]]; renderVisitorList(t); }
-        function saveVisitorOrder(){ saveDB(); alert('تم الحفظ'); }
+        function removeVisitorItem(t,i){ if(!canEdit('settings'))return; const k=t==='senior'?'visitor_order_senior':'visitor_order_middle'; DB.settings[k].splice(i,1); renderVisitorList(t); }
+        function moveVisitorItem(t,i,d){ if(!canEdit('settings'))return; const k=t==='senior'?'visitor_order_senior':'visitor_order_middle'; const a=DB.settings[k]; if(d==='up'&&i>0)[a[i],a[i-1]]=[a[i-1],a[i]]; if(d==='down'&&i<a.length-1)[a[i],a[i+1]]=[a[i+1],a[i]]; renderVisitorList(t); }
+        function saveVisitorOrder(){ if(!canEdit('settings'))return; saveDB(); alert('تم الحفظ'); }
+        function loadFooterSettings(){ document.getElementById('footer_text').value=DB.settings.footer_text||''; document.getElementById('footer_align').value=DB.settings.footer_align||'center'; document.getElementById('footer_fontsize').value=DB.settings.footer_fontsize||'12'; }
+        function saveFooterSettings(){ if(!canEdit('settings'))return; DB.settings.footer_text=document.getElementById('footer_text').value; DB.settings.footer_align=document.getElementById('footer_align').value; DB.settings.footer_fontsize=document.getElementById('footer_fontsize').value; saveDB(); alert('تم الحفظ'); }
         function loadSystemLogs(){ const b=document.getElementById('logTableBody'); b.innerHTML=''; (DB.logs||[]).forEach(l=>{b.innerHTML+=`<tr><td>${l.date}</td><td>${l.user}</td><td>${l.action}</td><td>${l.details}</td></tr>`;}); }
-        function clearSystemLogs(){ if(confirm('مسح؟')){DB.logs=[]; saveDB(); loadSystemLogs();} }
+        function clearSystemLogs(){ if(!canEdit('settings'))return; if(confirm('مسح؟')){DB.logs=[]; saveDB(); loadSystemLogs();} }
         function setVisitTab(t,el){ CURRENT_VISIT_TAB=t; el.parentElement.querySelectorAll('.custom-tab').forEach(c=>c.classList.remove('active')); el.classList.add('active'); renderVisitsTable(); }
 
         document.getElementById('loginForm').addEventListener('submit', login);
