@@ -6,7 +6,6 @@
     <title>نظام متابعة جودة التعليم</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --primary: #1e4078; --text: #333; --bg: #f7f9fc; --danger: #da291c; --success: #28a745; --warning: #ffc107; }
         * { box-sizing: border-box; font-family: 'Cairo', sans-serif; }
@@ -87,37 +86,21 @@
 
         /* Image Upload Box Style */
         .upload-container {
-            border: 2px dashed #ccc;
-            border-radius: 8px;
-            padding: 20px;
-            text-align: center;
-            background-color: #fcfcfc;
-            margin-bottom: 20px;
-            position: relative;
-            transition: 0.3s;
+            border: 2px dashed #ccc; border-radius: 8px; padding: 20px; text-align: center; background-color: #fcfcfc; margin-bottom: 20px; position: relative; transition: 0.3s;
         }
         .upload-container:hover { border-color: var(--primary); background-color: #f0f4f8; }
         .upload-label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
-        
         .upload-btn-wrapper { margin-top: 10px; }
         .upload-btn-custom {
-            background-color: #28a745; color: white; border: none; padding: 10px 25px;
-            border-radius: 5px; cursor: pointer; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 8px;
+            background-color: #28a745; color: white; border: none; padding: 10px 25px; border-radius: 5px; cursor: pointer; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 8px;
         }
         .upload-hint { display: block; margin-top: 5px; color: #888; font-size: 0.8rem; }
-
         .image-preview-wrapper {
-            margin-top: 15px; position: relative; display: inline-block;
-            border: 1px solid #ddd; padding: 5px; border-radius: 5px; background: white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            margin-top: 15px; position: relative; display: inline-block; border: 1px solid #ddd; padding: 5px; border-radius: 5px; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         .image-preview { max-width: 200px; max-height: 100px; display: block; cursor: pointer; }
         .remove-img-btn {
-            position: absolute; top: -10px; right: -10px;
-            background: #dc3545; color: white; border: none;
-            width: 24px; height: 24px; border-radius: 50%;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            font-size: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            position: absolute; top: -10px; right: -10px; background: #dc3545; color: white; border: none; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
         /* --- Signature Settings Styles --- */
@@ -254,7 +237,33 @@
                 </table>
             </div>
 
-            <div id="visits" class="section-card"><h3>الزيارات الصفية</h3></div>
+            <div id="visits" class="section-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <h3 style="color:var(--primary);">سجل الزيارات الصفية</h3>
+                    <button class="btn btn-primary" style="width:auto;" onclick="openAddVisitModal()"><i class="fas fa-plus"></i> إضافة زيارة جديدة</button>
+                </div>
+
+                <div class="custom-tabs">
+                    <div class="custom-tab active" onclick="setVisitTab('senior', this)">زيارات القيادة العليا</div>
+                    <div class="custom-tab" onclick="setVisitTab('middle', this)">زيارات القيادة الوسطى</div>
+                </div>
+
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th width="15%">التاريخ</th>
+                            <th width="15%">القسم</th>
+                            <th width="20%">اسم المعلمة</th>
+                            <th width="15%">التقييم</th>
+                            <th width="15%">الزائر</th>
+                            <th width="20%">ملاحظات / إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="visitsTableBody">
+                    </tbody>
+                </table>
+            </div>
+
             <div id="performance" class="section-card"><h3>تقييم الأداء</h3></div>
             <div id="quality-report" class="section-card"><h3>تقرير الجودة</h3></div>
             
@@ -489,6 +498,46 @@
         </div>
     </div>
 
+    <div id="addVisitModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header"><span>إضافة زيارة صفية</span> <span onclick="closeModal('addVisitModal')" style="cursor:pointer;">&times;</span></div>
+            <div class="modal-body">
+                <form id="addVisitForm">
+                    <div class="form-group">
+                        <label style="font-weight:bold; display:block; margin-bottom:5px;">القسم</label>
+                        <select id="visitDept" class="form-control" onchange="onVisitDeptChange()">
+                            <option value="">اختر القسم...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label style="font-weight:bold; display:block; margin-bottom:5px;">المعلم/ة</label>
+                        <select id="visitTeacher" class="form-control">
+                            <option value="">اختر المعلم/ة...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label style="font-weight:bold; display:block; margin-bottom:5px;">تاريخ الزيارة</label>
+                        <input type="date" id="visitDate" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label style="font-weight:bold; display:block; margin-bottom:5px;">التقييم</label>
+                        <select id="visitEval" class="form-control">
+                            <option value="">اختر التقييم...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label style="font-weight:bold; display:block; margin-bottom:5px;">الملاحظات</label>
+                        <textarea id="visitNotes" class="form-control" rows="4" placeholder="اكتب ملاحظات الزيارة هنا..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="saveVisit()">حفظ</button>
+                <button class="btn" style="background:#ddd;" onclick="closeModal('addVisitModal')">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
     <div id="addEvalModal" class="modal-overlay">
         <div class="modal-box">
             <div class="modal-header"><span>إضافة/تعديل معيار تقييم</span> <span onclick="closeModal('addEvalModal')" style="cursor:pointer;">&times;</span></div>
@@ -577,6 +626,8 @@
             middle: [],
             teachers: [],
             departments: [],
+            visits_senior: [], // تخزين زيارات القيادة العليا
+            visits_middle: [], // تخزين زيارات القيادة الوسطى
             settings: {
                 schoolName: 'مدرسة مدينة حمد الابتدائية للبنات',
                 schoolYear: '2025 / 2026م',
@@ -600,6 +651,7 @@
         let DB = {}; 
         let CURRENT_USER = null;
         let CURRENT_TAB = 'senior';
+        let CURRENT_VISIT_TAB = 'senior'; // للتحكم في تاب الزيارات المعروضة
         let EDITING_PERM_ID = null;
         let IS_BULK_PERM_MODE = false;
         let CURRENT_PICKER_TYPE = null;
@@ -615,6 +667,10 @@
                 DB.settings = {...INITIAL_DB.settings, ...DB.settings};
                 if(!DB.settings.evaluation_criteria) DB.settings.evaluation_criteria = [];
                 if(!DB.logs) DB.logs = [];
+                
+                // التأكد من وجود مصفوفات الزيارات
+                if(!DB.visits_senior) DB.visits_senior = [];
+                if(!DB.visits_middle) DB.visits_middle = [];
 
                 ['admins', 'senior', 'middle', 'teachers', 'departments'].forEach(grp => {
                     if(DB[grp] && Array.isArray(DB[grp])) {
@@ -737,6 +793,7 @@
             if (link) link.classList.add('active');
             
             if(pageId === 'settings') loadSettings();
+            if(pageId === 'visits') renderVisitsTable(); // تحميل الزيارات
         }
 
         function showApp() {
@@ -760,8 +817,12 @@
         function setTab(tab, el) {
             CURRENT_TAB = tab;
             document.querySelectorAll('.custom-tab').forEach(t => {
-                if(t.parentElement.previousElementSibling && t.parentElement.previousElementSibling.firstElementChild && t.parentElement.previousElementSibling.firstElementChild.innerText.includes('إدارة المستخدمين'))
-                    t.classList.remove('active');
+                // Check if this tab belongs to user-management
+                 if(t.parentElement.previousElementSibling && t.parentElement.previousElementSibling.id === 'userActionButtons') {
+                     // pass
+                 } else if (el.parentElement === t.parentElement) {
+                     t.classList.remove('active');
+                 }
             });
             Array.from(el.parentElement.children).forEach(c => c.classList.remove('active'));
             el.classList.add('active');
@@ -1422,7 +1483,7 @@
             loadEvaluationSettings();
         }
 
-        // --- System Logs Logic ---
+        // === System Logs Logic ===
         function loadSystemLogs() {
             const tbody = document.getElementById('logTableBody');
             tbody.innerHTML = '';
@@ -1450,6 +1511,154 @@
                 saveDB();
                 loadSystemLogs();
             }
+        }
+
+        // ============================================
+        // === منطق الزيارات الصفية (Classroom Visits) ===
+        // ============================================
+
+        function setVisitTab(tab, el) {
+            CURRENT_VISIT_TAB = tab;
+            // تحديث كلاسات التابات
+            Array.from(el.parentElement.children).forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            renderVisitsTable();
+        }
+
+        function openAddVisitModal() {
+            document.getElementById('addVisitForm').reset();
+            
+            // 1. تعبئة قائمة الأقسام
+            const deptSel = document.getElementById('visitDept');
+            deptSel.innerHTML = '<option value="">اختر القسم...</option>';
+            if(DB.departments && DB.departments.length > 0) {
+                DB.departments.forEach(d => {
+                    const opt = document.createElement('option');
+                    opt.value = d.name;
+                    opt.innerText = d.name;
+                    deptSel.appendChild(opt);
+                });
+            } else {
+                deptSel.innerHTML = '<option value="">لا توجد أقسام مضافة</option>';
+            }
+
+            // 2. تعبئة قائمة التقييم
+            const evalSel = document.getElementById('visitEval');
+            evalSel.innerHTML = '<option value="">اختر التقييم...</option>';
+            if(DB.settings.evaluation_criteria && DB.settings.evaluation_criteria.length > 0) {
+                DB.settings.evaluation_criteria.forEach(e => {
+                    if(e.status === 'active') { // عرض المعايير النشطة فقط
+                        const opt = document.createElement('option');
+                        opt.value = e.name;
+                        opt.innerText = e.name;
+                        evalSel.appendChild(opt);
+                    }
+                });
+            }
+
+            // تصفير قائمة المعلمات
+            document.getElementById('visitTeacher').innerHTML = '<option value="">اختر المعلم/ة...</option>';
+            
+            document.getElementById('addVisitModal').style.display = 'flex';
+        }
+
+        function onVisitDeptChange() {
+            const selectedDept = document.getElementById('visitDept').value;
+            const teacherSel = document.getElementById('visitTeacher');
+            teacherSel.innerHTML = '<option value="">اختر المعلم/ة...</option>';
+
+            if(selectedDept && DB.teachers) {
+                // جلب المعلمات اللاتي ينتمين لنفس القسم المختار
+                const teachers = DB.teachers.filter(t => t.dept === selectedDept && t.status === 'active');
+                if(teachers.length > 0) {
+                    teachers.forEach(t => {
+                        const opt = document.createElement('option');
+                        opt.value = t.name;
+                        opt.innerText = t.name;
+                        teacherSel.appendChild(opt);
+                    });
+                } else {
+                    teacherSel.innerHTML = '<option value="">لا يوجد معلمات في هذا القسم</option>';
+                }
+            }
+        }
+
+        function saveVisit() {
+            const dept = document.getElementById('visitDept').value;
+            const teacher = document.getElementById('visitTeacher').value;
+            const date = document.getElementById('visitDate').value;
+            const eval = document.getElementById('visitEval').value;
+            const notes = document.getElementById('visitNotes').value;
+
+            if(!dept || !teacher || !date || !eval) {
+                alert('يرجى تعبئة جميع الحقول المطلوبة');
+                return;
+            }
+
+            const visitObj = {
+                id: Date.now(),
+                dept: dept,
+                teacher: teacher,
+                date: date,
+                eval: eval,
+                notes: notes,
+                visitorName: CURRENT_USER.name,
+                visitorId: CURRENT_USER.id
+            };
+
+            // تحديد مكان الحفظ بناءً على تصنيف المستخدم
+            // إذا كان المستخدم في مجموعة القيادة الوسطى -> يحفظ في زيارات القيادة الوسطى
+            // خلاف ذلك (قيادة عليا أو أدمن) -> يحفظ في زيارات القيادة العليا
+            
+            let isMiddle = false;
+            if(DB.middle && DB.middle.some(u => u.id === CURRENT_USER.id)) {
+                isMiddle = true;
+            }
+
+            if(isMiddle) {
+                if(!DB.visits_middle) DB.visits_middle = [];
+                DB.visits_middle.push(visitObj);
+                addSystemLog('زيارة صفية', `إضافة زيارة (وسطى): ${teacher}`);
+            } else {
+                if(!DB.visits_senior) DB.visits_senior = [];
+                DB.visits_senior.push(visitObj);
+                addSystemLog('زيارة صفية', `إضافة زيارة (عليا): ${teacher}`);
+            }
+
+            saveDB();
+            renderVisitsTable();
+            closeModal('addVisitModal');
+            alert('تم حفظ الزيارة بنجاح');
+        }
+
+        function renderVisitsTable() {
+            const tbody = document.getElementById('visitsTableBody');
+            tbody.innerHTML = '';
+
+            let list = [];
+            if(CURRENT_VISIT_TAB === 'senior') list = DB.visits_senior || [];
+            else list = DB.visits_middle || [];
+
+            if(list.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="padding:20px; color:#888;">لا توجد زيارات مسجلة</td></tr>';
+                return;
+            }
+
+            // ترتيب الزيارات بالأحدث أولاً
+            list.sort((a,b) => b.id - a.id);
+
+            list.forEach(v => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${v.date}</td>
+                    <td>${v.dept}</td>
+                    <td style="font-weight:bold;">${v.teacher}</td>
+                    <td><span class="status-badge status-active" style="background:#eef; color:var(--primary); border:1px solid #ccf;">${v.eval}</span></td>
+                    <td>${v.visitorName}</td>
+                    <td style="font-size:0.85rem; color:#666;">${v.notes || '-'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
         }
 
         document.getElementById('loginForm').addEventListener('submit', login);
