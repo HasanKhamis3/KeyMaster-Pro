@@ -121,8 +121,8 @@
         }
 
         /* --- Signature Settings Styles --- */
-        .signature-grid { display: flex; gap: 20px; flex-wrap: wrap; }
-        .signature-card { flex: 1; min-width: 300px; border: 1px solid #eee; border-radius: 8px; padding: 20px; background: #fcfcfc; text-align: center; }
+        .signature-grid { display: flex; flex-direction: column; gap: 20px; }
+        .signature-card { border: 1px solid #eee; border-radius: 8px; padding: 20px; background: #fcfcfc; text-align: center; width: 100%; }
         .signature-title { color: var(--primary); font-weight: bold; margin-bottom: 15px; font-size: 1.1rem; }
         
         /* --- Visitor Order Styles --- */
@@ -263,7 +263,8 @@
                 
                 <div class="custom-tabs">
                     <div class="custom-tab active" onclick="setSettingTab('gen', this)">الإعدادات العامة</div>
-                    <div class="custom-tab" onclick="setSettingTab('sig', this)">إعدادات التوقيعات</div>
+                    <div class="custom-tab" onclick="setSettingTab('eval', this)">إعدادات التقييم</div>
+                    <div class="custom-tab" onclick="setSettingTab('sig', this)">إعدادات التوقيع</div>
                     <div class="custom-tab" onclick="setSettingTab('vis', this)">ترتيب الزوار</div>
                     <div class="custom-tab" onclick="setSettingTab('fot', this)">إعدادات التذييل</div>
                     <div class="custom-tab" onclick="setSettingTab('log', this)">سجل النظام</div>
@@ -330,6 +331,28 @@
                     </div>
                 </div>
 
+                <div id="eval" class="setting-content-pane">
+                    <h3 style="color:var(--primary); border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:20px;">الزيارة الصفية</h3>
+                    
+                    <div style="margin-bottom:15px; text-align:left;">
+                        <button class="btn btn-primary" onclick="openAddEvalModal()">+ إضافة تقييم</button>
+                    </div>
+
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th width="10%">#</th>
+                                <th width="40%">اسم المعيار</th>
+                                <th width="15%">الدرجة القصوى</th>
+                                <th width="10%">الحالة</th>
+                                <th width="25%">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="evalTableBody">
+                            </tbody>
+                    </table>
+                </div>
+
                 <div id="sig" class="setting-content-pane">
                     <p style="margin-bottom:20px; color:#666;">تحديد الأشخاص المسؤولين عن توقيع التقرير من القيادة العليا</p>
                     <div class="signature-grid">
@@ -344,6 +367,7 @@
                                 <button class="btn" style="background:#dc3545; color:white; min-width:100px;" onclick="clearSignature('sig_director')">إزالة</button>
                             </div>
                         </div>
+
                         <div class="signature-card">
                             <div class="signature-title">المدير/ة المساعد/ة</div>
                             <div class="form-group">
@@ -443,6 +467,12 @@
                 <form id="addUserForm">
                     <input type="hidden" id="editUserId">
                     <label>الاسم الكامل / اسم القسم</label><input type="text" id="addName" class="form-control" required>
+                    
+                    <div id="deptWrapper" class="form-group" style="display:none;">
+                        <label>القسم</label>
+                        <select id="addDept" class="form-control"></select>
+                    </div>
+
                     <div id="userFields">
                         <label>الوظيفة</label><input type="text" id="addJob" class="form-control">
                         <label>رقم الهاتف</label><input type="text" id="addPhone" class="form-control">
@@ -454,6 +484,25 @@
             <div class="modal-footer">
                 <button class="btn btn-primary" onclick="saveUserForm()">حفظ</button>
                 <button class="btn" style="background:#ddd;" onclick="closeModal('addUserModal')">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="addEvalModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header"><span>إضافة/تعديل معيار تقييم</span> <span onclick="closeModal('addEvalModal')" style="cursor:pointer;">&times;</span></div>
+            <div class="modal-body">
+                <form id="addEvalForm">
+                    <input type="hidden" id="editEvalId">
+                    <label>اسم المعيار</label>
+                    <input type="text" id="evalName" class="form-control" required placeholder="مثال: التخطيط الفعال">
+                    <label>الدرجة القصوى</label>
+                    <input type="number" id="evalMaxScore" class="form-control" required placeholder="مثال: 10">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="saveEvalForm()">حفظ</button>
+                <button class="btn" style="background:#ddd;" onclick="closeModal('addEvalModal')">إلغاء</button>
             </div>
         </div>
     </div>
@@ -542,7 +591,9 @@
                 // Footer Settings
                 footer_text: '',
                 footer_align: 'center',
-                footer_fontsize: '12'
+                footer_fontsize: '12',
+                // Evaluation Criteria
+                evaluation_criteria: []
             },
             logs: [] // System Audit Logs
         };
@@ -563,6 +614,7 @@
                 if(!DB.settings) DB.settings = {};
                 // Merge new settings keys if missing
                 DB.settings = {...INITIAL_DB.settings, ...DB.settings};
+                if(!DB.settings.evaluation_criteria) DB.settings.evaluation_criteria = [];
                 if(!DB.logs) DB.logs = [];
 
                 ['admins', 'senior', 'middle', 'teachers', 'departments'].forEach(grp => {
@@ -862,11 +914,40 @@
 
         function openAddUserModal() { 
             const isDept = (CURRENT_TAB === 'departments');
-            document.getElementById('userFields').style.display = isDept ? 'none' : 'block';
-            document.getElementById('addUserModalTitle').innerText = isDept ? 'إضافة قسم جديد' : 'إضافة مستخدم جديد';
+            const isTeacher = (CURRENT_TAB === 'teachers');
+            
             document.getElementById('editUserId').value = ''; 
             document.getElementById('addUserForm').reset();
             document.getElementById('addUserModal').style.display = 'flex'; 
+
+            if (isDept) {
+                document.getElementById('addUserModalTitle').innerText = 'إضافة قسم جديد';
+                document.getElementById('userFields').style.display = 'none';
+                document.getElementById('deptWrapper').style.display = 'none';
+            } else if (isTeacher) {
+                document.getElementById('addUserModalTitle').innerText = 'إضافة معلمة جديدة';
+                document.getElementById('userFields').style.display = 'none';
+                document.getElementById('deptWrapper').style.display = 'block';
+                
+                // Populate departments dropdown
+                const sel = document.getElementById('addDept');
+                sel.innerHTML = '<option value="">اختر القسم...</option>';
+                if(DB.departments && DB.departments.length > 0) {
+                    DB.departments.forEach(d => {
+                        const opt = document.createElement('option');
+                        opt.value = d.name;
+                        opt.innerText = d.name;
+                        sel.appendChild(opt);
+                    });
+                } else {
+                    sel.innerHTML = '<option value="">لا توجد أقسام مضافة</option>';
+                }
+
+            } else {
+                document.getElementById('addUserModalTitle').innerText = 'إضافة مستخدم جديد';
+                document.getElementById('userFields').style.display = 'block';
+                document.getElementById('deptWrapper').style.display = 'none';
+            }
         }
 
         function editUser(id) {
@@ -874,14 +955,36 @@
             if(!u) return;
             document.getElementById('editUserId').value = u.id;
             document.getElementById('addName').value = u.name;
+            
             const isDept = (CURRENT_TAB === 'departments');
-            document.getElementById('userFields').style.display = isDept ? 'none' : 'block';
-            if(!isDept) {
+            const isTeacher = (CURRENT_TAB === 'teachers');
+            
+            if (isDept) {
+                document.getElementById('userFields').style.display = 'none';
+                document.getElementById('deptWrapper').style.display = 'none';
+            } else if (isTeacher) {
+                document.getElementById('userFields').style.display = 'none';
+                document.getElementById('deptWrapper').style.display = 'block';
+                const sel = document.getElementById('addDept');
+                sel.innerHTML = '<option value="">اختر القسم...</option>';
+                if(DB.departments && DB.departments.length > 0) {
+                    DB.departments.forEach(d => {
+                        const opt = document.createElement('option');
+                        opt.value = d.name;
+                        opt.innerText = d.name;
+                        if (u.dept === d.name) opt.selected = true;
+                        sel.appendChild(opt);
+                    });
+                }
+            } else {
+                document.getElementById('userFields').style.display = 'block';
+                document.getElementById('deptWrapper').style.display = 'none';
                 document.getElementById('addJob').value = u.job || u.dept || '';
                 document.getElementById('addPhone').value = u.phone || '';
                 document.getElementById('addLogin').value = u.login || '';
                 document.getElementById('addPass').value = u.pass || '';
             }
+            
             document.getElementById('addUserModalTitle').innerText = 'تعديل البيانات';
             document.getElementById('addUserModal').style.display = 'flex'; 
         }
@@ -891,9 +994,11 @@
         function saveUserForm() {
             const name = document.getElementById('addName').value.trim();
             if(!name) { alert("يرجى إدخال الاسم"); return; }
+            
             const editId = document.getElementById('editUserId').value;
             const isEdit = editId !== '';
             let targetUser;
+
             if (isEdit) {
                 targetUser = DB[CURRENT_TAB].find(u => u.id == editId);
                 targetUser.name = name;
@@ -906,12 +1011,18 @@
                 }
                 addSystemLog('إضافة مستخدم', `إضافة جديد: ${name} في ${CURRENT_TAB}`);
             }
-            if (CURRENT_TAB !== 'departments') {
+
+            if (CURRENT_TAB === 'teachers') {
+                const deptVal = document.getElementById('addDept').value;
+                if(!deptVal) { alert("يرجى اختيار القسم"); return; }
+                targetUser.dept = deptVal;
+            } else if (CURRENT_TAB !== 'departments') {
                 targetUser.job = document.getElementById('addJob').value.trim();
                 targetUser.phone = document.getElementById('addPhone').value.trim();
                 targetUser.login = document.getElementById('addLogin').value.trim();
                 targetUser.pass = document.getElementById('addPass').value.trim();
             }
+
             if (!isEdit) DB[CURRENT_TAB].push(targetUser);
             saveDB();
             renderTable();
@@ -940,7 +1051,7 @@
                     <div class="info-item"><label>الوظيفة</label><span>${u.job || u.dept || '-'}</span></div>
                     <div class="info-item"><label>رقم الهاتف</label><span>${u.phone || '-'}</span></div>
                     <div class="info-item"><label>الحالة</label><span style="color:${u.status==='active'?'green':'red'}">${u.status==='active'?'مفعل':'معطل'}</span></div>
-                    <div class="info-item"><label>اسم الدخول</label><span style="background:#eee; padding:2px 5px; border-radius:4px;">${u.login}</span></div>
+                    <div class="info-item"><label>اسم الدخول</label><span style="background:#eee; padding:2px 5px; border-radius:4px;">${u.login || '-'}</span></div>
                 </div>
             `;
             document.getElementById('viewUserModal').style.display = 'flex';
@@ -1026,6 +1137,7 @@
             if (t === 'vis') loadVisitorSettings();
             if (t === 'fot') loadFooterSettings();
             if (t === 'log') loadSystemLogs();
+            if (t === 'eval') loadEvaluationSettings();
         }
 
         function loadSettings() {
@@ -1192,7 +1304,7 @@
 
         function saveVisitorOrder() { addSystemLog('إعدادات', 'تحديث ترتيب الزوار'); saveDB(); alert('تم حفظ ترتيب الزوار بنجاح'); }
 
-        // --- Footer Settings Logic (Updated) ---
+        // --- Footer Settings Logic ---
         function loadFooterSettings() {
             const s = DB.settings;
             document.getElementById('footer_text').value = s.footer_text || '';
@@ -1207,6 +1319,113 @@
             addSystemLog('إعدادات', 'تحديث تذييل التقرير');
             saveDB();
             alert('تم حفظ إعدادات التذييل');
+        }
+
+        // --- Evaluation Settings Logic ---
+        function loadEvaluationSettings() {
+            const tbody = document.getElementById('evalTableBody');
+            tbody.innerHTML = '';
+            const list = DB.settings.evaluation_criteria || [];
+            
+            if(list.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="padding:20px; color:#888;">لم يتم إضافة معايير بعد</td></tr>';
+                return;
+            }
+
+            list.forEach((item, idx) => {
+                const isActive = item.status === 'active';
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${idx + 1}</td>
+                    <td>${item.name}</td>
+                    <td>${item.max_score}</td>
+                    <td><span class="status-badge ${isActive ? 'status-active' : 'status-inactive'}">${isActive ? 'مفعل' : 'معطل'}</span></td>
+                    <td>
+                        <div style="display:flex; justify-content:center; gap:2px; flex-wrap:wrap;">
+                            <button class="action-btn btn-move" onclick="moveEval(${item.id}, 'up')" title="نقل لأعلى"><i class="fas fa-arrow-up"></i></button>
+                            <button class="action-btn btn-move" onclick="moveEval(${item.id}, 'down')" title="نقل لأسفل"><i class="fas fa-arrow-down"></i></button>
+                            <button class="action-btn btn-toggle ${isActive?'':'off'}" onclick="toggleEvalStatus(${item.id})"><i class="fas fa-power-off"></i> ${isActive?'تعطيل':'تفعيل'}</button>
+                            <button class="action-btn btn-edit" onclick="openAddEvalModal(${item.id})"><i class="fas fa-edit"></i> تعديل</button>
+                            <button class="action-btn btn-delete" onclick="deleteEval(${item.id})"><i class="fas fa-trash"></i> حذف</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function openAddEvalModal(id = null) {
+            document.getElementById('addEvalForm').reset();
+            document.getElementById('editEvalId').value = '';
+            if(id) {
+                const item = DB.settings.evaluation_criteria.find(x => x.id === id);
+                if(item) {
+                    document.getElementById('editEvalId').value = item.id;
+                    document.getElementById('evalName').value = item.name;
+                    document.getElementById('evalMaxScore').value = item.max_score;
+                }
+            }
+            document.getElementById('addEvalModal').style.display = 'flex';
+        }
+
+        function saveEvalForm() {
+            const name = document.getElementById('evalName').value.trim();
+            const score = document.getElementById('evalMaxScore').value.trim();
+            if(!name || !score) { alert('يرجى تعبئة كافة الحقول'); return; }
+
+            const editId = document.getElementById('editEvalId').value;
+            let list = DB.settings.evaluation_criteria;
+
+            if(editId) {
+                const item = list.find(x => x.id == editId);
+                if(item) {
+                    item.name = name;
+                    item.max_score = score;
+                }
+            } else {
+                list.push({
+                    id: Date.now(),
+                    name: name,
+                    max_score: score,
+                    status: 'active'
+                });
+            }
+            addSystemLog('إعدادات التقييم', editId ? 'تعديل معيار' : 'إضافة معيار جديد');
+            saveDB();
+            loadEvaluationSettings();
+            closeModal('addEvalModal');
+        }
+
+        function deleteEval(id) {
+            if(confirm('هل أنت متأكد من الحذف؟')) {
+                DB.settings.evaluation_criteria = DB.settings.evaluation_criteria.filter(x => x.id !== id);
+                addSystemLog('إعدادات التقييم', 'حذف معيار تقييم');
+                saveDB();
+                loadEvaluationSettings();
+            }
+        }
+
+        function toggleEvalStatus(id) {
+            const item = DB.settings.evaluation_criteria.find(x => x.id === id);
+            if(item) {
+                item.status = (item.status === 'active') ? 'inactive' : 'active';
+                saveDB();
+                loadEvaluationSettings();
+            }
+        }
+
+        function moveEval(id, direction) {
+            const list = DB.settings.evaluation_criteria;
+            const index = list.findIndex(x => x.id === id);
+            if(index === -1) return;
+
+            if (direction === 'up' && index > 0) {
+                [list[index], list[index - 1]] = [list[index - 1], list[index]];
+            } else if (direction === 'down' && index < list.length - 1) {
+                [list[index], list[index + 1]] = [list[index + 1], list[index]];
+            }
+            saveDB();
+            loadEvaluationSettings();
         }
 
         // --- System Logs Logic ---
