@@ -203,12 +203,12 @@
             </div>
             <ul class="nav-links">
                 <li id="nav-dashboard"><a onclick="navigate('dashboard')" data-page="dashboard"><i class="fas fa-home"></i> لوحة التحكم</a></li>
-                <li id="nav-user-management"><a onclick="navigate('user-management')" data-page="user-management"><i class="fas fa-users-cog"></i> إدارة المستخدمين</a></li>
-                <li id="nav-distinguished"><a onclick="navigate('distinguished')" data-page="distinguished"><i class="fas fa-star"></i> المعلمين المتميزين</a></li>
-                <li id="nav-qualitative"><a onclick="navigate('qualitative')" data-page="qualitative"><i class="fas fa-file-alt"></i> التقرير النوعي</a></li>
                 <li id="nav-visits"><a onclick="navigate('visits')" data-page="visits"><i class="fas fa-clipboard-check"></i> الزيارات الصفية</a></li>
                 <li id="nav-performance"><a onclick="navigate('performance')" data-page="performance"><i class="fas fa-chart-line"></i> تقييم الأداء</a></li>
-                <li id="nav-quality-report"><a onclick="navigate('quality-report')" data-page="quality-report"><i class="fas fa-file-word"></i> تقرير الجودة</a></li>
+                <li id="nav-distinguished"><a onclick="navigate('distinguished')" data-page="distinguished"><i class="fas fa-star"></i> المعلمين المتميزين</a></li>
+                <li id="nav-qualitative"><a onclick="navigate('qualitative')" data-page="qualitative"><i class="fas fa-file-alt"></i> التقرير النوعي</a></li>
+                <li id="nav-quality-report"><a onclick="navigate('quality-report')" data-page="quality-report"><i class="fas fa-file-word"></i> تقرير جودة التعليم</a></li>
+                <li id="nav-user-management"><a onclick="navigate('user-management')" data-page="user-management"><i class="fas fa-users-cog"></i> إدارة المستخدمين</a></li>
                 <li id="nav-settings"><a onclick="navigate('settings')" data-page="settings"><i class="fas fa-cog"></i> الإعدادات</a></li>
             </ul>
         </aside>
@@ -227,34 +227,77 @@
 
             <div id="dashboard" class="section-card active"><h3>لوحة التحكم</h3><p>مرحباً بك في النظام</p></div>
             
-            <div id="user-management" class="section-card">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
-                    <h3>إدارة المستخدمين</h3>
-                    
-                    <div id="userActionButtons" style="display:flex; gap:10px; flex-wrap:wrap;">
-                        <button id="addBtnMain" class="btn" style="background:#2c5aa0; color:white;" onclick="openAddUserModal()"><i class="fas fa-plus"></i> إضافة جديد</button>
-                        <button class="btn" style="background:#17a2b8; color:white;" onclick="exportCSV()"><i class="fas fa-file-export"></i> تصدير CSV</button>
-                        <button class="btn" style="background:#dc3545; color:white;" onclick="deleteSelected()"><i class="fas fa-trash"></i> حذف المحدد</button>
-                        <button class="btn" style="background:#6c757d; color:white;" onclick="toggleStatusSelected()"><i class="fas fa-toggle-on"></i> تفعيل/إلغاء المحدد</button>
-                        <button id="bulkPermBtn" class="btn" style="background:#343a40; color:white;" onclick="openBulkPerms()"><i class="fas fa-key"></i> صلاحيات المحدد</button>
-                    </div>
-                    <div id="noEditPermissionMsg" style="display:none; color:red; font-weight:bold;">(وضع القراءة فقط)</div>
+            <div id="visits" class="section-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <h3 style="color:var(--primary);">سجل الزيارات الصفية</h3>
+                    <button class="btn btn-primary" style="width:auto;" onclick="openAddVisitModal()"><i class="fas fa-plus"></i> إضافة زيارة جديدة</button>
+                </div>
+
+                <div class="filter-container">
+                    <label class="filter-label"><i class="fas fa-filter"></i> تصفية حسب الشهر:</label>
+                    <select id="visitMonthFilter" class="filter-select" onchange="renderVisitsTable()">
+                        <option value="all">كل الأشهر</option>
+                        <option value="01">يناير</option>
+                        <option value="02">فبراير</option>
+                        <option value="03">مارس</option>
+                        <option value="04">أبريل</option>
+                        <option value="05">مايو</option>
+                        <option value="06">يونيو</option>
+                        <option value="07">يوليو</option>
+                        <option value="08">أغسطس</option>
+                        <option value="09">سبتمبر</option>
+                        <option value="10">أكتوبر</option>
+                        <option value="11">نوفمبر</option>
+                        <option value="12">ديسمبر</option>
+                    </select>
                 </div>
 
                 <div class="custom-tabs">
-                    <div class="custom-tab active" onclick="setTab('senior', this)">القيادة العليا</div>
-                    <div class="custom-tab" onclick="setTab('middle', this)">القيادة الوسطى</div>
-                    <div class="custom-tab" onclick="setTab('teachers', this)">المعلمات</div>
-                    <div class="custom-tab" onclick="setTab('departments', this)">الأقسام</div>
+                    <div class="custom-tab active" onclick="setVisitTab('senior', this)">زيارات القيادة العليا</div>
+                    <div class="custom-tab" onclick="setVisitTab('middle', this)">زيارات القيادة الوسطى</div>
                 </div>
 
                 <table class="custom-table">
                     <thead>
-                        <tr id="tableHeadRow">
+                        <tr>
+                            <th width="15%">التاريخ</th>
+                            <th width="15%">القسم</th>
+                            <th width="20%">اسم المعلمة</th>
+                            <th width="15%">التقييم</th>
+                            <th width="20%">الزائر</th>
+                            <th width="15%">وظيفة الزائر</th>
                         </tr>
                     </thead>
-                    <tbody id="usersTableBody"></tbody>
+                    <tbody id="visitsTableBody">
+                    </tbody>
                 </table>
+            </div>
+
+            <div id="performance" class="section-card">
+                <h3 style="color:var(--primary); margin-bottom:20px;">تقييم الأداء الصفي</h3>
+                
+                <div class="filter-container">
+                    <label class="filter-label"><i class="fas fa-calendar-alt"></i> اختر الشهر:</label>
+                    <select id="perfMonthFilter" class="filter-select" onchange="renderPerformanceChart()">
+                        <option value="all">كل الأشهر</option>
+                        <option value="01">يناير</option>
+                        <option value="02">فبراير</option>
+                        <option value="03">مارس</option>
+                        <option value="04">أبريل</option>
+                        <option value="05">مايو</option>
+                        <option value="06">يونيو</option>
+                        <option value="07">يوليو</option>
+                        <option value="08">أغسطس</option>
+                        <option value="09">سبتمبر</option>
+                        <option value="10">أكتوبر</option>
+                        <option value="11">نوفمبر</option>
+                        <option value="12">ديسمبر</option>
+                    </select>
+                </div>
+
+                <div style="padding:20px; background:#fff; border:1px solid #eee; border-radius:8px;">
+                    <canvas id="perfChart" width="400" height="150"></canvas>
+                </div>
             </div>
 
             <div id="distinguished" class="section-card">
@@ -361,80 +404,37 @@
                 </table>
             </div>
 
-            <div id="visits" class="section-card">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                    <h3 style="color:var(--primary);">سجل الزيارات الصفية</h3>
-                    <button class="btn btn-primary" style="width:auto;" onclick="openAddVisitModal()"><i class="fas fa-plus"></i> إضافة زيارة جديدة</button>
-                </div>
+            <div id="quality-report" class="section-card"><h3>تقرير الجودة</h3></div>
 
-                <div class="filter-container">
-                    <label class="filter-label"><i class="fas fa-filter"></i> تصفية حسب الشهر:</label>
-                    <select id="visitMonthFilter" class="filter-select" onchange="renderVisitsTable()">
-                        <option value="all">كل الأشهر</option>
-                        <option value="01">يناير</option>
-                        <option value="02">فبراير</option>
-                        <option value="03">مارس</option>
-                        <option value="04">أبريل</option>
-                        <option value="05">مايو</option>
-                        <option value="06">يونيو</option>
-                        <option value="07">يوليو</option>
-                        <option value="08">أغسطس</option>
-                        <option value="09">سبتمبر</option>
-                        <option value="10">أكتوبر</option>
-                        <option value="11">نوفمبر</option>
-                        <option value="12">ديسمبر</option>
-                    </select>
+            <div id="user-management" class="section-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
+                    <h3>إدارة المستخدمين</h3>
+                    
+                    <div id="userActionButtons" style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <button id="addBtnMain" class="btn" style="background:#2c5aa0; color:white;" onclick="openAddUserModal()"><i class="fas fa-plus"></i> إضافة جديد</button>
+                        <button class="btn" style="background:#17a2b8; color:white;" onclick="exportCSV()"><i class="fas fa-file-export"></i> تصدير CSV</button>
+                        <button class="btn" style="background:#dc3545; color:white;" onclick="deleteSelected()"><i class="fas fa-trash"></i> حذف المحدد</button>
+                        <button class="btn" style="background:#6c757d; color:white;" onclick="toggleStatusSelected()"><i class="fas fa-toggle-on"></i> تفعيل/إلغاء المحدد</button>
+                        <button id="bulkPermBtn" class="btn" style="background:#343a40; color:white;" onclick="openBulkPerms()"><i class="fas fa-key"></i> صلاحيات المحدد</button>
+                    </div>
+                    <div id="noEditPermissionMsg" style="display:none; color:red; font-weight:bold;">(وضع القراءة فقط)</div>
                 </div>
 
                 <div class="custom-tabs">
-                    <div class="custom-tab active" onclick="setVisitTab('senior', this)">زيارات القيادة العليا</div>
-                    <div class="custom-tab" onclick="setVisitTab('middle', this)">زيارات القيادة الوسطى</div>
+                    <div class="custom-tab active" onclick="setTab('senior', this)">القيادة العليا</div>
+                    <div class="custom-tab" onclick="setTab('middle', this)">القيادة الوسطى</div>
+                    <div class="custom-tab" onclick="setTab('teachers', this)">المعلمات</div>
+                    <div class="custom-tab" onclick="setTab('departments', this)">الأقسام</div>
                 </div>
 
                 <table class="custom-table">
                     <thead>
-                        <tr>
-                            <th width="15%">التاريخ</th>
-                            <th width="15%">القسم</th>
-                            <th width="20%">اسم المعلمة</th>
-                            <th width="15%">التقييم</th>
-                            <th width="20%">الزائر</th>
-                            <th width="15%">وظيفة الزائر</th>
+                        <tr id="tableHeadRow">
                         </tr>
                     </thead>
-                    <tbody id="visitsTableBody">
-                    </tbody>
+                    <tbody id="usersTableBody"></tbody>
                 </table>
             </div>
-
-            <div id="performance" class="section-card">
-                <h3 style="color:var(--primary); margin-bottom:20px;">تقييم الأداء الصفي</h3>
-                
-                <div class="filter-container">
-                    <label class="filter-label"><i class="fas fa-calendar-alt"></i> اختر الشهر:</label>
-                    <select id="perfMonthFilter" class="filter-select" onchange="renderPerformanceChart()">
-                        <option value="all">كل الأشهر</option>
-                        <option value="01">يناير</option>
-                        <option value="02">فبراير</option>
-                        <option value="03">مارس</option>
-                        <option value="04">أبريل</option>
-                        <option value="05">مايو</option>
-                        <option value="06">يونيو</option>
-                        <option value="07">يوليو</option>
-                        <option value="08">أغسطس</option>
-                        <option value="09">سبتمبر</option>
-                        <option value="10">أكتوبر</option>
-                        <option value="11">نوفمبر</option>
-                        <option value="12">ديسمبر</option>
-                    </select>
-                </div>
-
-                <div style="padding:20px; background:#fff; border:1px solid #eee; border-radius:8px;">
-                    <canvas id="perfChart" width="400" height="150"></canvas>
-                </div>
-            </div>
-
-            <div id="quality-report" class="section-card"><h3>تقرير الجودة</h3></div>
             
             <div id="settings" class="section-card">
                 <h3 style="color:var(--primary); margin-bottom:20px;">الإعدادات</h3>
@@ -826,14 +826,15 @@
 
     <script>
         // === System Configuration ===
+        // UPDATED ORDER
         const SECTIONS = [
             {id: 'dashboard', name: 'لوحة التحكم'},
-            {id: 'user-management', name: 'إدارة المستخدمين'},
-            {id: 'distinguished', name: 'المعلمين المتميزين'},
-            {id: 'qualitative', name: 'التقرير النوعي'},
             {id: 'visits', name: 'الزيارات الصفية'},
             {id: 'performance', name: 'تقييم الأداء'},
+            {id: 'distinguished', name: 'المعلمين المتميزين'},
+            {id: 'qualitative', name: 'التقرير النوعي'},
             {id: 'quality-report', name: 'تقرير الجودة'},
+            {id: 'user-management', name: 'إدارة المستخدمين'},
             {id: 'settings', name: 'الإعدادات'}
         ];
 
@@ -1129,10 +1130,6 @@
             });
         }
 
-        // ... [Include other basic functions like moveUser, toggleSelectAll, deleteSelected, toggleStatusSelected, toggleStatus, exportCSV, openAddUserModal, editUser, closeModal, saveUserForm, deleteUser, viewUser, openBulkPerms, openPerms, toggleAllPerms, submitPermissions, togglePass, setSettingTab, loadSettings, showImagePreview, triggerFileSelect, handleFileUpload, removeImage, saveGeneralSettings, openImageModal, loadSignatureSettings, saveSignatureSettings, clearSignature, loadVisitorSettings, renderVisitorList, openVisitorPicker, filterPickerList, addVisitorToOrder, removeVisitorItem, moveVisitorItem, saveVisitorOrder, loadFooterSettings, saveFooterSettings, loadEvaluationSettings, openAddEvalModal, saveEvalForm, deleteEval, toggleEvalStatus, moveEval, loadSystemLogs, clearSystemLogs, setVisitTab, openAddVisitModal, onVisitDeptChange, saveVisit, getLatestJobTitle, renderVisitsTable, renderPerformanceChart] ...
-        // (Due to space, I'm keeping the core structure, assuming previous functions exist)
-        
-        // Re-declaring key small functions for completeness if copy-pasted:
         function moveUser(id, direction) {
             const list = DB[CURRENT_TAB];
             const index = list.findIndex(u => u.id === id);
