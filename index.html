@@ -25,7 +25,12 @@
 
         .main-content { margin-right: 260px; flex: 1; padding: 30px; }
         .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .user-profile { display: flex; align-items: center; gap: 10px; background: white; padding: 5px 15px; border-radius: 50px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        
+        /* Updated Profile Header Style */
+        .user-profile { display: flex; align-items: center; gap: 15px; background: white; padding: 8px 20px; border-radius: 50px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .user-info-text { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.2; }
+        .user-name { font-weight: bold; color: var(--primary); font-size: 1rem; }
+        .user-job { font-size: 0.75rem; color: #777; }
 
         /* Login */
         .login-wrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: linear-gradient(135deg, var(--primary), #2b2b2b); display: flex; justify-content: center; align-items: center; z-index: 9999; }
@@ -50,9 +55,13 @@
         .custom-checkbox { width: 18px; height: 18px; cursor: pointer; }
 
         /* Status Badge */
-        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; user-select: none; }
+        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
         .status-active { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .status-inactive { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        /* Action Buttons Container */
+        .top-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .action-hidden { display: none !important; }
 
         /* Modals */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 5000; }
@@ -80,13 +89,6 @@
         .perm-list { border: 1px solid #eee; border-radius: 6px; padding: 10px; max-height: 300px; overflow-y: auto; }
         .perm-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
         .image-upload-container { border: 2px dashed #ccc; border-radius: 8px; padding: 20px; text-align: center; background-color: #fcfcfc; margin-bottom: 20px; position: relative; min-height: 150px; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
-
-        /* User View */
-        .user-view-card { text-align: center; margin-bottom: 20px; }
-        .user-view-avatar { width: 80px; height: 80px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 15px auto; }
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: right; background: #f9f9f9; padding: 15px; border-radius: 8px; }
-        .info-item label { display: block; color: #777; font-size: 0.85rem; margin-bottom: 5px; }
-        .info-item span { font-weight: bold; color: #333; }
 
         @media print { .sidebar, .login-wrapper { display: none; } .main-content { margin: 0; } }
     </style>
@@ -133,8 +135,11 @@
             <header class="top-header">
                 <h2 id="pageTitle">لوحة التحكم</h2>
                 <div class="user-profile">
-                    <span id="headerUserName">المستخدم</span>
-                    <button class="btn" style="background:#eee; padding:5px 10px;" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+                    <div class="user-info-text">
+                        <span id="headerUserName" class="user-name">المستخدم</span>
+                        <span id="headerUserJob" class="user-job">الوظيفة</span>
+                    </div>
+                    <button class="btn" style="background:#eee; padding:8px 12px; border-radius:50%;" onclick="logout()" title="تسجيل الخروج"><i class="fas fa-sign-out-alt"></i></button>
                 </div>
             </header>
 
@@ -143,13 +148,14 @@
             <div id="user-management" class="section-card">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
                     <h3>إدارة المستخدمين</h3>
-                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    
+                    <div id="userActionButtons" class="top-actions">
                         <button class="btn" style="background:#2c5aa0; color:white;" onclick="openAddUserModal()"><i class="fas fa-plus"></i> إضافة جديد</button>
                         <button class="btn" style="background:#17a2b8; color:white;" onclick="exportCSV()"><i class="fas fa-file-export"></i> تصدير CSV</button>
-                        
                         <button class="btn" style="background:#dc3545; color:white;" onclick="deleteSelected()"><i class="fas fa-trash"></i> حذف المحدد</button>
                         <button class="btn" style="background:#6c757d; color:white;" onclick="toggleStatusSelected()"><i class="fas fa-toggle-on"></i> تفعيل/إلغاء المحدد</button>
                     </div>
+                    <div id="noEditPermissionMsg" style="display:none; color:red; font-weight:bold;">(وضع القراءة فقط)</div>
                 </div>
 
                 <div class="user-tabs">
@@ -166,7 +172,7 @@
                             <th width="25%">الاسم</th>
                             <th width="15%">الوظيفة</th>
                             <th width="15%">الحالة</th>
-                            <th width="35%">إدارة المستخدمين</th>
+                            <th width="35%">الإجراءات</th>
                         </tr>
                     </thead>
                     <tbody id="usersTableBody"></tbody>
@@ -264,11 +270,16 @@
         SECTIONS.forEach(s => DEFAULT_PERMS[s.id] = {view: true, edit: false});
 
         const INITIAL_DB = {
-            admins: [{id: 999, name: 'مدير النظام', login: 'admin', pass: 'Hasan@12', status: 'active', permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS))}],
+            admins: [{id: 999, name: 'مدير النظام', login: 'admin', pass: 'Hasan@12', status: 'active', job: 'مسؤول النظام', permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS))}],
             senior: [{id: 1, name: 'علياء محمد مبارك الدوسري', job: 'مديرة المدرسة', phone: '39669118', login: '39669118', pass: '39669118', status: 'active', permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS)), dateAdded: '2025/01/01'}],
             middle: [],
             teachers: []
         };
+
+        // Fix Admin Permissions to allow everything by default for new installs
+        Object.keys(INITIAL_DB.admins[0].permissions).forEach(k => {
+            INITIAL_DB.admins[0].permissions[k].edit = true;
+        });
 
         let DB = {}; 
         let CURRENT_USER = null;
@@ -280,22 +291,18 @@
             const storedDB = localStorage.getItem('QualitySys_DB_V2');
             if (storedDB) {
                 DB = JSON.parse(storedDB);
-                
-                // تنظيف البيانات عند بدء التشغيل لضمان عدم وجود مسافات خفية
                 ['admins', 'senior', 'middle', 'teachers'].forEach(grp => {
                     if(DB[grp]) {
                         DB[grp].forEach(u => { 
                             if(!u.permissions) u.permissions = JSON.parse(JSON.stringify(DEFAULT_PERMS));
-                            if(!u.status) u.status = 'active'; // ضمان وجود حالة
+                            if(!u.status) u.status = 'active'; 
 
-                            // تنظيف صارم
                             u.login = String(u.login).trim().replace(/[\uFEFF\x00-\x1F\s]/g, '');
                             u.pass = String(u.pass).trim().replace(/[\uFEFF\x00-\x1F\s]/g, '');
                         });
                     }
                 });
                 
-                // ضمان صحة المدير
                 if(!DB.admins) DB.admins = JSON.parse(JSON.stringify(INITIAL_DB.admins));
                 const adm = DB.admins.find(u => u.login === 'admin');
                 if(adm) { adm.pass = 'Hasan@12'; } else { DB.admins.push(INITIAL_DB.admins[0]); }
@@ -327,7 +334,7 @@
 
         function saveDB() { localStorage.setItem('QualitySys_DB_V2', JSON.stringify(DB)); }
 
-        // === دالة تسجيل الدخول (تم حل المشكلة) ===
+        // === دالة تسجيل الدخول ===
         function login(e) {
             e.preventDefault();
             const errBox = document.getElementById('loginError');
@@ -339,11 +346,9 @@
             
             let userFound = null;
 
-            // البحث عن المستخدم وتجاهل المسافات
             ['admins', 'senior', 'middle', 'teachers'].forEach(grp => {
                 const match = DB[grp].find(x => String(x.login).trim() === uInput);
                 if(match) {
-                    // التحقق من كلمة المرور
                     if(String(match.pass).trim() === pInput) {
                         userFound = match;
                     }
@@ -351,7 +356,6 @@
             });
 
             if (userFound) {
-                // التحقق من حالة التفعيل
                 if (userFound.status === 'active') {
                     CURRENT_USER = userFound;
                     localStorage.setItem('QualitySys_Session', userFound.id);
@@ -379,9 +383,16 @@
             }
         }
 
+        // === نظام الصلاحيات الصارم ===
+        
         function navigate(pageId) {
             const perms = CURRENT_USER.permissions || DEFAULT_PERMS;
-            if (perms[pageId] && perms[pageId].view === false) return;
+            
+            // تحقق صارم من صلاحية المعاينة (View)
+            if (perms[pageId] && perms[pageId].view === false) {
+                alert("عذراً، ليس لديك صلاحية للوصول إلى هذه الصفحة.");
+                return;
+            }
 
             document.querySelectorAll('.section-card').forEach(d => d.classList.remove('active'));
             document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
@@ -398,7 +409,11 @@
         function showApp() {
             document.getElementById('loginPage').style.display = 'none';
             document.getElementById('app').style.display = 'flex';
+            
+            // تحديث الهيدر بالاسم والوظيفة
             document.getElementById('headerUserName').innerText = CURRENT_USER.name;
+            document.getElementById('headerUserJob').innerText = CURRENT_USER.job || CURRENT_USER.dept || 'مستخدم';
+            
             applySidebarPermissions();
             renderTable();
             navigate('dashboard');
@@ -408,7 +423,10 @@
             const perms = CURRENT_USER.permissions || DEFAULT_PERMS;
             SECTIONS.forEach(sec => {
                 const el = document.getElementById('nav-' + sec.id);
-                if(el) el.style.display = (perms[sec.id] && perms[sec.id].view === false) ? 'none' : 'block';
+                if(el) {
+                    // إخفاء الرابط تماماً إذا لم تكن هناك صلاحية معاينة
+                    el.style.display = (perms[sec.id] && perms[sec.id].view === false) ? 'none' : 'block';
+                }
             });
         }
 
@@ -425,26 +443,52 @@
         function renderTable() {
             const tbody = document.getElementById('usersTableBody');
             tbody.innerHTML = '';
+            
+            // التحقق من صلاحية التعديل للمستخدم الحالي في قسم إدارة المستخدمين
+            const userPerms = CURRENT_USER.permissions['user-management'] || {view:true, edit:false};
+            const canEdit = userPerms.edit === true;
+
+            // إظهار/إخفاء أزرار التحكم العلوية بناءً على الصلاحية
+            const actionButtons = document.getElementById('userActionButtons');
+            const noEditMsg = document.getElementById('noEditPermissionMsg');
+            
+            if(canEdit) {
+                actionButtons.classList.remove('action-hidden');
+                noEditMsg.style.display = 'none';
+            } else {
+                actionButtons.classList.add('action-hidden');
+                noEditMsg.style.display = 'block';
+            }
+
             const list = DB[CURRENT_TAB] || [];
             
             list.forEach((u, idx) => {
                 const isActive = u.status === 'active';
                 const statusBadge = isActive 
-                    ? `<span class="status-badge status-active" onclick="toggleStatus(${u.id})">مفعل</span>`
-                    : `<span class="status-badge status-inactive" onclick="toggleStatus(${u.id})">معطل</span>`;
+                    ? `<span class="status-badge status-active">مفعل</span>`
+                    : `<span class="status-badge status-inactive">معطل</span>`;
 
-                let row = `<td><input type="checkbox" class="custom-checkbox user-select-cb" value="${u.id}"></td>`;
+                let row = `<td><input type="checkbox" class="custom-checkbox user-select-cb" value="${u.id}" ${canEdit ? '' : 'disabled'}></td>`;
                 row += `<td>${idx+1}</td><td>${u.name}</td>`;
                 row += `<td>${u.job || (CURRENT_TAB === 'teachers' ? u.dept : '-')}</td>`;
                 row += `<td>${statusBadge}</td>`;
+                
+                // أزرار الإجراءات الفردية
                 row += `<td>
                     <div style="display:flex; justify-content:center; gap:5px;">
-                        <button class="btn" style="padding:5px; background:#ffc107; color:black; font-size:0.8rem;" onclick="viewUser(${u.id})">معاينة</button>
-                        <button class="btn" style="padding:5px; background:#28a745; color:white; font-size:0.8rem;" onclick="editUser(${u.id})">تعديل</button>
-                        <button class="btn" style="padding:5px; background:#dc3545; color:white; font-size:0.8rem;" onclick="deleteUser(${u.id})">حذف</button>
-                        <button class="btn" style="padding:5px; background:#6c757d; color:white; font-size:0.8rem;" onclick="openPerms(${u.id})">الصلاحيات</button>
-                    </div>
-                </td>`;
+                        <button class="btn" style="padding:5px; background:#ffc107; color:black; font-size:0.8rem;" onclick="viewUser(${u.id})" title="معاينة"><i class="fas fa-eye"></i></button>`;
+                
+                // إضافة الأزرار فقط إذا كان يملك صلاحية التعديل
+                if (canEdit) {
+                    row += `
+                        <button class="btn" style="padding:5px; background:${isActive ? '#6c757d' : '#28a745'}; color:white; font-size:0.8rem;" onclick="toggleStatus(${u.id})" title="${isActive ? 'تعطيل' : 'تفعيل'}"><i class="fas fa-power-off"></i></button>
+                        <button class="btn" style="padding:5px; background:#17a2b8; color:white; font-size:0.8rem;" onclick="editUser(${u.id})" title="تعديل"><i class="fas fa-edit"></i></button>
+                        <button class="btn" style="padding:5px; background:#dc3545; color:white; font-size:0.8rem;" onclick="deleteUser(${u.id})" title="حذف"><i class="fas fa-trash"></i></button>
+                        <button class="btn" style="padding:5px; background:#343a40; color:white; font-size:0.8rem;" onclick="openPerms(${u.id})" title="الصلاحيات"><i class="fas fa-key"></i></button>
+                    `;
+                }
+
+                row += `</div></td>`;
                 const tr = document.createElement('tr');
                 tr.innerHTML = row;
                 tbody.appendChild(tr);
@@ -454,7 +498,9 @@
         // --- Bulk Actions & Logic ---
 
         function toggleSelectAll(source) {
-            document.querySelectorAll('.user-select-cb').forEach(cb => cb.checked = source.checked);
+            document.querySelectorAll('.user-select-cb').forEach(cb => {
+                if(!cb.disabled) cb.checked = source.checked;
+            });
         }
 
         function deleteSelected() {
@@ -475,11 +521,9 @@
             if(checkboxes.length === 0) { alert('لم يتم تحديد أي مستخدم.'); return; }
             
             const idsToToggle = Array.from(checkboxes).map(cb => parseInt(cb.value));
-            let changedCount = 0;
             DB[CURRENT_TAB].forEach(u => {
                 if(idsToToggle.includes(u.id)) {
                     u.status = (u.status === 'active') ? 'inactive' : 'active';
-                    changedCount++;
                 }
             });
             saveDB();
@@ -593,7 +637,12 @@
                 u.permissions[sec.id].edit = document.getElementById(`pe_${sec.id}`).checked;
             });
             saveDB();
-            if (CURRENT_USER.id === u.id) { CURRENT_USER = u; applySidebarPermissions(); }
+            // تحديث الصلاحيات فورياً إذا كان المستخدم يعدل صلاحياته بنفسه
+            if (CURRENT_USER.id === u.id) { 
+                CURRENT_USER = u; 
+                applySidebarPermissions(); 
+                renderTable(); // لإعادة رسم الجدول بناءً على صلاحية التعديل الجديدة
+            }
             closeModal('permModal');
         }
 
