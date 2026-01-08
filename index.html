@@ -138,12 +138,13 @@
                         <button class="btn" style="background:#2c5aa0; color:white;" onclick="openAddUserModal()"><i class="fas fa-plus"></i> إضافة جديد</button>
                         <button class="btn" style="background:#17a2b8; color:white;" onclick="exportCSV()"><i class="fas fa-file-export"></i> تصدير CSV</button>
                         <button class="btn" style="background:#6f42c1; color:white;" onclick="triggerImport()"><i class="fas fa-file-import"></i> استيراد CSV</button>
-                        <input type="file" id="csvInput" style="display:none" accept=".csv,.txt" onchange="importCSV(this)">
+                        <input type="file" id="csvInput" style="display:none" accept=".csv,.txt" onchange="processImport(this)">
                     </div>
                 </div>
                 
-                <div style="background:#fff3cd; color:#856404; padding:10px; margin-bottom:15px; border-radius:6px; font-size:0.9rem; border:1px solid #ffeeba;">
-                    <i class="fas fa-info-circle"></i> <b>تنبيه هام عند الاستيراد:</b> عند حفظ الملف في Excel، يرجى اختيار نوع الملف: <b>CSV UTF-8 (Comma delimited)</b> لتجنب ظهور الرموز (؟؟؟؟).
+                <div style="background:#d4edda; color:#155724; padding:15px; margin-bottom:15px; border-radius:6px; font-size:0.95rem; border:1px solid #c3e6cb;">
+                    <i class="fas fa-check-circle" style="margin-left:5px;"></i> <b>تم تحديث النظام:</b><br>
+                    يمكنك الآن استيراد ملفات CSV المحفوظة من نسخ Excel القديمة (التي لا تدعم UTF-8) مباشرة، سيقوم النظام بمعالجة اللغة العربية تلقائياً.
                 </div>
 
                 <div class="user-tabs">
@@ -280,7 +281,6 @@
                         if(!u.dateAdded) u.dateAdded = '2025/01/01'; 
                     });
                 });
-                // Force Update Admin Password if exists
                 if(DB.admins) {
                     const adm = DB.admins.find(u => u.login === 'admin');
                     if(adm) { adm.pass = 'Hasan@12'; saveDB(); }
@@ -334,7 +334,6 @@
             location.reload();
         }
 
-        // === Navigation ===
         function navigate(pageId) {
             const perms = CURRENT_USER.permissions || DEFAULT_PERMS;
             if (perms[pageId] && perms[pageId].view === false) return;
@@ -413,7 +412,6 @@
                 const clean = (t) => t ? `"${String(t).replace(/"/g, '""')}"` : '""';
                 csvContent += `${clean(row.name)},${clean(row.job || row.dept)},${clean(row.phone)},${clean(row.login)},${clean(row.pass)},${clean(row.dateAdded)}\n`;
             });
-            // UTF-8 BOM is crucial for Excel to open it correctly initially
             const bom = "\uFEFF";
             const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
@@ -429,65 +427,82 @@
             document.getElementById('csvInput').click();
         }
 
-        function importCSV(input) {
+        // === دالة الاستيراد الذكية الجديدة ===
+        // 1. تقرأ الملف.
+        // 2. إذا وجدت علامات استفهام، تعيد القراءة بترميز Windows-1256 (الخاص بـ Excel القديم).
+        function processImport(input) {
             const file = input.files[0];
             if (!file) return;
 
+            // المحاولة الأولى: قراءة كـ UTF-8 (الافتراضي)
             const reader = new FileReader();
+            reader.readAsText(file, "UTF-8");
+            
             reader.onload = function(e) {
                 const text = e.target.result;
-                const rows = text.split('\n');
                 
-                if(rows.length < 1) return;
+                // فحص إذا كان النص يحتوي على علامات استفهام كثيرة (دليل على تلف الترميز)
+                if (text.includes('?????') || text.includes('')) {
+                    // المحاولة الثانية: إعادة القراءة بترميز اللغة العربية الخاص بـ Windows (Excel القديم)
+                    const retryReader = new FileReader();
+                    retryReader.readAsText(file, "windows-1256");
+                    
+                    retryReader.onload = function(evt) {
+                        // الآن النص يجب أن يكون سليماً
+                        tryParseCSV(evt.target.result, input);
+                    };
+                } else {
+                    // النص سليم من البداية (UTF-8)
+                    tryParseCSV(text, input);
+                }
+            };
+        }
 
-                // --- الذكاء في تحديد الفاصل ---
-                // نتحقق من السطر الأول لمعرفة نوع الفاصل المستخدم (فاصلة، فاصلة منقوطة، أو Tab)
-                const firstLine = rows[0];
-                let separator = ',';
-                if (firstLine.indexOf('\t') > -1) separator = '\t';
-                else if (firstLine.indexOf(';') > -1) separator = ';';
+        function tryParseCSV(text, input) {
+            const rows = text.split('\n');
+            if(rows.length < 1) return;
 
-                let addedCount = 0;
-                for (let i = 1; i < rows.length; i++) {
-                    const row = rows[i].trim();
-                    if (row) {
-                        // تقسيم الصف بناءً على الفاصل المكتشف
-                        // ملاحظة: هذا تقسيم بسيط، إذا كانت البيانات تحتوي على فواصل داخل علامات التنصيص قد تحتاج لمكتبة خارجية
-                        let cols = row.split(separator);
+            const firstLine = rows[0];
+            let separator = ',';
+            if (firstLine.indexOf('\t') > -1) separator = '\t';
+            else if (firstLine.indexOf(';') > -1) separator = ';';
+
+            let addedCount = 0;
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i].trim();
+                if (row) {
+                    let cols = row.split(separator);
+                    const clean = (val) => val ? val.replace(/^"|"$/g, '').replace(/^'|'$/g, '').trim() : '';
+
+                    if (cols.length >= 1 && clean(cols[0]) !== "") {
+                            const newUser = {
+                            id: Date.now() + i + Math.floor(Math.random() * 1000),
+                            name: clean(cols[0]),
+                            job: clean(cols[1]),
+                            phone: clean(cols[2]),
+                            login: clean(cols[3]) || clean(cols[2]) || 'user'+(Date.now()+i),
+                            pass: clean(cols[4]) || '123456',
+                            dateAdded: clean(cols[5]) || new Date().toLocaleDateString('en-GB'),
+                            status: 'active',
+                            permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS))
+                        };
                         
-                        // تنظيف البيانات من علامات التنصيص والمسافات
-                        const clean = (val) => val ? val.replace(/^"|"$/g, '').replace(/^'|'$/g, '').trim() : '';
-
-                        // التأكد من أن الصف يحتوي بيانات صالحة (الاسم موجود)
-                        if (cols.length >= 1 && clean(cols[0]) !== "") {
-                             const newUser = {
-                                id: Date.now() + i + Math.floor(Math.random() * 1000),
-                                name: clean(cols[0]),
-                                job: clean(cols[1]),
-                                phone: clean(cols[2]),
-                                login: clean(cols[3]) || clean(cols[2]) || 'user'+(Date.now()+i),
-                                pass: clean(cols[4]) || '123456',
-                                dateAdded: clean(cols[5]) || new Date().toLocaleDateString('en-GB'),
-                                status: 'active',
-                                permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS))
-                            };
-                            
-                            // التحقق من التكرار البسيط
-                            const exists = DB[CURRENT_TAB].some(u => u.name === newUser.name && u.phone === newUser.phone);
-                            if(!exists) {
-                                DB[CURRENT_TAB].push(newUser);
-                                addedCount++;
-                            }
+                        const exists = DB[CURRENT_TAB].some(u => u.name === newUser.name && u.phone === newUser.phone);
+                        if(!exists) {
+                            DB[CURRENT_TAB].push(newUser);
+                            addedCount++;
                         }
                     }
                 }
-                saveDB();
-                renderTable();
-                alert(`تم استيراد ${addedCount} مستخدم بنجاح.\nإذا ظهرت الأسماء كرموز (؟؟؟)، يرجى التأكد من حفظ الملف في Excel بصيغة "CSV UTF-8".`);
-                input.value = '';
-            };
-            // القراءة كـ Text تضمن استخدام المتصفح لـ UTF-8 بشكل افتراضي
-            reader.readAsText(file);
+            }
+            saveDB();
+            renderTable();
+            if(addedCount > 0) {
+                alert(`تم استيراد ${addedCount} مستخدم بنجاح.`);
+            } else {
+                alert("لم يتم استيراد أي بيانات جديدة (ربما البيانات مكررة أو الملف فارغ).");
+            }
+            input.value = '';
         }
 
         // === Misc Logic (Modals, etc) ===
