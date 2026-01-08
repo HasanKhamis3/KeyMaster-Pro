@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --primary: #1e4078; --text: #333; --bg: #f7f9fc; --danger: #da291c; --success: #28a745; }
+        :root { --primary: #1e4078; --text: #333; --bg: #f7f9fc; --danger: #da291c; --success: #28a745; --warning: #ffc107; }
         * { box-sizing: border-box; font-family: 'Cairo', sans-serif; }
         body { margin: 0; background: var(--bg); color: var(--text); }
         
@@ -48,6 +48,11 @@
         .custom-table td { padding: 12px; border-bottom: 1px solid #eee; background: white; text-align: center; vertical-align: middle; }
         
         .custom-checkbox { width: 18px; height: 18px; cursor: pointer; }
+
+        /* Status Badge */
+        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; user-select: none; }
+        .status-active { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .status-inactive { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
 
         /* Modals */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 5000; }
@@ -99,11 +104,10 @@
                     <i class="fas fa-eye password-icon" onclick="togglePass('loginPass', this)"></i>
                 </div>
                 <button type="submit" class="btn btn-primary">دخول</button>
-                <p id="loginError" style="color:red; font-size:0.9rem; margin-top:10px; display:none;">بيانات غير صحيحة أو حساب معطل</p>
+                <p id="loginError" style="color:red; font-size:0.9rem; margin-top:10px; display:none;"></p>
                 
                 <div style="margin-top:30px; border-top:1px solid #eee; padding-top:10px;">
-                    <small style="color:#777;">أدوات الطوارئ:</small><br>
-                    <button type="button" class="btn" style="background:#6c757d; color:white; font-size:0.7rem; padding:5px 10px; margin:5px;" onclick="resetSystem()">حذف كافة البيانات (Reset)</button>
+                    <button type="button" class="btn" style="background:#6c757d; color:white; font-size:0.7rem; padding:5px 10px;" onclick="resetSystem()">إعادة ضبط المصنع (Reset)</button>
                 </div>
             </form>
         </div>
@@ -139,16 +143,13 @@
             <div id="user-management" class="section-card">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
                     <h3>إدارة المستخدمين</h3>
-                    <div style="display:flex; gap:10px;">
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
                         <button class="btn" style="background:#2c5aa0; color:white;" onclick="openAddUserModal()"><i class="fas fa-plus"></i> إضافة جديد</button>
                         <button class="btn" style="background:#17a2b8; color:white;" onclick="exportCSV()"><i class="fas fa-file-export"></i> تصدير CSV</button>
-                        <button class="btn" style="background:#6f42c1; color:white;" onclick="triggerImport()"><i class="fas fa-file-import"></i> استيراد CSV</button>
-                        <input type="file" id="csvInput" style="display:none" accept=".csv,.txt" onchange="processImport(this)">
+                        
+                        <button class="btn" style="background:#dc3545; color:white;" onclick="deleteSelected()"><i class="fas fa-trash"></i> حذف المحدد</button>
+                        <button class="btn" style="background:#6c757d; color:white;" onclick="toggleStatusSelected()"><i class="fas fa-toggle-on"></i> تفعيل/إلغاء المحدد</button>
                     </div>
-                </div>
-                
-                <div style="background:#d1ecf1; color:#0c5460; padding:15px; margin-bottom:15px; border-radius:6px; font-size:0.9rem; border:1px solid #bee5eb;">
-                    <i class="fas fa-check-circle"></i> <b>حالة النظام:</b> تم تفعيل مصحح البيانات التلقائي. سيتم الآن قبول الدخول حتى لو كانت هناك اختلافات بسيطة في تنسيق الأرقام.
                 </div>
 
                 <div class="user-tabs">
@@ -161,11 +162,11 @@
                     <thead>
                         <tr id="tableHeadRow">
                             <th width="5%"><input type="checkbox" id="selectAll" class="custom-checkbox" onchange="toggleSelectAll(this)"></th>
-                            <th width="5%">الترتيب</th>
+                            <th width="5%">#</th>
                             <th width="25%">الاسم</th>
-                            <th width="20%">الوظيفة</th>
-                            <th width="15%">رقم الهاتف</th>
-                            <th width="30%">إدارة المستخدمين</th>
+                            <th width="15%">الوظيفة</th>
+                            <th width="15%">الحالة</th>
+                            <th width="35%">إدارة المستخدمين</th>
                         </tr>
                     </thead>
                     <tbody id="usersTableBody"></tbody>
@@ -280,27 +281,26 @@
             if (storedDB) {
                 DB = JSON.parse(storedDB);
                 
-                // === المكنسة البرمجية: إصلاح البيانات الفاسدة عند بدء التشغيل ===
+                // تنظيف البيانات عند بدء التشغيل لضمان عدم وجود مسافات خفية
                 ['admins', 'senior', 'middle', 'teachers'].forEach(grp => {
                     if(DB[grp]) {
                         DB[grp].forEach(u => { 
                             if(!u.permissions) u.permissions = JSON.parse(JSON.stringify(DEFAULT_PERMS));
-                            
-                            // تنظيف عميق لاسم المستخدم وكلمة المرور من أي رموز خفية أو مسافات
-                            // String(...) يضمن أن الرقم يتحول لنص
-                            // replace يزيل المسافات والرموز غير المرئية
+                            if(!u.status) u.status = 'active'; // ضمان وجود حالة
+
+                            // تنظيف صارم
                             u.login = String(u.login).trim().replace(/[\uFEFF\x00-\x1F\s]/g, '');
                             u.pass = String(u.pass).trim().replace(/[\uFEFF\x00-\x1F\s]/g, '');
                         });
                     }
                 });
                 
-                // التأكد من مدير النظام
+                // ضمان صحة المدير
                 if(!DB.admins) DB.admins = JSON.parse(JSON.stringify(INITIAL_DB.admins));
                 const adm = DB.admins.find(u => u.login === 'admin');
                 if(adm) { adm.pass = 'Hasan@12'; } else { DB.admins.push(INITIAL_DB.admins[0]); }
                 
-                saveDB(); // حفظ النسخة النظيفة
+                saveDB();
 
             } else {
                 DB = JSON.parse(JSON.stringify(INITIAL_DB));
@@ -327,33 +327,42 @@
 
         function saveDB() { localStorage.setItem('QualitySys_DB_V2', JSON.stringify(DB)); }
 
-        // === دالة تسجيل الدخول المحسنة ===
+        // === دالة تسجيل الدخول (تم حل المشكلة) ===
         function login(e) {
             e.preventDefault();
+            const errBox = document.getElementById('loginError');
+            errBox.style.display = 'none';
+            errBox.innerText = '';
+
+            const uInput = document.getElementById('loginUser').value.trim();
+            const pInput = document.getElementById('loginPass').value.trim();
             
-            // تنظيف المدخلات من المسافات
-            const u = document.getElementById('loginUser').value.trim();
-            const p = document.getElementById('loginPass').value.trim();
-            
-            let found = null;
+            let userFound = null;
+
+            // البحث عن المستخدم وتجاهل المسافات
             ['admins', 'senior', 'middle', 'teachers'].forEach(grp => {
-                const match = DB[grp].find(x => {
-                    // مقارنة مرنة جداً: تحويل الكل لنصوص ومسح المسافات
-                    const storedLogin = String(x.login).trim();
-                    const storedPass = String(x.pass).trim();
-                    return storedLogin === u && storedPass === p;
-                });
-                if(match) found = match;
+                const match = DB[grp].find(x => String(x.login).trim() === uInput);
+                if(match) {
+                    // التحقق من كلمة المرور
+                    if(String(match.pass).trim() === pInput) {
+                        userFound = match;
+                    }
+                }
             });
 
-            if (found) {
-                if (found.status === 'active') {
-                    CURRENT_USER = found;
-                    localStorage.setItem('QualitySys_Session', found.id);
+            if (userFound) {
+                // التحقق من حالة التفعيل
+                if (userFound.status === 'active') {
+                    CURRENT_USER = userFound;
+                    localStorage.setItem('QualitySys_Session', userFound.id);
                     showApp();
-                } else { alert("هذا الحساب معطل"); }
-            } else { 
-                alert("بيانات غير صحيحة.\nتأكد من كتابة اسم المستخدم وكلمة المرور بدقة."); 
+                } else {
+                    errBox.innerText = "عذراً، هذا الحساب معطل. يرجى التواصل مع المشرف للمساعدة.";
+                    errBox.style.display = 'block';
+                }
+            } else {
+                errBox.innerText = "بيانات غير صحيحة. يرجى التأكد من اسم المستخدم وكلمة المرور.";
+                errBox.style.display = 'block';
             }
         }
 
@@ -403,7 +412,7 @@
             });
         }
 
-        // === User Management & Import/Export ===
+        // === User Management ===
 
         function setTab(tab, el) {
             CURRENT_TAB = tab;
@@ -417,11 +426,17 @@
             const tbody = document.getElementById('usersTableBody');
             tbody.innerHTML = '';
             const list = DB[CURRENT_TAB] || [];
+            
             list.forEach((u, idx) => {
+                const isActive = u.status === 'active';
+                const statusBadge = isActive 
+                    ? `<span class="status-badge status-active" onclick="toggleStatus(${u.id})">مفعل</span>`
+                    : `<span class="status-badge status-inactive" onclick="toggleStatus(${u.id})">معطل</span>`;
+
                 let row = `<td><input type="checkbox" class="custom-checkbox user-select-cb" value="${u.id}"></td>`;
                 row += `<td>${idx+1}</td><td>${u.name}</td>`;
                 row += `<td>${u.job || (CURRENT_TAB === 'teachers' ? u.dept : '-')}</td>`;
-                row += `<td>${u.phone || '-'}</td>`;
+                row += `<td>${statusBadge}</td>`;
                 row += `<td>
                     <div style="display:flex; justify-content:center; gap:5px;">
                         <button class="btn" style="padding:5px; background:#ffc107; color:black; font-size:0.8rem;" onclick="viewUser(${u.id})">معاينة</button>
@@ -436,17 +451,57 @@
             });
         }
 
+        // --- Bulk Actions & Logic ---
+
         function toggleSelectAll(source) {
             document.querySelectorAll('.user-select-cb').forEach(cb => cb.checked = source.checked);
+        }
+
+        function deleteSelected() {
+            const checkboxes = document.querySelectorAll('.user-select-cb:checked');
+            if(checkboxes.length === 0) { alert('لم يتم تحديد أي مستخدم.'); return; }
+            
+            if(confirm(`هل أنت متأكد من حذف ${checkboxes.length} مستخدم؟`)) {
+                const idsToDelete = Array.from(checkboxes).map(cb => parseInt(cb.value));
+                DB[CURRENT_TAB] = DB[CURRENT_TAB].filter(u => !idsToDelete.includes(u.id));
+                saveDB();
+                renderTable();
+                document.getElementById('selectAll').checked = false;
+            }
+        }
+
+        function toggleStatusSelected() {
+            const checkboxes = document.querySelectorAll('.user-select-cb:checked');
+            if(checkboxes.length === 0) { alert('لم يتم تحديد أي مستخدم.'); return; }
+            
+            const idsToToggle = Array.from(checkboxes).map(cb => parseInt(cb.value));
+            let changedCount = 0;
+            DB[CURRENT_TAB].forEach(u => {
+                if(idsToToggle.includes(u.id)) {
+                    u.status = (u.status === 'active') ? 'inactive' : 'active';
+                    changedCount++;
+                }
+            });
+            saveDB();
+            renderTable();
+        }
+
+        function toggleStatus(id) {
+            const u = DB[CURRENT_TAB].find(x => x.id === id);
+            if(u) {
+                u.status = (u.status === 'active') ? 'inactive' : 'active';
+                saveDB();
+                renderTable();
+            }
         }
 
         function exportCSV() {
             const list = DB[CURRENT_TAB] || [];
             if (list.length === 0) { alert("لا يوجد بيانات للتصدير"); return; }
-            let csvContent = "الاسم الكامل,الوظيفة,رقم الهاتف,اسم المستخدم,كلمة المرور,تاريخ الإضافة\n";
+            let csvContent = "الاسم الكامل,الوظيفة,رقم الهاتف,اسم المستخدم,كلمة المرور,تاريخ الإضافة,الحالة\n";
             list.forEach(row => {
                 const clean = (t) => t ? `"${String(t).replace(/"/g, '""').trim()}"` : '""';
-                csvContent += `${clean(row.name)},${clean(row.job || row.dept)},${clean(row.phone)},${clean(row.login)},${clean(row.pass)},${clean(row.dateAdded)}\n`;
+                csvContent += `${clean(row.name)},${clean(row.job || row.dept)},${clean(row.phone)},${clean(row.login)},${clean(row.pass)},${clean(row.dateAdded)},${clean(row.status)}\n`;
             });
             const bom = "\uFEFF";
             const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -459,95 +514,11 @@
             document.body.removeChild(link);
         }
 
-        function triggerImport() {
-            document.getElementById('csvInput').click();
-        }
-
-        // === دالة الاستيراد الجديدة (آمنة وصلبة) ===
-        function processImport(input) {
-            const file = input.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const buffer = e.target.result;
-                const decoder = new TextDecoder('windows-1256');
-                const text = decoder.decode(buffer);
-
-                // فحص التلف الشديد
-                if (text.indexOf("?????") !== -1) {
-                    alert("الملف تالف جداً بسبب الحفظ الخاطئ. يرجى استخدام ملف جديد.");
-                    input.value = '';
-                    return;
-                }
-
-                tryParseCSV(text, input);
-            };
-            reader.readAsArrayBuffer(file);
-        }
-
-        function tryParseCSV(text, input) {
-            const rows = text.split('\n');
-            if(rows.length < 1) return;
-
-            const firstLine = rows[0];
-            let separator = ',';
-            if (firstLine.indexOf('\t') > -1) separator = '\t';
-            else if (firstLine.indexOf(';') > -1) separator = ';';
-
-            let addedCount = 0;
-            // دالة تنظيف صارمة جداً
-            const deepClean = (val) => {
-                if(!val) return '';
-                // إزالة علامات التنصيص، الرموز غير المرئية، والمسافات الزائدة
-                return val.replace(/^"|"$/g, '').replace(/^'|'$/g, '').replace(/[\uFEFF\x00-\x1F]/g, '').trim();
-            };
-
-            for (let i = 1; i < rows.length; i++) {
-                const row = rows[i].trim();
-                if (row) {
-                    let cols = row.split(separator);
-                    
-                    if (cols.length >= 1 && deepClean(cols[0]) !== "") {
-                            // تجاهل سطر العناوين
-                            if(deepClean(cols[0]).indexOf("الاسم") !== -1) continue;
-
-                            const newUser = {
-                            id: Date.now() + i + Math.floor(Math.random() * 1000),
-                            name: deepClean(cols[0]),
-                            job: deepClean(cols[1]),
-                            phone: deepClean(cols[2]),
-                            // إذا كان حقل الدخول فارغ، نستخدم رقم الهاتف
-                            login: deepClean(cols[3]) || deepClean(cols[2]) || 'user'+(Date.now()+i),
-                            // إذا كانت كلمة المرور فارغة، نستخدم 123456
-                            pass: deepClean(cols[4]) || '123456', 
-                            dateAdded: deepClean(cols[5]) || new Date().toLocaleDateString('en-GB'),
-                            status: 'active',
-                            permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS))
-                        };
-                        
-                        // منع التكرار
-                        const exists = DB[CURRENT_TAB].some(u => u.name === newUser.name && u.phone === newUser.phone);
-                        if(!exists) {
-                            DB[CURRENT_TAB].push(newUser);
-                            addedCount++;
-                        }
-                    }
-                }
-            }
-            saveDB();
-            renderTable();
-            if(addedCount > 0) alert(`تم استيراد ${addedCount} مستخدم بنجاح.\nجرب تسجيل الدخول الآن.`);
-            else alert("لم يتم استيراد أي بيانات (ربما مكررة أو الملف فارغ).");
-            input.value = '';
-        }
-
         // === Misc Logic (Modals, etc) ===
         function viewUser(id) {
             const u = DB[CURRENT_TAB].find(x => x.id === id);
             const content = document.getElementById('viewUserContent');
             
-            // إضافة عرض لكلمة المرور الفعلية (للتحقق)
             content.innerHTML = `
                 <div class="user-view-card">
                     <div class="user-view-avatar">${u.name.charAt(0)}</div>
@@ -556,13 +527,9 @@
                 <div class="info-grid">
                     <div class="info-item"><label>الوظيفة</label><span>${u.job || u.dept || '-'}</span></div>
                     <div class="info-item"><label>رقم الهاتف</label><span>${u.phone || '-'}</span></div>
-                    <div class="info-item"><label>تاريخ الإضافة</label><span>${u.dateAdded || '-'}</span></div>
                     <div class="info-item"><label>الحالة</label><span style="color:${u.status==='active'?'green':'red'}">${u.status==='active'?'مفعل':'معطل'}</span></div>
                     <div class="info-item"><label>اسم الدخول</label><span style="background:#eee; padding:2px 5px; border-radius:4px;">${u.login}</span></div>
                     <div class="info-item"><label>كلمة المرور</label><span style="background:#eee; padding:2px 5px; border-radius:4px;">${u.pass}</span></div>
-                </div>
-                <div style="text-align:center; margin-top:10px; font-size:0.8rem; color:#888;">
-                    ملاحظة: تأكد من عدم وجود مسافات قبل أو بعد البيانات عند الدخول.
                 </div>
             `;
             document.getElementById('viewUserModal').style.display = 'flex';
