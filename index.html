@@ -18,7 +18,7 @@
         .sidebar-header { padding: 20px; border-bottom: 1px solid #f0f4f8; display: flex; gap: 10px; align-items: center; }
         .sidebar-header i { font-size: 1.8rem; color: var(--primary); }
         .nav-links { list-style: none; padding: 20px 0; margin: 0; }
-        .nav-links li { margin-bottom: 5px; display: none; } /* مخفي افتراضياً */
+        .nav-links li { margin-bottom: 5px; display: none; }
         .nav-links a { display: flex; align-items: center; padding: 12px 25px; color: #777; text-decoration: none; transition: 0.3s; font-weight: 600; border-right: 4px solid transparent; cursor: pointer; }
         .nav-links a:hover, .nav-links a.active { color: var(--primary); background: #f0f4f8; border-right-color: var(--primary); }
         .nav-links a i { margin-left: 10px; width: 25px; text-align: center; }
@@ -44,11 +44,9 @@
         .user-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
         
         .custom-table { width: 100%; border-collapse: collapse; }
-        /* Centered Headers and Cells */
         .custom-table th { background: #2c5aa0; color: white; padding: 12px; text-align: center; font-weight: bold; }
         .custom-table td { padding: 12px; border-bottom: 1px solid #eee; background: white; text-align: center; vertical-align: middle; }
         
-        /* Checkbox Style */
         .custom-checkbox { width: 18px; height: 18px; cursor: pointer; }
 
         /* Modals */
@@ -59,7 +57,7 @@
         .modal-body { padding: 20px; }
         .modal-footer { padding: 15px 20px; background: #f9f9f9; display: flex; gap: 10px; justify-content: flex-end; }
 
-        /* Settings Layout */
+        /* Settings */
         .settings-layout { display: flex; gap: 20px; align-items: flex-start; }
         .settings-sidebar { width: 250px; background: white; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; flex-shrink: 0; }
         .settings-sidebar-header { padding: 15px; border-bottom: 1px solid #eee; font-weight: bold; color: var(--primary); text-align: center; }
@@ -70,7 +68,6 @@
         .setting-tab-pane { display: none; }
         .setting-tab-pane.active { display: block; animation: fadeIn 0.3s; }
 
-        /* Helpers */
         .password-wrapper { position: relative; }
         .password-wrapper input { padding-left: 40px; }
         .password-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #777; }
@@ -78,9 +75,8 @@
         .perm-list { border: 1px solid #eee; border-radius: 6px; padding: 10px; max-height: 300px; overflow-y: auto; }
         .perm-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
         .image-upload-container { border: 2px dashed #ccc; border-radius: 8px; padding: 20px; text-align: center; background-color: #fcfcfc; margin-bottom: 20px; position: relative; min-height: 150px; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
-        .upload-preview-box img { max-width: 100%; max-height: 150px; }
 
-        /* View Modal Details */
+        /* User View */
         .user-view-card { text-align: center; margin-bottom: 20px; }
         .user-view-avatar { width: 80px; height: 80px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 15px auto; }
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: right; background: #f9f9f9; padding: 15px; border-radius: 8px; }
@@ -141,11 +137,15 @@
                     <div style="display:flex; gap:10px;">
                         <button class="btn" style="background:#2c5aa0; color:white;" onclick="openAddUserModal()"><i class="fas fa-plus"></i> إضافة جديد</button>
                         <button class="btn" style="background:#17a2b8; color:white;" onclick="exportCSV()"><i class="fas fa-file-export"></i> تصدير CSV</button>
-                        <button class="btn" style="background:#6f42c1; color:white;" onclick="document.getElementById('csvInput').click()"><i class="fas fa-file-import"></i> استيراد CSV</button>
-                        <input type="file" id="csvInput" style="display:none" accept=".csv" onchange="importCSV(this)">
+                        <button class="btn" style="background:#6f42c1; color:white;" onclick="triggerImport()"><i class="fas fa-file-import"></i> استيراد CSV</button>
+                        <input type="file" id="csvInput" style="display:none" accept=".csv,.txt" onchange="importCSV(this)">
                     </div>
                 </div>
                 
+                <div style="background:#fff3cd; color:#856404; padding:10px; margin-bottom:15px; border-radius:6px; font-size:0.9rem; border:1px solid #ffeeba;">
+                    <i class="fas fa-info-circle"></i> <b>تنبيه هام عند الاستيراد:</b> عند حفظ الملف في Excel، يرجى اختيار نوع الملف: <b>CSV UTF-8 (Comma delimited)</b> لتجنب ظهور الرموز (؟؟؟؟).
+                </div>
+
                 <div class="user-tabs">
                     <div class="user-tab active" onclick="setTab('senior', this)">القيادة العليا</div>
                     <div class="user-tab" onclick="setTab('middle', this)">القيادة الوسطى</div>
@@ -187,16 +187,13 @@
                             <h3 style="color:var(--primary); margin-bottom:20px; border-bottom:1px solid #eee; padding-bottom:10px;">الإعدادات العامة</h3>
                             <div class="form-group"><label>اسم المدرسة</label><input type="text" id="confSchool" class="form-control" value="مدرسة مدينة حمد الابتدائية للبنات"></div>
                             <div class="form-group"><label>العام الدراسي</label><input type="text" id="confYear" class="form-control" value="2025 / 2026م"></div>
-                            <div class="form-group"><label>شعار الوزارة</label><div class="image-upload-container"><button class="btn" style="background:#28a745; color:white;">تحميل شعار الوزارة</button></div></div>
-                            <div class="form-group"><label>شعار المدرسة</label><div class="image-upload-container"><button class="btn" style="background:#28a745; color:white;">تحميل شعار المدرسة</button></div></div>
-                            <div class="form-group"><label>ختم المدرسة</label><div class="image-upload-container"><button class="btn" style="background:#28a745; color:white;">تحميل ختم المدرسة</button></div></div>
                             <button class="btn btn-primary" onclick="alert('تم الحفظ')">حفظ الإعدادات</button>
                         </div>
-                        <div id="rep" class="setting-tab-pane"><h3>إعدادات تقرير الجودة</h3><p>خيارات التقرير...</p></div>
-                        <div id="sig" class="setting-tab-pane"><h3>إعدادات التوقيعات</h3><p>تحديد الموقعين...</p></div>
-                        <div id="vis" class="setting-tab-pane"><h3>ترتيب الزوار</h3><p>ترتيب ظهور الزوار...</p></div>
-                        <div id="fot" class="setting-tab-pane"><h3>إعدادات التذييل</h3><input class="form-control" placeholder="نص التذييل"></div>
-                        <div id="log" class="setting-tab-pane"><h3>سجل النظام</h3><p>السجلات...</p></div>
+                        <div id="rep" class="setting-tab-pane"><h3>إعدادات تقرير الجودة</h3></div>
+                        <div id="sig" class="setting-tab-pane"><h3>إعدادات التوقيعات</h3></div>
+                        <div id="vis" class="setting-tab-pane"><h3>ترتيب الزوار</h3></div>
+                        <div id="fot" class="setting-tab-pane"><h3>إعدادات التذييل</h3></div>
+                        <div id="log" class="setting-tab-pane"><h3>سجل النظام</h3></div>
                     </div>
                 </div>
             </div>
@@ -225,8 +222,7 @@
     <div id="viewUserModal" class="modal-overlay">
         <div class="modal-box">
             <div class="modal-header">معاينة بيانات المستخدم <span onclick="closeModal('viewUserModal')" style="cursor:pointer;">&times;</span></div>
-            <div class="modal-body" id="viewUserContent">
-                </div>
+            <div class="modal-body" id="viewUserContent"></div>
             <div class="modal-footer">
                 <button class="btn" style="background:#28a745; color:white;" onclick="closeModal('viewUserModal')">إغلاق</button>
             </div>
@@ -261,7 +257,6 @@
         const DEFAULT_PERMS = {};
         SECTIONS.forEach(s => DEFAULT_PERMS[s.id] = {view: true, edit: false});
 
-        // 2. تحديث كلمة مرور المدير في البيانات الأولية
         const INITIAL_DB = {
             admins: [{id: 999, name: 'مدير النظام', login: 'admin', pass: 'Hasan@12', status: 'active', permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS))}],
             senior: [{id: 1, name: 'علياء محمد مبارك الدوسري', job: 'مديرة المدرسة', phone: '39669118', login: '39669118', pass: '39669118', status: 'active', permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS)), dateAdded: '2025/01/01'}],
@@ -275,7 +270,6 @@
         let EDITING_PERM_ID = null;
 
         // === Core Functions ===
-        
         function initSystem() {
             const storedDB = localStorage.getItem('QualitySys_DB_V2');
             if (storedDB) {
@@ -286,16 +280,11 @@
                         if(!u.dateAdded) u.dateAdded = '2025/01/01'; 
                     });
                 });
-                
-                // 3. تحديث قسري لكلمة مرور المدير (لمنع التعارض مع البيانات المخزنة سابقاً)
-                if (DB.admins && DB.admins.length > 0) {
-                    const adminUser = DB.admins.find(u => u.login === 'admin');
-                    if(adminUser) {
-                        adminUser.pass = 'Hasan@12';
-                        saveDB(); // حفظ التعديل
-                    }
+                // Force Update Admin Password if exists
+                if(DB.admins) {
+                    const adm = DB.admins.find(u => u.login === 'admin');
+                    if(adm) { adm.pass = 'Hasan@12'; saveDB(); }
                 }
-
             } else {
                 DB = JSON.parse(JSON.stringify(INITIAL_DB));
                 saveDB();
@@ -308,7 +297,6 @@
                     const u = DB[grp].find(x => x.id == sessionID);
                     if(u) found = u;
                 });
-
                 if (found && found.status === 'active') {
                     CURRENT_USER = found;
                     showApp();
@@ -320,15 +308,12 @@
             }
         }
 
-        function saveDB() {
-            localStorage.setItem('QualitySys_DB_V2', JSON.stringify(DB));
-        }
+        function saveDB() { localStorage.setItem('QualitySys_DB_V2', JSON.stringify(DB)); }
 
         function login(e) {
             e.preventDefault();
             const u = document.getElementById('loginUser').value.trim();
             const p = document.getElementById('loginPass').value.trim();
-            
             let found = null;
             ['admins', 'senior', 'middle', 'teachers'].forEach(grp => {
                 const match = DB[grp].find(x => String(x.login).trim() === u && String(x.pass).trim() === p);
@@ -340,12 +325,8 @@
                     CURRENT_USER = found;
                     localStorage.setItem('QualitySys_Session', found.id);
                     showApp();
-                } else {
-                    alert("هذا الحساب معطل");
-                }
-            } else {
-                alert("بيانات غير صحيحة");
-            }
+                } else { alert("هذا الحساب معطل"); }
+            } else { alert("بيانات غير صحيحة"); }
         }
 
         function logout() {
@@ -353,33 +334,7 @@
             location.reload();
         }
 
-        // === UI & Permissions ===
-
-        function showApp() {
-            document.getElementById('loginPage').style.display = 'none';
-            document.getElementById('app').style.display = 'flex';
-            document.getElementById('headerUserName').innerText = CURRENT_USER.name;
-            
-            applySidebarPermissions();
-            renderTable();
-            navigate('dashboard');
-        }
-
-        function applySidebarPermissions() {
-            const perms = CURRENT_USER.permissions || DEFAULT_PERMS;
-            SECTIONS.forEach(sec => {
-                const el = document.getElementById('nav-' + sec.id);
-                if (el) {
-                    if (perms[sec.id] && perms[sec.id].view === false) {
-                        el.style.display = 'none';
-                    } else {
-                        el.style.display = 'block';
-                    }
-                }
-            });
-        }
-
-        // 1. منطق التنقل بين الأقسام
+        // === Navigation ===
         function navigate(pageId) {
             const perms = CURRENT_USER.permissions || DEFAULT_PERMS;
             if (perms[pageId] && perms[pageId].view === false) return;
@@ -393,33 +348,45 @@
             if (target) target.classList.add('active');
             if (link) link.classList.add('active');
             
-            if(pageId === 'settings') {
-                document.getElementById('settings').style.display = 'block';
-            }
+            if(pageId === 'settings') document.getElementById('settings').style.display = 'block';
         }
 
-        // === User Management ===
+        function showApp() {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('app').style.display = 'flex';
+            document.getElementById('headerUserName').innerText = CURRENT_USER.name;
+            applySidebarPermissions();
+            renderTable();
+            navigate('dashboard');
+        }
+
+        function applySidebarPermissions() {
+            const perms = CURRENT_USER.permissions || DEFAULT_PERMS;
+            SECTIONS.forEach(sec => {
+                const el = document.getElementById('nav-' + sec.id);
+                if(el) el.style.display = (perms[sec.id] && perms[sec.id].view === false) ? 'none' : 'block';
+            });
+        }
+
+        // === User Management & Import/Export ===
 
         function setTab(tab, el) {
             CURRENT_TAB = tab;
             document.querySelectorAll('.user-tab').forEach(t => t.classList.remove('active'));
             el.classList.add('active');
-            const selectAll = document.getElementById('selectAll');
-            if(selectAll) selectAll.checked = false;
+            if(document.getElementById('selectAll')) document.getElementById('selectAll').checked = false;
             renderTable();
         }
 
         function renderTable() {
             const tbody = document.getElementById('usersTableBody');
             tbody.innerHTML = '';
-            
             const list = DB[CURRENT_TAB] || [];
             list.forEach((u, idx) => {
                 let row = `<td><input type="checkbox" class="custom-checkbox user-select-cb" value="${u.id}"></td>`;
                 row += `<td>${idx+1}</td><td>${u.name}</td>`;
                 row += `<td>${u.job || (CURRENT_TAB === 'teachers' ? u.dept : '-')}</td>`;
                 row += `<td>${u.phone || '-'}</td>`;
-                
                 row += `<td>
                     <div style="display:flex; justify-content:center; gap:5px;">
                         <button class="btn" style="padding:5px; background:#ffc107; color:black; font-size:0.8rem;" onclick="viewUser(${u.id})">معاينة</button>
@@ -428,45 +395,38 @@
                         <button class="btn" style="padding:5px; background:#6c757d; color:white; font-size:0.8rem;" onclick="openPerms(${u.id})">الصلاحيات</button>
                     </div>
                 </td>`;
-                
                 const tr = document.createElement('tr');
                 tr.innerHTML = row;
                 tbody.appendChild(tr);
             });
         }
 
-        // --- Export/Import Logic ---
-
         function toggleSelectAll(source) {
-            const checkboxes = document.querySelectorAll('.user-select-cb');
-            checkboxes.forEach(cb => cb.checked = source.checked);
+            document.querySelectorAll('.user-select-cb').forEach(cb => cb.checked = source.checked);
         }
 
         function exportCSV() {
             const list = DB[CURRENT_TAB] || [];
-            if (list.length === 0) {
-                alert("لا يوجد بيانات للتصدير");
-                return;
-            }
+            if (list.length === 0) { alert("لا يوجد بيانات للتصدير"); return; }
             let csvContent = "الاسم الكامل,الوظيفة,رقم الهاتف,اسم المستخدم,كلمة المرور,تاريخ الإضافة\n";
             list.forEach(row => {
-                const name = `"${row.name || ''}"`;
-                const job = `"${row.job || row.dept || ''}"`;
-                const phone = `"${row.phone || ''}"`;
-                const login = `"${row.login || ''}"`;
-                const pass = `"${row.pass || ''}"`;
-                const date = `"${row.dateAdded || ''}"`;
-                csvContent += `${name},${job},${phone},${login},${pass},${date}\n`;
+                const clean = (t) => t ? `"${String(t).replace(/"/g, '""')}"` : '""';
+                csvContent += `${clean(row.name)},${clean(row.job || row.dept)},${clean(row.phone)},${clean(row.login)},${clean(row.pass)},${clean(row.dateAdded)}\n`;
             });
+            // UTF-8 BOM is crucial for Excel to open it correctly initially
             const bom = "\uFEFF";
             const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             const url = URL.createObjectURL(blob);
             link.setAttribute("href", url);
-            link.setAttribute("download", `${CURRENT_TAB}_users_${new Date().toISOString().slice(0,10)}.csv`);
+            link.setAttribute("download", `${CURRENT_TAB}_users.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+        }
+
+        function triggerImport() {
+            document.getElementById('csvInput').click();
         }
 
         function importCSV(input) {
@@ -477,38 +437,60 @@
             reader.onload = function(e) {
                 const text = e.target.result;
                 const rows = text.split('\n');
+                
+                if(rows.length < 1) return;
+
+                // --- الذكاء في تحديد الفاصل ---
+                // نتحقق من السطر الأول لمعرفة نوع الفاصل المستخدم (فاصلة، فاصلة منقوطة، أو Tab)
+                const firstLine = rows[0];
+                let separator = ',';
+                if (firstLine.indexOf('\t') > -1) separator = '\t';
+                else if (firstLine.indexOf(';') > -1) separator = ';';
+
                 let addedCount = 0;
                 for (let i = 1; i < rows.length; i++) {
                     const row = rows[i].trim();
                     if (row) {
-                        const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                        const clean = (val) => val ? val.replace(/^"|"$/g, '').trim() : '';
-                        if (cols.length >= 2) {
+                        // تقسيم الصف بناءً على الفاصل المكتشف
+                        // ملاحظة: هذا تقسيم بسيط، إذا كانت البيانات تحتوي على فواصل داخل علامات التنصيص قد تحتاج لمكتبة خارجية
+                        let cols = row.split(separator);
+                        
+                        // تنظيف البيانات من علامات التنصيص والمسافات
+                        const clean = (val) => val ? val.replace(/^"|"$/g, '').replace(/^'|'$/g, '').trim() : '';
+
+                        // التأكد من أن الصف يحتوي بيانات صالحة (الاسم موجود)
+                        if (cols.length >= 1 && clean(cols[0]) !== "") {
                              const newUser = {
-                                id: Date.now() + i,
+                                id: Date.now() + i + Math.floor(Math.random() * 1000),
                                 name: clean(cols[0]),
                                 job: clean(cols[1]),
                                 phone: clean(cols[2]),
                                 login: clean(cols[3]) || clean(cols[2]) || 'user'+(Date.now()+i),
                                 pass: clean(cols[4]) || '123456',
-                                status: 'active',
                                 dateAdded: clean(cols[5]) || new Date().toLocaleDateString('en-GB'),
+                                status: 'active',
                                 permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS))
                             };
-                            DB[CURRENT_TAB].push(newUser);
-                            addedCount++;
+                            
+                            // التحقق من التكرار البسيط
+                            const exists = DB[CURRENT_TAB].some(u => u.name === newUser.name && u.phone === newUser.phone);
+                            if(!exists) {
+                                DB[CURRENT_TAB].push(newUser);
+                                addedCount++;
+                            }
                         }
                     }
                 }
                 saveDB();
                 renderTable();
-                alert(`تم استيراد ${addedCount} مستخدم بنجاح.`);
+                alert(`تم استيراد ${addedCount} مستخدم بنجاح.\nإذا ظهرت الأسماء كرموز (؟؟؟)، يرجى التأكد من حفظ الملف في Excel بصيغة "CSV UTF-8".`);
                 input.value = '';
             };
+            // القراءة كـ Text تضمن استخدام المتصفح لـ UTF-8 بشكل افتراضي
             reader.readAsText(file);
         }
 
-        // === Restore View Modal Logic ===
+        // === Misc Logic (Modals, etc) ===
         function viewUser(id) {
             const u = DB[CURRENT_TAB].find(x => x.id === id);
             const content = document.getElementById('viewUserContent');
@@ -529,7 +511,35 @@
             document.getElementById('viewUserModal').style.display = 'flex';
         }
 
-        // === Permissions Management ===
+        function openAddUserModal() { document.getElementById('addUserModal').style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        
+        function saveNewUser() {
+            const newUser = {
+                id: Date.now(),
+                name: document.getElementById('addName').value,
+                job: document.getElementById('addJob').value,
+                phone: document.getElementById('addPhone').value,
+                login: document.getElementById('addLogin').value,
+                pass: document.getElementById('addPass').value,
+                status: 'active',
+                dateAdded: new Date().toLocaleDateString('en-GB'),
+                permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS))
+            };
+            DB[CURRENT_TAB].push(newUser);
+            saveDB();
+            renderTable();
+            closeModal('addUserModal');
+        }
+
+        function deleteUser(id) {
+            if(confirm('هل أنت متأكد من حذف هذا المستخدم؟')) {
+                DB[CURRENT_TAB] = DB[CURRENT_TAB].filter(u => u.id !== id);
+                saveDB();
+                renderTable();
+            }
+        }
+
         function openPerms(id) {
             EDITING_PERM_ID = id;
             const u = DB[CURRENT_TAB].find(x => x.id === id);
@@ -559,41 +569,8 @@
                 u.permissions[sec.id].edit = document.getElementById(`pe_${sec.id}`).checked;
             });
             saveDB();
-            if (CURRENT_USER.id === u.id) {
-                CURRENT_USER = u;
-                applySidebarPermissions();
-            }
+            if (CURRENT_USER.id === u.id) { CURRENT_USER = u; applySidebarPermissions(); }
             closeModal('permModal');
-            alert('تم حفظ الصلاحيات');
-        }
-
-        // === Utils & Modals ===
-        function openAddUserModal() { document.getElementById('addUserModal').style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function saveNewUser() {
-            const newUser = {
-                id: Date.now(),
-                name: document.getElementById('addName').value,
-                job: document.getElementById('addJob').value,
-                phone: document.getElementById('addPhone').value,
-                login: document.getElementById('addLogin').value,
-                pass: document.getElementById('addPass').value,
-                status: 'active',
-                dateAdded: new Date().toLocaleDateString('en-GB'),
-                permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS))
-            };
-            DB[CURRENT_TAB].push(newUser);
-            saveDB();
-            renderTable();
-            closeModal('addUserModal');
-        }
-        
-        function deleteUser(id) {
-            if(confirm('هل أنت متأكد من حذف هذا المستخدم؟')) {
-                DB[CURRENT_TAB] = DB[CURRENT_TAB].filter(u => u.id !== id);
-                saveDB();
-                renderTable();
-            }
         }
 
         function togglePass(id, icon) {
@@ -609,7 +586,6 @@
             el.classList.add('active'); 
         }
 
-        // Start
         document.getElementById('loginForm').addEventListener('submit', login);
         initSystem();
     </script>
