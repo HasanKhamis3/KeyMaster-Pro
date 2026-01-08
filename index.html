@@ -119,6 +119,35 @@
             font-size: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
+        /* --- Signature Settings Styles --- */
+        .signature-grid { display: flex; gap: 20px; flex-wrap: wrap; }
+        .signature-card { flex: 1; min-width: 300px; border: 1px solid #eee; border-radius: 8px; padding: 20px; background: #fcfcfc; text-align: center; }
+        .signature-title { color: var(--primary); font-weight: bold; margin-bottom: 15px; font-size: 1.1rem; }
+        
+        /* --- Visitor Order Styles --- */
+        .visitor-section { margin-bottom: 30px; border: 1px solid #eee; padding: 20px; border-radius: 8px; background: white; }
+        .visitor-section-title { font-weight: bold; margin-bottom: 15px; color: #444; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .visitor-list { list-style: none; padding: 0; margin: 0 0 15px 0; }
+        .visitor-list-item { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 10px 15px; border: 1px solid #eee; margin-bottom: 8px; border-radius: 6px; background: #fff;
+            transition: 0.2s;
+        }
+        .visitor-list-item:hover { background-color: #f9fbff; border-color: #cce5ff; }
+        .visitor-name { font-weight: bold; color: #333; }
+        .visitor-controls { display: flex; gap: 5px; }
+        .empty-list-msg { color: #888; font-style: italic; padding: 15px; text-align: center; border: 1px dashed #ddd; border-radius: 6px; background: #fdfdfd; }
+        .btn-add-visitor { background-color: var(--primary); color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-add-visitor:hover { opacity: 0.9; }
+
+        /* Picker Modal List */
+        .picker-list { max-height: 300px; overflow-y: auto; border: 1px solid #eee; border-radius: 6px; }
+        .picker-item { padding: 10px 15px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .picker-item:hover { background-color: #f0f4f8; }
+        .picker-item:last-child { border-bottom: none; }
+        .picker-item-name { font-weight: bold; }
+        .picker-item-job { font-size: 0.8rem; color: #777; }
+
         /* Password Wrapper */
         .password-wrapper { position: relative; }
         .password-wrapper input { padding-left: 40px; }
@@ -229,7 +258,6 @@
                 
                 <div class="custom-tabs">
                     <div class="custom-tab active" onclick="setSettingTab('gen', this)">الإعدادات العامة</div>
-                    <div class="custom-tab" onclick="setSettingTab('rep', this)">إعدادات تقرير الجودة</div>
                     <div class="custom-tab" onclick="setSettingTab('sig', this)">إعدادات التوقيعات</div>
                     <div class="custom-tab" onclick="setSettingTab('vis', this)">ترتيب الزوار</div>
                     <div class="custom-tab" onclick="setSettingTab('fot', this)">إعدادات التذييل</div>
@@ -237,7 +265,6 @@
                 </div>
 
                 <div id="gen" class="setting-content-pane active">
-                    
                     <div class="form-group" style="margin-bottom:20px;">
                         <label class="upload-label">اسم المدرسة</label>
                         <input type="text" id="confSchool" class="form-control" placeholder="أدخل اسم المدرسة">
@@ -298,9 +325,64 @@
                     </div>
                 </div>
 
-                <div id="rep" class="setting-content-pane"><h3>إعدادات تقرير الجودة</h3></div>
-                <div id="sig" class="setting-content-pane"><h3>إعدادات التوقيعات</h3></div>
-                <div id="vis" class="setting-content-pane"><h3>ترتيب الزوار</h3></div>
+                <div id="sig" class="setting-content-pane">
+                    <p style="margin-bottom:20px; color:#666;">تحديد الأشخاص المسؤولين عن توقيع التقرير من القيادة العليا</p>
+                    
+                    <div class="signature-grid">
+                        <div class="signature-card">
+                            <div class="signature-title">مدير/ة المدرسة</div>
+                            <div class="form-group">
+                                <label style="display:block; text-align:right; margin-bottom:5px; color:#777;">اختر مدير/ة المدرسة</label>
+                                <select id="sig_director" class="form-control">
+                                    <option value="">اختر مدير المدرسة</option>
+                                </select>
+                            </div>
+                            <div style="display:flex; gap:10px; justify-content:center; margin-top:20px;">
+                                <button class="btn btn-primary" style="min-width:100px;" onclick="saveSignatureSettings()">حفظ</button>
+                                <button class="btn" style="background:#dc3545; color:white; min-width:100px;" onclick="clearSignature('sig_director')">إزالة</button>
+                            </div>
+                        </div>
+
+                        <div class="signature-card">
+                            <div class="signature-title">المدير/ة المساعد/ة</div>
+                            <div class="form-group">
+                                <label style="display:block; text-align:right; margin-bottom:5px; color:#777;">اختر المدير/ة المساعد/ة</label>
+                                <select id="sig_assistant" class="form-control">
+                                    <option value="">اختر المدير المساعد</option>
+                                </select>
+                            </div>
+                            <div style="display:flex; gap:10px; justify-content:center; margin-top:20px;">
+                                <button class="btn btn-primary" style="min-width:100px;" onclick="saveSignatureSettings()">حفظ</button>
+                                <button class="btn" style="background:#dc3545; color:white; min-width:100px;" onclick="clearSignature('sig_assistant')">إزالة</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="vis" class="setting-content-pane">
+                    <p style="margin-bottom:20px; color:#666;">حدد ترتيب ظهور أسماء الزوار في تقرير الزيارات الصفية</p>
+                    
+                    <div class="visitor-section">
+                        <div class="visitor-section-title">القيادة العليا</div>
+                        <ul id="list_visitor_senior" class="visitor-list">
+                            <li class="empty-list-msg">لم يتم إضافة زوار بعد</li>
+                        </ul>
+                        <button class="btn-add-visitor" onclick="openVisitorPicker('senior')">+ إضافة زائر من القيادة العليا</button>
+                    </div>
+
+                    <div class="visitor-section">
+                        <div class="visitor-section-title">القيادة الوسطى</div>
+                        <ul id="list_visitor_middle" class="visitor-list">
+                            <li class="empty-list-msg">لم يتم إضافة زوار بعد</li>
+                        </ul>
+                        <button class="btn-add-visitor" onclick="openVisitorPicker('middle')">+ إضافة زائر من القيادة الوسطى</button>
+                    </div>
+
+                    <div style="text-align: left; margin-top: 20px;">
+                        <button class="btn btn-toggle" onclick="saveVisitorOrder()">حفظ الترتيب</button>
+                    </div>
+                </div>
+
                 <div id="fot" class="setting-content-pane"><h3>إعدادات التذييل</h3></div>
                 <div id="log" class="setting-content-pane"><h3>سجل النظام</h3></div>
             </div>
@@ -369,6 +451,19 @@
         </div>
     </div>
 
+    <div id="visitorPickerModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">اختر اسماً للإضافة <span onclick="closeModal('visitorPickerModal')" style="cursor:pointer;">&times;</span></div>
+            <div class="modal-body">
+                <input type="text" id="visitorSearch" class="form-control" placeholder="بحث عن اسم..." onkeyup="filterPickerList()">
+                <div id="pickerList" class="picker-list"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" style="background:#ddd;" onclick="closeModal('visitorPickerModal')">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // === System Configuration ===
         const SECTIONS = [
@@ -394,7 +489,13 @@
                 schoolYear: '2025 / 2026م',
                 ministryLogo: '',
                 schoolLogo: '',
-                schoolStamp: ''
+                schoolStamp: '',
+                // Signatures
+                signature_director_id: '',
+                signature_assistant_id: '',
+                // Visitor Orders (storing IDs)
+                visitor_order_senior: [],
+                visitor_order_middle: []
             }
         };
 
@@ -403,6 +504,7 @@
         let CURRENT_TAB = 'senior';
         let EDITING_PERM_ID = null;
         let IS_BULK_PERM_MODE = false;
+        let CURRENT_PICKER_TYPE = null; // 'senior' or 'middle'
 
         // === Core Functions ===
         function initSystem() {
@@ -410,9 +512,10 @@
             if (storedDB) {
                 DB = JSON.parse(storedDB);
                 if(!DB.departments) DB.departments = [];
-                // Ensure settings exist
-                if(!DB.settings) DB.settings = JSON.parse(JSON.stringify(INITIAL_DB.settings));
-                
+                // Ensure settings exist and merge with default structure
+                if(!DB.settings) DB.settings = {};
+                DB.settings = {...INITIAL_DB.settings, ...DB.settings};
+
                 ['admins', 'senior', 'middle', 'teachers', 'departments'].forEach(grp => {
                     if(DB[grp] && Array.isArray(DB[grp])) {
                         DB[grp].forEach(u => { 
@@ -541,8 +644,6 @@
                 if(t.parentElement.previousElementSibling && t.parentElement.previousElementSibling.firstElementChild && t.parentElement.previousElementSibling.firstElementChild.innerText.includes('إدارة المستخدمين'))
                     t.classList.remove('active');
             });
-            // Handle generic custom tabs logic if needed, but for now manually handle
-            // Find all siblings in the container and remove active
             Array.from(el.parentElement.children).forEach(c => c.classList.remove('active'));
             el.classList.add('active');
             if(document.getElementById('selectAll')) document.getElementById('selectAll').checked = false;
@@ -844,7 +945,6 @@
             document.getElementById('permModal').style.display = 'flex';
         }
 
-        // Toggle All inside Modal
         function toggleAllPerms(type, source) {
             const className = type === 'view' ? '.perm-view-cb' : '.perm-edit-cb';
             document.querySelectorAll(className).forEach(cb => cb.checked = source.checked);
@@ -890,10 +990,11 @@
         function setSettingTab(t, el) { 
             document.querySelectorAll('.setting-content-pane').forEach(p => p.classList.remove('active')); 
             document.getElementById(t).classList.add('active'); 
-            
-            // Remove active from all siblings
             Array.from(el.parentElement.children).forEach(c => c.classList.remove('active'));
             el.classList.add('active'); 
+            
+            if (t === 'sig') loadSignatureSettings();
+            if (t === 'vis') loadVisitorSettings();
         }
 
         function loadSettings() {
@@ -910,7 +1011,6 @@
             const img = document.getElementById(imgId);
             const wrap = document.getElementById(wrapId);
             const btn = document.getElementById(btnId);
-            
             if (src) {
                 img.src = src;
                 wrap.style.display = 'inline-block';
@@ -921,22 +1021,15 @@
             }
         }
 
-        function triggerFileSelect(inputId) {
-            document.getElementById(inputId).click();
-        }
+        function triggerFileSelect(inputId) { document.getElementById(inputId).click(); }
 
         function handleFileUpload(input, previewId, dbKey) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const dataUrl = e.target.result;
-                    // Update DB immediately or wait for save? 
-                    // Let's store in DB immediately to simplify state for now, but usually waiting for Save button is better.
-                    // Here we will just update the view and let Save button commit to DB.
                     const img = document.getElementById(previewId);
                     img.src = dataUrl;
-                    
-                    // Show preview, hide button
                     const wrapId = previewId.replace('preview_', 'preview_wrap_');
                     const btnId = previewId.replace('preview_', 'btn_wrap_');
                     document.getElementById(wrapId).style.display = 'inline-block';
@@ -950,15 +1043,11 @@
             if(confirm('هل تريد حذف هذه الصورة؟')) {
                 const img = document.getElementById(previewId);
                 img.src = '';
-                document.getElementById(inputId).value = ''; // Reset input
-                
+                document.getElementById(inputId).value = ''; 
                 const wrapId = previewId.replace('preview_', 'preview_wrap_');
                 const btnId = previewId.replace('preview_', 'btn_wrap_');
                 document.getElementById(wrapId).style.display = 'none';
                 document.getElementById(btnId).style.display = 'block';
-                
-                // Clear from DB immediately? Or wait for save.
-                // Let's just update UI. Real save happens on "Save Settings".
             }
         }
 
@@ -966,12 +1055,10 @@
             DB.settings.schoolName = document.getElementById('confSchool').value;
             DB.settings.schoolYear = document.getElementById('confYear').value;
             
-            // Get current srcs (if they exist)
             const minSrc = document.getElementById('preview_ministry').getAttribute('src');
             const schSrc = document.getElementById('preview_school').getAttribute('src');
             const stmSrc = document.getElementById('preview_stamp').getAttribute('src');
             
-            // Check if src is empty or is actual data
             DB.settings.ministryLogo = (minSrc && minSrc.startsWith('data:')) ? minSrc : ''; 
             DB.settings.schoolLogo = (schSrc && schSrc.startsWith('data:')) ? schSrc : ''; 
             DB.settings.schoolStamp = (stmSrc && stmSrc.startsWith('data:')) ? stmSrc : ''; 
@@ -984,6 +1071,148 @@
             if(!src) return;
             document.getElementById('fullImage').src = src;
             document.getElementById('imageViewModal').style.display = 'flex';
+        }
+
+        // --- Signature Settings Logic ---
+        function loadSignatureSettings() {
+            // Populate Dropdowns from Senior Leadership
+            const seniors = DB.senior || [];
+            const dirSelect = document.getElementById('sig_director');
+            const asstSelect = document.getElementById('sig_assistant');
+            
+            // Helper to populate
+            const populate = (sel, selectedVal) => {
+                sel.innerHTML = '<option value="">اختر...</option>';
+                seniors.forEach(u => {
+                    const opt = document.createElement('option');
+                    opt.value = u.id;
+                    opt.innerText = u.name;
+                    if(u.id == selectedVal) opt.selected = true;
+                    sel.appendChild(opt);
+                });
+            };
+
+            populate(dirSelect, DB.settings.signature_director_id);
+            populate(asstSelect, DB.settings.signature_assistant_id);
+        }
+
+        function saveSignatureSettings() {
+            DB.settings.signature_director_id = document.getElementById('sig_director').value;
+            DB.settings.signature_assistant_id = document.getElementById('sig_assistant').value;
+            saveDB();
+            alert('تم حفظ التوقيعات');
+        }
+
+        function clearSignature(elemId) {
+            document.getElementById(elemId).value = "";
+            saveSignatureSettings();
+        }
+
+        // --- Visitor Order Logic ---
+        function loadVisitorSettings() {
+            renderVisitorList('senior');
+            renderVisitorList('middle');
+        }
+
+        function renderVisitorList(type) {
+            const listContainer = document.getElementById(`list_visitor_${type}`);
+            const orderIds = type === 'senior' ? DB.settings.visitor_order_senior : DB.settings.visitor_order_middle;
+            const sourceDB = type === 'senior' ? DB.senior : DB.middle;
+            
+            listContainer.innerHTML = '';
+
+            if(!orderIds || orderIds.length === 0) {
+                listContainer.innerHTML = '<li class="empty-list-msg">لم يتم إضافة زوار بعد</li>';
+                return;
+            }
+
+            orderIds.forEach((id, index) => {
+                const user = sourceDB.find(u => u.id == id);
+                if(user) {
+                    const li = document.createElement('li');
+                    li.className = 'visitor-list-item';
+                    li.innerHTML = `
+                        <span class="visitor-name">${user.name}</span>
+                        <div class="visitor-controls">
+                            <button class="action-btn btn-move" onclick="moveVisitorItem('${type}', ${index}, 'up')" title="للأعلى"><i class="fas fa-arrow-up"></i></button>
+                            <button class="action-btn btn-move" onclick="moveVisitorItem('${type}', ${index}, 'down')" title="للأسفل"><i class="fas fa-arrow-down"></i></button>
+                            <button class="action-btn btn-delete" onclick="removeVisitorItem('${type}', ${index})"><i class="fas fa-trash"></i></button>
+                        </div>
+                    `;
+                    listContainer.appendChild(li);
+                }
+            });
+        }
+
+        function openVisitorPicker(type) {
+            CURRENT_PICKER_TYPE = type;
+            document.getElementById('visitorSearch').value = '';
+            filterPickerList();
+            document.getElementById('visitorPickerModal').style.display = 'flex';
+        }
+
+        function filterPickerList() {
+            const query = document.getElementById('visitorSearch').value.toLowerCase();
+            const listDiv = document.getElementById('pickerList');
+            listDiv.innerHTML = '';
+
+            const type = CURRENT_PICKER_TYPE;
+            const sourceDB = type === 'senior' ? DB.senior : DB.middle;
+            const currentOrder = type === 'senior' ? DB.settings.visitor_order_senior : DB.settings.visitor_order_middle;
+
+            // Filter out already added users
+            const availableUsers = sourceDB.filter(u => !currentOrder.includes(u.id));
+
+            availableUsers.forEach(u => {
+                if(u.name.toLowerCase().includes(query)) {
+                    const item = document.createElement('div');
+                    item.className = 'picker-item';
+                    item.innerHTML = `
+                        <div>
+                            <div class="picker-item-name">${u.name}</div>
+                            <div class="picker-item-job">${u.job || u.dept || ''}</div>
+                        </div>
+                        <i class="fas fa-plus-circle" style="color:var(--success);"></i>
+                    `;
+                    item.onclick = () => addVisitorToOrder(u.id);
+                    listDiv.appendChild(item);
+                }
+            });
+
+            if(listDiv.innerHTML === '') listDiv.innerHTML = '<div style="padding:15px; text-align:center; color:#888;">لا توجد أسماء متاحة</div>';
+        }
+
+        function addVisitorToOrder(id) {
+            if(CURRENT_PICKER_TYPE === 'senior') {
+                if(!DB.settings.visitor_order_senior) DB.settings.visitor_order_senior = [];
+                DB.settings.visitor_order_senior.push(id);
+            } else {
+                if(!DB.settings.visitor_order_middle) DB.settings.visitor_order_middle = [];
+                DB.settings.visitor_order_middle.push(id);
+            }
+            closeModal('visitorPickerModal');
+            renderVisitorList(CURRENT_PICKER_TYPE);
+        }
+
+        function removeVisitorItem(type, index) {
+            const arr = type === 'senior' ? DB.settings.visitor_order_senior : DB.settings.visitor_order_middle;
+            arr.splice(index, 1);
+            renderVisitorList(type);
+        }
+
+        function moveVisitorItem(type, index, direction) {
+            const arr = type === 'senior' ? DB.settings.visitor_order_senior : DB.settings.visitor_order_middle;
+            if (direction === 'up' && index > 0) {
+                [arr[index], arr[index - 1]] = [arr[index - 1], arr[index]];
+            } else if (direction === 'down' && index < arr.length - 1) {
+                [arr[index], arr[index + 1]] = [arr[index + 1], arr[index]];
+            }
+            renderVisitorList(type);
+        }
+
+        function saveVisitorOrder() {
+            saveDB();
+            alert('تم حفظ ترتيب الزوار بنجاح');
         }
 
         document.getElementById('loginForm').addEventListener('submit', login);
