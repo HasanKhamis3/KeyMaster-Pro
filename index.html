@@ -19,7 +19,7 @@
         .sidebar-header i { font-size: 1.8rem; color: var(--primary); }
         .nav-links { list-style: none; padding: 20px 0; margin: 0; }
         .nav-links li { margin-bottom: 5px; display: none; } /* مخفي افتراضياً */
-        .nav-links a { display: flex; align-items: center; padding: 12px 25px; color: #777; text-decoration: none; transition: 0.3s; font-weight: 600; border-right: 4px solid transparent; }
+        .nav-links a { display: flex; align-items: center; padding: 12px 25px; color: #777; text-decoration: none; transition: 0.3s; font-weight: 600; border-right: 4px solid transparent; cursor: pointer; }
         .nav-links a:hover, .nav-links a.active { color: var(--primary); background: #f0f4f8; border-right-color: var(--primary); }
         .nav-links a i { margin-left: 10px; width: 25px; text-align: center; }
 
@@ -59,7 +59,7 @@
         .modal-body { padding: 20px; }
         .modal-footer { padding: 15px 20px; background: #f9f9f9; display: flex; gap: 10px; justify-content: flex-end; }
 
-        /* Settings Layout (Restored) */
+        /* Settings Layout */
         .settings-layout { display: flex; gap: 20px; align-items: flex-start; }
         .settings-sidebar { width: 250px; background: white; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; flex-shrink: 0; }
         .settings-sidebar-header { padding: 15px; border-bottom: 1px solid #eee; font-weight: bold; color: var(--primary); text-align: center; }
@@ -115,12 +115,12 @@
                 <div><div style="font-weight:bold;">جودة التعليم</div><small style="color:#888;">وزارة التربية</small></div>
             </div>
             <ul class="nav-links">
-                <li id="nav-dashboard"><a href="#dashboard" data-page="dashboard"><i class="fas fa-home"></i> لوحة التحكم</a></li>
-                <li id="nav-user-management"><a href="#user-management" data-page="user-management"><i class="fas fa-users-cog"></i> إدارة المستخدمين</a></li>
-                <li id="nav-visits"><a href="#visits" data-page="visits"><i class="fas fa-clipboard-check"></i> الزيارات الصفية</a></li>
-                <li id="nav-performance"><a href="#performance" data-page="performance"><i class="fas fa-chart-line"></i> تقييم الأداء</a></li>
-                <li id="nav-quality-report"><a href="#quality-report" data-page="quality-report"><i class="fas fa-file-word"></i> تقرير الجودة</a></li>
-                <li id="nav-settings"><a href="#settings" data-page="settings"><i class="fas fa-cog"></i> الإعدادات</a></li>
+                <li id="nav-dashboard"><a onclick="navigate('dashboard')" data-page="dashboard"><i class="fas fa-home"></i> لوحة التحكم</a></li>
+                <li id="nav-user-management"><a onclick="navigate('user-management')" data-page="user-management"><i class="fas fa-users-cog"></i> إدارة المستخدمين</a></li>
+                <li id="nav-visits"><a onclick="navigate('visits')" data-page="visits"><i class="fas fa-clipboard-check"></i> الزيارات الصفية</a></li>
+                <li id="nav-performance"><a onclick="navigate('performance')" data-page="performance"><i class="fas fa-chart-line"></i> تقييم الأداء</a></li>
+                <li id="nav-quality-report"><a onclick="navigate('quality-report')" data-page="quality-report"><i class="fas fa-file-word"></i> تقرير الجودة</a></li>
+                <li id="nav-settings"><a onclick="navigate('settings')" data-page="settings"><i class="fas fa-cog"></i> الإعدادات</a></li>
             </ul>
         </aside>
 
@@ -261,8 +261,9 @@
         const DEFAULT_PERMS = {};
         SECTIONS.forEach(s => DEFAULT_PERMS[s.id] = {view: true, edit: false});
 
+        // 2. تحديث كلمة مرور المدير في البيانات الأولية
         const INITIAL_DB = {
-            admins: [{id: 999, name: 'مدير النظام', login: 'admin', pass: 'admin123', status: 'active', permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS))}],
+            admins: [{id: 999, name: 'مدير النظام', login: 'admin', pass: 'Hasan@12', status: 'active', permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS))}],
             senior: [{id: 1, name: 'علياء محمد مبارك الدوسري', job: 'مديرة المدرسة', phone: '39669118', login: '39669118', pass: '39669118', status: 'active', permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS)), dateAdded: '2025/01/01'}],
             middle: [],
             teachers: []
@@ -282,9 +283,19 @@
                 ['admins', 'senior', 'middle', 'teachers'].forEach(grp => {
                     if(DB[grp]) DB[grp].forEach(u => { 
                         if(!u.permissions) u.permissions = JSON.parse(JSON.stringify(DEFAULT_PERMS));
-                        if(!u.dateAdded) u.dateAdded = '2025/01/01'; // Ensure date exists
+                        if(!u.dateAdded) u.dateAdded = '2025/01/01'; 
                     });
                 });
+                
+                // 3. تحديث قسري لكلمة مرور المدير (لمنع التعارض مع البيانات المخزنة سابقاً)
+                if (DB.admins && DB.admins.length > 0) {
+                    const adminUser = DB.admins.find(u => u.login === 'admin');
+                    if(adminUser) {
+                        adminUser.pass = 'Hasan@12';
+                        saveDB(); // حفظ التعديل
+                    }
+                }
+
             } else {
                 DB = JSON.parse(JSON.stringify(INITIAL_DB));
                 saveDB();
@@ -368,6 +379,7 @@
             });
         }
 
+        // 1. منطق التنقل بين الأقسام
         function navigate(pageId) {
             const perms = CURRENT_USER.permissions || DEFAULT_PERMS;
             if (perms[pageId] && perms[pageId].view === false) return;
@@ -392,7 +404,6 @@
             CURRENT_TAB = tab;
             document.querySelectorAll('.user-tab').forEach(t => t.classList.remove('active'));
             el.classList.add('active');
-            // Reset Select All
             const selectAll = document.getElementById('selectAll');
             if(selectAll) selectAll.checked = false;
             renderTable();
@@ -404,7 +415,6 @@
             
             const list = DB[CURRENT_TAB] || [];
             list.forEach((u, idx) => {
-                // إضافة مربع الاختيار (Checkbox) في كل صف
                 let row = `<td><input type="checkbox" class="custom-checkbox user-select-cb" value="${u.id}"></td>`;
                 row += `<td>${idx+1}</td><td>${u.name}</td>`;
                 row += `<td>${u.job || (CURRENT_TAB === 'teachers' ? u.dept : '-')}</td>`;
@@ -425,25 +435,20 @@
             });
         }
 
-        // --- ميزات التحديد والاستيراد والتصدير الجديدة ---
+        // --- Export/Import Logic ---
 
-        // 1. تحديد الكل
         function toggleSelectAll(source) {
             const checkboxes = document.querySelectorAll('.user-select-cb');
             checkboxes.forEach(cb => cb.checked = source.checked);
         }
 
-        // 2. تصدير CSV (يدعم العربية)
         function exportCSV() {
             const list = DB[CURRENT_TAB] || [];
             if (list.length === 0) {
                 alert("لا يوجد بيانات للتصدير");
                 return;
             }
-
-            // العناوين
             let csvContent = "الاسم الكامل,الوظيفة,رقم الهاتف,اسم المستخدم,كلمة المرور,تاريخ الإضافة\n";
-
             list.forEach(row => {
                 const name = `"${row.name || ''}"`;
                 const job = `"${row.job || row.dept || ''}"`;
@@ -451,14 +456,10 @@
                 const login = `"${row.login || ''}"`;
                 const pass = `"${row.pass || ''}"`;
                 const date = `"${row.dateAdded || ''}"`;
-                
                 csvContent += `${name},${job},${phone},${login},${pass},${date}\n`;
             });
-
-            // إضافة BOM (Byte Order Mark) لدعم اللغة العربية في Excel
             const bom = "\uFEFF";
             const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
-            
             const link = document.createElement("a");
             const url = URL.createObjectURL(blob);
             link.setAttribute("href", url);
@@ -468,7 +469,6 @@
             document.body.removeChild(link);
         }
 
-        // 3. استيراد CSV
         function importCSV(input) {
             const file = input.files[0];
             if (!file) return;
@@ -477,43 +477,33 @@
             reader.onload = function(e) {
                 const text = e.target.result;
                 const rows = text.split('\n');
-                
                 let addedCount = 0;
-
-                // تجاوز الصف الأول (العناوين)
                 for (let i = 1; i < rows.length; i++) {
                     const row = rows[i].trim();
                     if (row) {
-                        // تقسيم النص مع مراعاة الفواصل داخل علامات التنصيص (بسيط)
-                        // ملاحظة: هذا تقسيم بسيط، للملفات المعقدة يفضل استخدام مكتبة CSV Parser
                         const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                        
-                        // تنظيف علامات التنصيص
                         const clean = (val) => val ? val.replace(/^"|"$/g, '').trim() : '';
-
-                        if (cols.length >= 2) { // تأكد من وجود اسم على الأقل
+                        if (cols.length >= 2) {
                              const newUser = {
-                                id: Date.now() + i, // معرف فريد
+                                id: Date.now() + i,
                                 name: clean(cols[0]),
                                 job: clean(cols[1]),
                                 phone: clean(cols[2]),
-                                login: clean(cols[3]) || clean(cols[2]) || 'user'+(Date.now()+i), // Login fallback
-                                pass: clean(cols[4]) || '123456', // Pass fallback
+                                login: clean(cols[3]) || clean(cols[2]) || 'user'+(Date.now()+i),
+                                pass: clean(cols[4]) || '123456',
                                 status: 'active',
                                 dateAdded: clean(cols[5]) || new Date().toLocaleDateString('en-GB'),
                                 permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS))
                             };
-                            
                             DB[CURRENT_TAB].push(newUser);
                             addedCount++;
                         }
                     }
                 }
-
                 saveDB();
                 renderTable();
                 alert(`تم استيراد ${addedCount} مستخدم بنجاح.`);
-                input.value = ''; // Reset input
+                input.value = '';
             };
             reader.readAsText(file);
         }
@@ -522,7 +512,6 @@
         function viewUser(id) {
             const u = DB[CURRENT_TAB].find(x => x.id === id);
             const content = document.getElementById('viewUserContent');
-            
             content.innerHTML = `
                 <div class="user-view-card">
                     <div class="user-view-avatar">${u.name.charAt(0)}</div>
@@ -547,9 +536,7 @@
             document.getElementById('permTargetName').innerText = 'صلاحيات: ' + u.name;
             const container = document.getElementById('permList');
             container.innerHTML = '';
-
             const userPerms = u.permissions || DEFAULT_PERMS;
-
             SECTIONS.forEach(sec => {
                 const p = userPerms[sec.id] || {view: true, edit: false};
                 container.innerHTML += `
@@ -566,20 +553,16 @@
 
         function submitPermissions() {
             const u = DB[CURRENT_TAB].find(x => x.id === EDITING_PERM_ID);
-            
             SECTIONS.forEach(sec => {
                 if(!u.permissions[sec.id]) u.permissions[sec.id] = {};
                 u.permissions[sec.id].view = document.getElementById(`pv_${sec.id}`).checked;
                 u.permissions[sec.id].edit = document.getElementById(`pe_${sec.id}`).checked;
             });
-
             saveDB();
-
             if (CURRENT_USER.id === u.id) {
                 CURRENT_USER = u;
                 applySidebarPermissions();
             }
-
             closeModal('permModal');
             alert('تم حفظ الصلاحيات');
         }
