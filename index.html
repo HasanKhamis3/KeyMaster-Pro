@@ -78,8 +78,10 @@
         .btn-edit { background: #17a2b8; }
         .btn-delete { background: #dc3545; }
         .btn-perm { background: #343a40; }
-        .btn-toggle { background: #28a745; min-width: 80px; justify-content: center; }
+        .btn-toggle { background: #28a745; }
         .btn-toggle.off { background: #6c757d; }
+        /* Move buttons style */
+        .btn-move { background: #6c757d; padding: 6px 8px; } 
         .action-btn:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 
         /* Modals */
@@ -107,6 +109,8 @@
         
         .perm-list { border: 1px solid #eee; border-radius: 6px; padding: 10px; max-height: 300px; overflow-y: auto; }
         .perm-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
+        .perm-header { display: flex; justify-content: space-between; padding: 10px; background: #f8f9fa; border: 1px solid #eee; border-radius: 6px; margin-bottom: 10px; font-weight: bold; font-size: 0.9rem; }
+        
         .image-upload-container { border: 2px dashed #ccc; border-radius: 8px; padding: 20px; text-align: center; background-color: #fcfcfc; margin-bottom: 20px; position: relative; min-height: 150px; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
 
         .user-view-card { text-align: center; margin-bottom: 20px; }
@@ -268,7 +272,16 @@
         <div class="modal-box">
             <div class="modal-header">إدارة الصلاحيات <span onclick="closeModal('permModal')" style="cursor:pointer;">&times;</span></div>
             <div class="modal-body">
-                <h4 id="permTargetName" style="margin-top:0; color:var(--primary);"></h4>
+                <h4 id="permTargetName" style="margin-top:0; color:var(--primary); margin-bottom:15px;"></h4>
+                
+                <div class="perm-header">
+                    <span>تحديد الكل</span>
+                    <div style="display:flex; gap:15px;">
+                        <label><input type="checkbox" onchange="toggleAllPerms('view', this)"> الكل معاينة</label>
+                        <label><input type="checkbox" onchange="toggleAllPerms('edit', this)"> الكل تعديل</label>
+                    </div>
+                </div>
+
                 <div class="perm-list" id="permList"></div>
             </div>
             <div class="modal-footer">
@@ -357,7 +370,6 @@
 
         function saveDB() { localStorage.setItem('QualitySys_DB_V2', JSON.stringify(DB)); }
 
-        // === STRICT LOGIN LOGIC ===
         function login(e) {
             e.preventDefault();
             const errBox = document.getElementById('loginError');
@@ -427,7 +439,6 @@
             });
         }
 
-        // === Tabs & Table ===
         function setTab(tab, el) {
             CURRENT_TAB = tab;
             document.querySelectorAll('.user-tab').forEach(t => t.classList.remove('active'));
@@ -468,7 +479,7 @@
                 `;
                 addBtn.innerText = "إضافة قسم جديد";
                 addBtn.setAttribute('onclick', 'openAddUserModal()'); 
-                if(bulkPermBtn) bulkPermBtn.style.display = 'none'; // No bulk perms for departments
+                if(bulkPermBtn) bulkPermBtn.style.display = 'none'; 
             } else {
                 headRow.innerHTML = `
                     <th width="5%"><input type="checkbox" id="selectAll" class="custom-checkbox" onchange="toggleSelectAll(this)"></th>
@@ -500,12 +511,18 @@
                 row += `<td>${statusBadge}</td>`;
                 row += `<td><div style="display:flex; justify-content:center; gap:2px; flex-wrap:wrap;">`;
                 
+                if(canEdit) {
+                    // Added Up/Down Arrows
+                    row += `<button class="action-btn btn-move" onclick="moveUser(${u.id}, 'up')" title="نقل لأعلى"><i class="fas fa-arrow-up"></i></button>`;
+                    row += `<button class="action-btn btn-move" onclick="moveUser(${u.id}, 'down')" title="نقل لأسفل"><i class="fas fa-arrow-down"></i></button>`;
+                }
+
                 if (CURRENT_TAB === 'departments') {
                     if(canEdit) {
                         row += `<button class="action-btn btn-toggle ${isActive?'':'off'}" onclick="toggleStatus(${u.id})"><i class="fas fa-power-off"></i> ${isActive?'تعطيل':'تفعيل'}</button>
                                 <button class="action-btn btn-edit" onclick="editUser(${u.id})"><i class="fas fa-edit"></i> تعديل</button>
                                 <button class="action-btn btn-delete" onclick="deleteUser(${u.id})"><i class="fas fa-trash"></i> حذف</button>`;
-                    } else { row += `<span style="color:#999; font-size:0.8rem;">لا توجد صلاحية</span>`; }
+                    }
                 } else {
                     row += `<button class="action-btn btn-view" onclick="viewUser(${u.id})"><i class="fas fa-eye"></i> معاينة</button>`;
                     if (canEdit) {
@@ -522,6 +539,22 @@
             });
         }
 
+        // --- Reordering Logic ---
+        function moveUser(id, direction) {
+            const list = DB[CURRENT_TAB];
+            const index = list.findIndex(u => u.id === id);
+            if (index === -1) return;
+
+            if (direction === 'up' && index > 0) {
+                [list[index], list[index - 1]] = [list[index - 1], list[index]];
+            } else if (direction === 'down' && index < list.length - 1) {
+                [list[index], list[index + 1]] = [list[index + 1], list[index]];
+            }
+            saveDB();
+            renderTable();
+        }
+
+        // --- Bulk Actions ---
         function toggleSelectAll(source) { document.querySelectorAll('.user-select-cb').forEach(cb => { if(!cb.disabled) cb.checked = source.checked; }); }
 
         function deleteSelected() {
@@ -574,6 +607,7 @@
             document.body.removeChild(link);
         }
 
+        // === Modal Logic ===
         function openAddUserModal() { 
             const isDept = (CURRENT_TAB === 'departments');
             document.getElementById('userFields').style.display = isDept ? 'none' : 'block';
@@ -656,16 +690,16 @@
             document.getElementById('viewUserModal').style.display = 'flex';
         }
 
-        // --- Bulk Permissions Logic ---
+        // --- Bulk Permissions ---
         function openBulkPerms() {
             const checkboxes = document.querySelectorAll('.user-select-cb:checked');
             if(checkboxes.length === 0) { alert('لم يتم تحديد أي مستخدم.'); return; }
             IS_BULK_PERM_MODE = true;
             document.getElementById('permTargetName').innerText = `تعديل صلاحيات (${checkboxes.length}) مستخدم`;
-            // Reset modal checks to empty/unchecked or default to avoid confusion
-            document.querySelectorAll('#permList input[type="checkbox"]').forEach(cb => cb.checked = false);
-            
-            // Build the perm list UI similar to openPerms but without pre-checking
+            // Uncheck master toggles
+            const masters = document.querySelectorAll('.perm-header input');
+            if(masters) masters.forEach(m => m.checked = false);
+
             const container = document.getElementById('permList');
             container.innerHTML = '';
             SECTIONS.forEach(sec => {
@@ -673,8 +707,8 @@
                 <div class="perm-item">
                     <span>${sec.name}</span>
                     <div style="display:flex; gap:15px;">
-                        <label><input type="checkbox" id="pv_${sec.id}"> معاينة</label>
-                        <label><input type="checkbox" id="pe_${sec.id}"> تعديل</label>
+                        <label><input type="checkbox" id="pv_${sec.id}" class="perm-view-cb"> معاينة</label>
+                        <label><input type="checkbox" id="pe_${sec.id}" class="perm-edit-cb"> تعديل</label>
                     </div>
                 </div>`;
             });
@@ -687,6 +721,11 @@
             EDITING_PERM_ID = id;
             const u = DB[CURRENT_TAB].find(x => x.id === id);
             document.getElementById('permTargetName').innerText = 'صلاحيات: ' + u.name;
+            
+            // Uncheck master toggles
+            const masters = document.querySelectorAll('.perm-header input');
+            if(masters) masters.forEach(m => m.checked = false);
+
             const container = document.getElementById('permList');
             container.innerHTML = '';
             const userPerms = u.permissions || DEFAULT_PERMS;
@@ -696,21 +735,24 @@
                 <div class="perm-item">
                     <span>${sec.name}</span>
                     <div style="display:flex; gap:15px;">
-                        <label><input type="checkbox" id="pv_${sec.id}" ${p.view ? 'checked' : ''}> معاينة</label>
-                        <label><input type="checkbox" id="pe_${sec.id}" ${p.edit ? 'checked' : ''}> تعديل</label>
+                        <label><input type="checkbox" id="pv_${sec.id}" class="perm-view-cb" ${p.view ? 'checked' : ''}> معاينة</label>
+                        <label><input type="checkbox" id="pe_${sec.id}" class="perm-edit-cb" ${p.edit ? 'checked' : ''}> تعديل</label>
                     </div>
                 </div>`;
             });
             document.getElementById('permModal').style.display = 'flex';
         }
 
+        // Toggle All inside Modal
+        function toggleAllPerms(type, source) {
+            const className = type === 'view' ? '.perm-view-cb' : '.perm-edit-cb';
+            document.querySelectorAll(className).forEach(cb => cb.checked = source.checked);
+        }
+
         function submitPermissions() {
             if (IS_BULK_PERM_MODE) {
-                // Bulk Save
                 const checkboxes = document.querySelectorAll('.user-select-cb:checked');
                 const ids = Array.from(checkboxes).map(cb => parseInt(cb.value));
-                
-                // Get the new permission state from modal
                 const newPerms = {};
                 SECTIONS.forEach(sec => {
                     newPerms[sec.id] = {
@@ -718,16 +760,13 @@
                         edit: document.getElementById(`pe_${sec.id}`).checked
                     };
                 });
-
                 DB[CURRENT_TAB].forEach(u => {
                     if (ids.includes(u.id)) {
-                        // Apply permissions. Note: We clone to avoid reference issues
                         u.permissions = JSON.parse(JSON.stringify(newPerms));
                     }
                 });
                 alert('تم تحديث صلاحيات المستخدمين المحددين بنجاح.');
             } else {
-                // Single Save
                 const u = DB[CURRENT_TAB].find(x => x.id === EDITING_PERM_ID);
                 SECTIONS.forEach(sec => {
                     if(!u.permissions[sec.id]) u.permissions[sec.id] = {};
