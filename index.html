@@ -43,10 +43,11 @@
         .section-card { background: white; border-radius: 10px; padding: 25px; margin-bottom: 20px; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
         .section-card.active { display: block; }
 
-        /* Tables & Tabs */
-        .user-tabs { display: flex; gap: 15px; border-bottom: 2px solid #eee; margin-bottom: 20px; }
-        .user-tab { padding: 10px 20px; cursor: pointer; color: #777; font-weight: bold; border-bottom: 3px solid transparent; }
-        .user-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+        /* General Tables & Tabs */
+        .custom-tabs { display: flex; gap: 15px; border-bottom: 2px solid #eee; margin-bottom: 20px; overflow-x: auto; }
+        .custom-tab { padding: 10px 20px; cursor: pointer; color: #777; font-weight: bold; border-bottom: 3px solid transparent; white-space: nowrap; transition: 0.3s; }
+        .custom-tab:hover { background-color: #f9f9f9; color: var(--primary); }
+        .custom-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
         
         .custom-table { width: 100%; border-collapse: collapse; }
         .custom-table th { background: #2c5aa0; color: white; padding: 12px; text-align: center; font-weight: bold; }
@@ -59,28 +60,14 @@
         .status-active { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .status-inactive { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
 
-        /* Action Buttons with Text */
-        .action-btn { 
-            padding: 6px 12px; 
-            border: none; 
-            border-radius: 6px; 
-            color: white; 
-            cursor: pointer; 
-            font-size: 0.75rem; 
-            margin: 2px; 
-            transition: 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            font-weight: 600;
-        }
+        /* Action Buttons */
+        .action-btn { padding: 6px 12px; border: none; border-radius: 6px; color: white; cursor: pointer; font-size: 0.75rem; margin: 2px; transition: 0.2s; display: inline-flex; align-items: center; gap: 5px; font-weight: 600; }
         .btn-view { background: #ffc107; color: #333; }
         .btn-edit { background: #17a2b8; }
         .btn-delete { background: #dc3545; }
         .btn-perm { background: #343a40; }
         .btn-toggle { background: #28a745; }
         .btn-toggle.off { background: #6c757d; }
-        /* Move buttons style */
         .btn-move { background: #6c757d; padding: 6px 8px; } 
         .action-btn:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 
@@ -92,27 +79,57 @@
         .modal-body { padding: 20px; }
         .modal-footer { padding: 15px 20px; background: #f9f9f9; display: flex; gap: 10px; justify-content: flex-end; }
 
-        /* Settings */
-        .settings-layout { display: flex; gap: 20px; align-items: flex-start; }
-        .settings-sidebar { width: 250px; background: white; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; flex-shrink: 0; }
-        .settings-sidebar-header { padding: 15px; border-bottom: 1px solid #eee; font-weight: bold; color: var(--primary); text-align: center; }
-        .settings-nav-item { display: block; padding: 12px 20px; color: #666; text-decoration: none; transition: 0.3s; cursor: pointer; border-bottom: 1px solid #f9f9f9; }
-        .settings-nav-item:hover { background-color: #f8f9fa; color: var(--primary); }
-        .settings-nav-item.active { background-color: var(--primary); color: white; border-right: 4px solid #15305b; }
-        .settings-content-area { flex-grow: 1; background: white; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); padding: 30px; min-height: 500px; }
-        .setting-tab-pane { display: none; }
-        .setting-tab-pane.active { display: block; animation: fadeIn 0.3s; }
+        /* --- Settings Specific Styles --- */
+        .setting-content-pane { display: none; animation: fadeIn 0.3s; }
+        .setting-content-pane.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* Image Upload Box Style */
+        .upload-container {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            background-color: #fcfcfc;
+            margin-bottom: 20px;
+            position: relative;
+            transition: 0.3s;
+        }
+        .upload-container:hover { border-color: var(--primary); background-color: #f0f4f8; }
+        .upload-label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
+        
+        .upload-btn-wrapper { margin-top: 10px; }
+        .upload-btn-custom {
+            background-color: #28a745; color: white; border: none; padding: 10px 25px;
+            border-radius: 5px; cursor: pointer; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 8px;
+        }
+        .upload-hint { display: block; margin-top: 5px; color: #888; font-size: 0.8rem; }
+
+        .image-preview-wrapper {
+            margin-top: 15px; position: relative; display: inline-block;
+            border: 1px solid #ddd; padding: 5px; border-radius: 5px; background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .image-preview { max-width: 200px; max-height: 100px; display: block; cursor: pointer; }
+        .remove-img-btn {
+            position: absolute; top: -10px; right: -10px;
+            background: #dc3545; color: white; border: none;
+            width: 24px; height: 24px; border-radius: 50%;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* Password Wrapper */
         .password-wrapper { position: relative; }
         .password-wrapper input { padding-left: 40px; }
         .password-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #777; }
         
+        /* Permissions List */
         .perm-list { border: 1px solid #eee; border-radius: 6px; padding: 10px; max-height: 300px; overflow-y: auto; }
         .perm-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
         .perm-header { display: flex; justify-content: space-between; padding: 10px; background: #f8f9fa; border: 1px solid #eee; border-radius: 6px; margin-bottom: 10px; font-weight: bold; font-size: 0.9rem; }
         
-        .image-upload-container { border: 2px dashed #ccc; border-radius: 8px; padding: 20px; text-align: center; background-color: #fcfcfc; margin-bottom: 20px; position: relative; min-height: 150px; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
-
+        /* User View */
         .user-view-card { text-align: center; margin-bottom: 20px; }
         .user-view-avatar { width: 80px; height: 80px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 15px auto; }
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: right; background: #f9f9f9; padding: 15px; border-radius: 8px; }
@@ -187,11 +204,11 @@
                     <div id="noEditPermissionMsg" style="display:none; color:red; font-weight:bold;">(وضع القراءة فقط)</div>
                 </div>
 
-                <div class="user-tabs">
-                    <div class="user-tab active" onclick="setTab('senior', this)">القيادة العليا</div>
-                    <div class="user-tab" onclick="setTab('middle', this)">القيادة الوسطى</div>
-                    <div class="user-tab" onclick="setTab('teachers', this)">المعلمات</div>
-                    <div class="user-tab" onclick="setTab('departments', this)">الأقسام</div>
+                <div class="custom-tabs">
+                    <div class="custom-tab active" onclick="setTab('senior', this)">القيادة العليا</div>
+                    <div class="custom-tab" onclick="setTab('middle', this)">القيادة الوسطى</div>
+                    <div class="custom-tab" onclick="setTab('teachers', this)">المعلمات</div>
+                    <div class="custom-tab" onclick="setTab('departments', this)">الأقسام</div>
                 </div>
 
                 <table class="custom-table">
@@ -208,30 +225,84 @@
             <div id="quality-report" class="section-card"><h3>تقرير الجودة</h3></div>
             
             <div id="settings" class="section-card">
-                <div class="settings-layout">
-                    <div class="settings-sidebar">
-                        <div class="settings-sidebar-header">الإعدادات</div>
-                        <div class="settings-nav-item active" onclick="setSettingTab('gen', this)">الإعدادات العامة</div>
-                        <div class="settings-nav-item" onclick="setSettingTab('rep', this)">إعدادات تقرير الجودة</div>
-                        <div class="settings-nav-item" onclick="setSettingTab('sig', this)">إعدادات التوقيعات</div>
-                        <div class="settings-nav-item" onclick="setSettingTab('vis', this)">ترتيب الزوار</div>
-                        <div class="settings-nav-item" onclick="setSettingTab('fot', this)">إعدادات التذييل</div>
-                        <div class="settings-nav-item" onclick="setSettingTab('log', this)">سجل النظام</div>
+                <h3 style="color:var(--primary); margin-bottom:20px;">الإعدادات</h3>
+                
+                <div class="custom-tabs">
+                    <div class="custom-tab active" onclick="setSettingTab('gen', this)">الإعدادات العامة</div>
+                    <div class="custom-tab" onclick="setSettingTab('rep', this)">إعدادات تقرير الجودة</div>
+                    <div class="custom-tab" onclick="setSettingTab('sig', this)">إعدادات التوقيعات</div>
+                    <div class="custom-tab" onclick="setSettingTab('vis', this)">ترتيب الزوار</div>
+                    <div class="custom-tab" onclick="setSettingTab('fot', this)">إعدادات التذييل</div>
+                    <div class="custom-tab" onclick="setSettingTab('log', this)">سجل النظام</div>
+                </div>
+
+                <div id="gen" class="setting-content-pane active">
+                    
+                    <div class="form-group" style="margin-bottom:20px;">
+                        <label class="upload-label">اسم المدرسة</label>
+                        <input type="text" id="confSchool" class="form-control" placeholder="أدخل اسم المدرسة">
                     </div>
-                    <div class="settings-content-area">
-                        <div id="gen" class="setting-tab-pane active">
-                            <h3 style="color:var(--primary); margin-bottom:20px; border-bottom:1px solid #eee; padding-bottom:10px;">الإعدادات العامة</h3>
-                            <div class="form-group"><label>اسم المدرسة</label><input type="text" id="confSchool" class="form-control" value="مدرسة مدينة حمد الابتدائية للبنات"></div>
-                            <div class="form-group"><label>العام الدراسي</label><input type="text" id="confYear" class="form-control" value="2025 / 2026م"></div>
-                            <button class="btn btn-primary" onclick="alert('تم الحفظ')">حفظ الإعدادات</button>
+
+                    <div class="form-group" style="margin-bottom:20px;">
+                        <label class="upload-label">العام الدراسي</label>
+                        <input type="text" id="confYear" class="form-control" placeholder="مثال: 2025 / 2026م">
+                    </div>
+
+                    <div class="upload-container">
+                        <label class="upload-label">شعار الوزارة</label>
+                        <input type="file" id="file_ministry" hidden accept="image/*" onchange="handleFileUpload(this, 'preview_ministry', 'ministryLogo')">
+                        <div class="upload-btn-wrapper" id="btn_wrap_ministry">
+                            <button type="button" class="upload-btn-custom" onclick="triggerFileSelect('file_ministry')">
+                                <i class="fas fa-upload"></i> تحميل شعار الوزارة
+                            </button>
+                            <span class="upload-hint">الحجم المقترح: 200x80 بكسل</span>
                         </div>
-                        <div id="rep" class="setting-tab-pane"><h3>إعدادات تقرير الجودة</h3></div>
-                        <div id="sig" class="setting-tab-pane"><h3>إعدادات التوقيعات</h3></div>
-                        <div id="vis" class="setting-tab-pane"><h3>ترتيب الزوار</h3></div>
-                        <div id="fot" class="setting-tab-pane"><h3>إعدادات التذييل</h3></div>
-                        <div id="log" class="setting-tab-pane"><h3>سجل النظام</h3></div>
+                        <div id="preview_wrap_ministry" style="display:none;" class="image-preview-wrapper">
+                            <img id="preview_ministry" class="image-preview" onclick="openImageModal(this.src)" title="اضغط للتكبير">
+                            <button class="remove-img-btn" onclick="removeImage('preview_ministry', 'ministryLogo', 'file_ministry')" title="حذف الصورة"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="upload-container">
+                        <label class="upload-label">شعار المدرسة</label>
+                        <input type="file" id="file_school" hidden accept="image/*" onchange="handleFileUpload(this, 'preview_school', 'schoolLogo')">
+                        <div class="upload-btn-wrapper" id="btn_wrap_school">
+                            <button type="button" class="upload-btn-custom" onclick="triggerFileSelect('file_school')">
+                                <i class="fas fa-upload"></i> تحميل شعار المدرسة
+                            </button>
+                            <span class="upload-hint">الحجم المقترح: 200x200 بكسل</span>
+                        </div>
+                        <div id="preview_wrap_school" style="display:none;" class="image-preview-wrapper">
+                            <img id="preview_school" class="image-preview" onclick="openImageModal(this.src)" title="اضغط للتكبير">
+                            <button class="remove-img-btn" onclick="removeImage('preview_school', 'schoolLogo', 'file_school')" title="حذف الصورة"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="upload-container">
+                        <label class="upload-label">ختم المدرسة</label>
+                        <input type="file" id="file_stamp" hidden accept="image/*" onchange="handleFileUpload(this, 'preview_stamp', 'schoolStamp')">
+                        <div class="upload-btn-wrapper" id="btn_wrap_stamp">
+                            <button type="button" class="upload-btn-custom" onclick="triggerFileSelect('file_stamp')">
+                                <i class="fas fa-upload"></i> تحميل ختم المدرسة
+                            </button>
+                            <span class="upload-hint">يستخدم في التقارير الرسمية</span>
+                        </div>
+                        <div id="preview_wrap_stamp" style="display:none;" class="image-preview-wrapper">
+                            <img id="preview_stamp" class="image-preview" onclick="openImageModal(this.src)" title="اضغط للتكبير">
+                            <button class="remove-img-btn" onclick="removeImage('preview_stamp', 'schoolStamp', 'file_stamp')" title="حذف الصورة"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+
+                    <div style="text-align: left; border-top: 1px solid #eee; padding-top: 20px;">
+                        <button class="btn btn-primary" style="width: 200px;" onclick="saveGeneralSettings()">حفظ الإعدادات</button>
                     </div>
                 </div>
+
+                <div id="rep" class="setting-content-pane"><h3>إعدادات تقرير الجودة</h3></div>
+                <div id="sig" class="setting-content-pane"><h3>إعدادات التوقيعات</h3></div>
+                <div id="vis" class="setting-content-pane"><h3>ترتيب الزوار</h3></div>
+                <div id="fot" class="setting-content-pane"><h3>إعدادات التذييل</h3></div>
+                <div id="log" class="setting-content-pane"><h3>سجل النظام</h3></div>
             </div>
         </main>
     </div>
@@ -291,6 +362,13 @@
         </div>
     </div>
 
+    <div id="imageViewModal" class="modal-overlay" onclick="closeModal('imageViewModal')">
+        <div style="position:relative; max-width:90%; max-height:90%;">
+            <span onclick="closeModal('imageViewModal')" style="position:absolute; top:-40px; right:0; color:white; font-size:30px; cursor:pointer;">&times;</span>
+            <img id="fullImage" src="" style="max-width:100%; max-height:80vh; border-radius:5px; box-shadow:0 0 20px rgba(0,0,0,0.5);">
+        </div>
+    </div>
+
     <script>
         // === System Configuration ===
         const SECTIONS = [
@@ -310,7 +388,14 @@
             senior: [{id: 1, name: 'علياء محمد مبارك الدوسري', job: 'مديرة المدرسة', phone: '39669118', login: '39669118', pass: '39669118', status: 'active', permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS)), dateAdded: '2025/01/01'}],
             middle: [],
             teachers: [],
-            departments: []
+            departments: [],
+            settings: {
+                schoolName: 'مدرسة مدينة حمد الابتدائية للبنات',
+                schoolYear: '2025 / 2026م',
+                ministryLogo: '',
+                schoolLogo: '',
+                schoolStamp: ''
+            }
         };
 
         let DB = {}; 
@@ -325,8 +410,11 @@
             if (storedDB) {
                 DB = JSON.parse(storedDB);
                 if(!DB.departments) DB.departments = [];
+                // Ensure settings exist
+                if(!DB.settings) DB.settings = JSON.parse(JSON.stringify(INITIAL_DB.settings));
+                
                 ['admins', 'senior', 'middle', 'teachers', 'departments'].forEach(grp => {
-                    if(DB[grp]) {
+                    if(DB[grp] && Array.isArray(DB[grp])) {
                         DB[grp].forEach(u => { 
                             if(grp !== 'departments') { 
                                 if(!u.permissions) u.permissions = JSON.parse(JSON.stringify(DEFAULT_PERMS));
@@ -360,8 +448,10 @@
             if (sessionID) {
                 let found = null;
                 ['admins', 'senior', 'middle', 'teachers'].forEach(grp => {
-                    const u = DB[grp].find(x => x.id == sessionID);
-                    if(u) found = u;
+                    if(DB[grp]) {
+                        const u = DB[grp].find(x => x.id == sessionID);
+                        if(u) found = u;
+                    }
                 });
                 if (found && found.status === 'active') { CURRENT_USER = found; showApp(); }
                 else { document.getElementById('loginPage').style.display = 'flex'; }
@@ -381,8 +471,10 @@
             let userFound = null;
 
             ['admins', 'senior', 'middle', 'teachers'].forEach(grp => {
-                const match = DB[grp].find(x => String(x.login).trim() === uInput && String(x.pass).trim() === pInput);
-                if(match) userFound = match;
+                if(DB[grp]) {
+                    const match = DB[grp].find(x => String(x.login).trim() === uInput && String(x.pass).trim() === pInput);
+                    if(match) userFound = match;
+                }
             });
 
             if (userFound) {
@@ -418,7 +510,10 @@
             const link = document.querySelector(`a[data-page="${pageId}"]`);
             if (target) target.classList.add('active');
             if (link) link.classList.add('active');
-            if(pageId === 'settings') document.getElementById('settings').style.display = 'block';
+            
+            if(pageId === 'settings') {
+                loadSettings();
+            }
         }
 
         function showApp() {
@@ -441,7 +536,14 @@
 
         function setTab(tab, el) {
             CURRENT_TAB = tab;
-            document.querySelectorAll('.user-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.custom-tab').forEach(t => {
+                // Only remove active from user management tabs
+                if(t.parentElement.previousElementSibling && t.parentElement.previousElementSibling.firstElementChild && t.parentElement.previousElementSibling.firstElementChild.innerText.includes('إدارة المستخدمين'))
+                    t.classList.remove('active');
+            });
+            // Handle generic custom tabs logic if needed, but for now manually handle
+            // Find all siblings in the container and remove active
+            Array.from(el.parentElement.children).forEach(c => c.classList.remove('active'));
             el.classList.add('active');
             if(document.getElementById('selectAll')) document.getElementById('selectAll').checked = false;
             renderTable();
@@ -512,7 +614,6 @@
                 row += `<td><div style="display:flex; justify-content:center; gap:2px; flex-wrap:wrap;">`;
                 
                 if(canEdit) {
-                    // Added Up/Down Arrows
                     row += `<button class="action-btn btn-move" onclick="moveUser(${u.id}, 'up')" title="نقل لأعلى"><i class="fas fa-arrow-up"></i></button>`;
                     row += `<button class="action-btn btn-move" onclick="moveUser(${u.id}, 'down')" title="نقل لأسفل"><i class="fas fa-arrow-down"></i></button>`;
                 }
@@ -785,11 +886,104 @@
             else { input.type = 'password'; icon.classList.replace('fa-eye-slash', 'fa-eye'); }
         }
 
-        function setSettingTab(t,el) { 
-            document.querySelectorAll('.setting-tab-pane').forEach(p=>p.classList.remove('active')); 
+        // === Settings Logic ===
+        function setSettingTab(t, el) { 
+            document.querySelectorAll('.setting-content-pane').forEach(p => p.classList.remove('active')); 
             document.getElementById(t).classList.add('active'); 
-            document.querySelectorAll('.settings-nav-item').forEach(i=>i.classList.remove('active')); 
+            
+            // Remove active from all siblings
+            Array.from(el.parentElement.children).forEach(c => c.classList.remove('active'));
             el.classList.add('active'); 
+        }
+
+        function loadSettings() {
+            const s = DB.settings;
+            document.getElementById('confSchool').value = s.schoolName || '';
+            document.getElementById('confYear').value = s.schoolYear || '';
+            
+            showImagePreview('preview_ministry', 'preview_wrap_ministry', 'btn_wrap_ministry', s.ministryLogo);
+            showImagePreview('preview_school', 'preview_wrap_school', 'btn_wrap_school', s.schoolLogo);
+            showImagePreview('preview_stamp', 'preview_wrap_stamp', 'btn_wrap_stamp', s.schoolStamp);
+        }
+
+        function showImagePreview(imgId, wrapId, btnId, src) {
+            const img = document.getElementById(imgId);
+            const wrap = document.getElementById(wrapId);
+            const btn = document.getElementById(btnId);
+            
+            if (src) {
+                img.src = src;
+                wrap.style.display = 'inline-block';
+                btn.style.display = 'none';
+            } else {
+                wrap.style.display = 'none';
+                btn.style.display = 'block';
+            }
+        }
+
+        function triggerFileSelect(inputId) {
+            document.getElementById(inputId).click();
+        }
+
+        function handleFileUpload(input, previewId, dbKey) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const dataUrl = e.target.result;
+                    // Update DB immediately or wait for save? 
+                    // Let's store in DB immediately to simplify state for now, but usually waiting for Save button is better.
+                    // Here we will just update the view and let Save button commit to DB.
+                    const img = document.getElementById(previewId);
+                    img.src = dataUrl;
+                    
+                    // Show preview, hide button
+                    const wrapId = previewId.replace('preview_', 'preview_wrap_');
+                    const btnId = previewId.replace('preview_', 'btn_wrap_');
+                    document.getElementById(wrapId).style.display = 'inline-block';
+                    document.getElementById(btnId).style.display = 'none';
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function removeImage(previewId, dbKey, inputId) {
+            if(confirm('هل تريد حذف هذه الصورة؟')) {
+                const img = document.getElementById(previewId);
+                img.src = '';
+                document.getElementById(inputId).value = ''; // Reset input
+                
+                const wrapId = previewId.replace('preview_', 'preview_wrap_');
+                const btnId = previewId.replace('preview_', 'btn_wrap_');
+                document.getElementById(wrapId).style.display = 'none';
+                document.getElementById(btnId).style.display = 'block';
+                
+                // Clear from DB immediately? Or wait for save.
+                // Let's just update UI. Real save happens on "Save Settings".
+            }
+        }
+
+        function saveGeneralSettings() {
+            DB.settings.schoolName = document.getElementById('confSchool').value;
+            DB.settings.schoolYear = document.getElementById('confYear').value;
+            
+            // Get current srcs (if they exist)
+            const minSrc = document.getElementById('preview_ministry').getAttribute('src');
+            const schSrc = document.getElementById('preview_school').getAttribute('src');
+            const stmSrc = document.getElementById('preview_stamp').getAttribute('src');
+            
+            // Check if src is empty or is actual data
+            DB.settings.ministryLogo = (minSrc && minSrc.startsWith('data:')) ? minSrc : ''; 
+            DB.settings.schoolLogo = (schSrc && schSrc.startsWith('data:')) ? schSrc : ''; 
+            DB.settings.schoolStamp = (stmSrc && stmSrc.startsWith('data:')) ? stmSrc : ''; 
+            
+            saveDB();
+            alert('تم حفظ الإعدادات بنجاح');
+        }
+
+        function openImageModal(src) {
+            if(!src) return;
+            document.getElementById('fullImage').src = src;
+            document.getElementById('imageViewModal').style.display = 'flex';
         }
 
         document.getElementById('loginForm').addEventListener('submit', login);
