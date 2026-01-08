@@ -36,6 +36,7 @@
         .login-wrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: linear-gradient(135deg, var(--primary), #2b2b2b); display: flex; justify-content: center; align-items: center; z-index: 9999; }
         .login-box { background: white; padding: 40px; border-radius: 12px; width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
         .form-control { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 15px; font-family: inherit; }
+        textarea.form-control { resize: vertical; }
         .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.3s; }
         .btn-primary { background: var(--primary); color: white; width: 100%; }
         
@@ -375,26 +376,35 @@
                 </div>
 
                 <div id="fot" class="setting-content-pane">
-                    <h4 style="color:var(--primary); margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">نصوص تذييل التقرير</h4>
-                    <p style="color:#666; font-size:0.9rem; margin-bottom:20px;">يمكنك تخصيص النصوص التي تظهر أسفل كل صفحة في التقارير المطبوعة.</p>
+                    <h3 style="color:var(--primary); margin-bottom:20px; font-weight:bold;">إعدادات تذييل التقرير</h3>
                     
-                    <div style="display:flex; gap:20px; flex-wrap:wrap;">
-                        <div class="form-group" style="flex:1;">
-                            <label>النص في اليمين</label>
-                            <input type="text" id="footer_right" class="form-control" placeholder="مثال: وزارة التربية والتعليم">
-                        </div>
-                        <div class="form-group" style="flex:1;">
-                            <label>النص في الوسط</label>
-                            <input type="text" id="footer_center" class="form-control" placeholder="مثال: نظام جودة التعليم">
-                        </div>
-                        <div class="form-group" style="flex:1;">
-                            <label>النص في اليسار</label>
-                            <input type="text" id="footer_left" class="form-control" placeholder="مثال: رقم الصفحة">
-                        </div>
+                    <div class="form-group" style="margin-bottom:20px;">
+                        <label style="display:block; font-weight:bold; margin-bottom:5px;">النص الذي سيظهر في تذييل كل صفحة من التقرير</label>
+                        <label style="display:block; color:#666; font-size:0.9rem; margin-bottom:5px;">نص التذييل</label>
+                        <textarea id="footer_text" class="form-control" rows="5" placeholder="أدخل نص التذييل الذي سيظهر في أسفل كل صفحة من التقرير"></textarea>
                     </div>
 
-                    <div style="margin-top:20px; border-top:1px solid #eee; padding-top:20px; text-align:left;">
-                        <button class="btn btn-primary" style="width:150px;" onclick="saveFooterSettings()">حفظ التذييل</button>
+                    <div class="form-group" style="margin-bottom:20px;">
+                        <label style="display:block; font-weight:bold; margin-bottom:5px;">محاذاة التذييل</label>
+                        <select id="footer_align" class="form-control">
+                            <option value="center">وسط</option>
+                            <option value="right">يمين</option>
+                            <option value="left">يسار</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom:20px;">
+                        <label style="display:block; font-weight:bold; margin-bottom:5px;">حجم الخط</label>
+                        <select id="footer_fontsize" class="form-control">
+                            <option value="10">10 نقطة</option>
+                            <option value="12">12 نقطة</option>
+                            <option value="14">14 نقطة</option>
+                            <option value="16">16 نقطة</option>
+                        </select>
+                    </div>
+
+                    <div style="text-align:left; margin-top:20px;">
+                        <button class="btn" style="background:#28a745; color:white; font-weight:bold;" onclick="saveFooterSettings()">حفظ إعدادات التذييل</button>
                     </div>
                 </div>
 
@@ -530,9 +540,9 @@
                 visitor_order_senior: [],
                 visitor_order_middle: [],
                 // Footer Settings
-                footer_right: 'وزارة التربية والتعليم',
-                footer_center: '',
-                footer_left: ''
+                footer_text: '',
+                footer_align: 'center',
+                footer_fontsize: '12'
             },
             logs: [] // System Audit Logs
         };
@@ -1182,18 +1192,18 @@
 
         function saveVisitorOrder() { addSystemLog('إعدادات', 'تحديث ترتيب الزوار'); saveDB(); alert('تم حفظ ترتيب الزوار بنجاح'); }
 
-        // --- Footer Settings Logic ---
+        // --- Footer Settings Logic (Updated) ---
         function loadFooterSettings() {
             const s = DB.settings;
-            document.getElementById('footer_right').value = s.footer_right || '';
-            document.getElementById('footer_center').value = s.footer_center || '';
-            document.getElementById('footer_left').value = s.footer_left || '';
+            document.getElementById('footer_text').value = s.footer_text || '';
+            document.getElementById('footer_align').value = s.footer_align || 'center';
+            document.getElementById('footer_fontsize').value = s.footer_fontsize || '12';
         }
 
         function saveFooterSettings() {
-            DB.settings.footer_right = document.getElementById('footer_right').value;
-            DB.settings.footer_center = document.getElementById('footer_center').value;
-            DB.settings.footer_left = document.getElementById('footer_left').value;
+            DB.settings.footer_text = document.getElementById('footer_text').value;
+            DB.settings.footer_align = document.getElementById('footer_align').value;
+            DB.settings.footer_fontsize = document.getElementById('footer_fontsize').value;
             addSystemLog('إعدادات', 'تحديث تذييل التقرير');
             saveDB();
             alert('تم حفظ إعدادات التذييل');
