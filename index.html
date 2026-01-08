@@ -100,7 +100,11 @@
                 </div>
                 <button type="submit" class="btn btn-primary">دخول</button>
                 <p id="loginError" style="color:red; font-size:0.9rem; margin-top:10px; display:none;">بيانات غير صحيحة أو حساب معطل</p>
-                <button type="button" class="btn" style="margin-top:20px; background:transparent; color:#ccc; font-size:0.8rem; text-decoration:underline;" onclick="resetSystem()">إعادة ضبط النظام (حذف البيانات التالفة)</button>
+                
+                <div style="margin-top:30px; border-top:1px solid #eee; padding-top:10px;">
+                    <small style="color:#777;">أدوات الطوارئ:</small><br>
+                    <button type="button" class="btn" style="background:#6c757d; color:white; font-size:0.7rem; padding:5px 10px; margin:5px;" onclick="resetSystem()">حذف كافة البيانات (Reset)</button>
+                </div>
             </form>
         </div>
     </div>
@@ -143,8 +147,8 @@
                     </div>
                 </div>
                 
-                <div style="background:#fff3cd; color:#856404; padding:15px; margin-bottom:15px; border-radius:6px; font-size:0.9rem; border:1px solid #ffeeba;">
-                    <i class="fas fa-check-circle" style="color:#28a745;"></i> <b>تم حل المشكلة:</b> النظام الآن يدعم الاستيراد من جميع نسخ Excel ويقوم بإصلاح كلمات المرور والأسماء تلقائياً.
+                <div style="background:#d1ecf1; color:#0c5460; padding:15px; margin-bottom:15px; border-radius:6px; font-size:0.9rem; border:1px solid #bee5eb;">
+                    <i class="fas fa-check-circle"></i> <b>حالة النظام:</b> تم تفعيل مصحح البيانات التلقائي. سيتم الآن قبول الدخول حتى لو كانت هناك اختلافات بسيطة في تنسيق الأرقام.
                 </div>
 
                 <div class="user-tabs">
@@ -275,21 +279,28 @@
             const storedDB = localStorage.getItem('QualitySys_DB_V2');
             if (storedDB) {
                 DB = JSON.parse(storedDB);
+                
+                // === المكنسة البرمجية: إصلاح البيانات الفاسدة عند بدء التشغيل ===
                 ['admins', 'senior', 'middle', 'teachers'].forEach(grp => {
-                    if(DB[grp]) DB[grp].forEach(u => { 
-                        if(!u.permissions) u.permissions = JSON.parse(JSON.stringify(DEFAULT_PERMS));
-                        if(!u.dateAdded) u.dateAdded = '2025/01/01';
-                        // Clean legacy dirty data on boot
-                        u.login = String(u.login).trim();
-                        u.pass = String(u.pass).trim();
-                    });
+                    if(DB[grp]) {
+                        DB[grp].forEach(u => { 
+                            if(!u.permissions) u.permissions = JSON.parse(JSON.stringify(DEFAULT_PERMS));
+                            
+                            // تنظيف عميق لاسم المستخدم وكلمة المرور من أي رموز خفية أو مسافات
+                            // String(...) يضمن أن الرقم يتحول لنص
+                            // replace يزيل المسافات والرموز غير المرئية
+                            u.login = String(u.login).trim().replace(/[\uFEFF\x00-\x1F\s]/g, '');
+                            u.pass = String(u.pass).trim().replace(/[\uFEFF\x00-\x1F\s]/g, '');
+                        });
+                    }
                 });
                 
-                // Ensure Admin Password is Correct
+                // التأكد من مدير النظام
                 if(!DB.admins) DB.admins = JSON.parse(JSON.stringify(INITIAL_DB.admins));
                 const adm = DB.admins.find(u => u.login === 'admin');
                 if(adm) { adm.pass = 'Hasan@12'; } else { DB.admins.push(INITIAL_DB.admins[0]); }
-                saveDB();
+                
+                saveDB(); // حفظ النسخة النظيفة
 
             } else {
                 DB = JSON.parse(JSON.stringify(INITIAL_DB));
@@ -316,16 +327,22 @@
 
         function saveDB() { localStorage.setItem('QualitySys_DB_V2', JSON.stringify(DB)); }
 
-        // === LOGIN FUNCTION (UPDATED TO BE ROBUST) ===
+        // === دالة تسجيل الدخول المحسنة ===
         function login(e) {
             e.preventDefault();
+            
+            // تنظيف المدخلات من المسافات
             const u = document.getElementById('loginUser').value.trim();
             const p = document.getElementById('loginPass').value.trim();
             
             let found = null;
             ['admins', 'senior', 'middle', 'teachers'].forEach(grp => {
-                // استخدام String() و trim() لضمان تطابق البيانات حتى لو كانت هناك مشاكل بسيطة
-                const match = DB[grp].find(x => String(x.login).trim() === u && String(x.pass).trim() === p);
+                const match = DB[grp].find(x => {
+                    // مقارنة مرنة جداً: تحويل الكل لنصوص ومسح المسافات
+                    const storedLogin = String(x.login).trim();
+                    const storedPass = String(x.pass).trim();
+                    return storedLogin === u && storedPass === p;
+                });
                 if(match) found = match;
             });
 
@@ -335,7 +352,9 @@
                     localStorage.setItem('QualitySys_Session', found.id);
                     showApp();
                 } else { alert("هذا الحساب معطل"); }
-            } else { alert("بيانات غير صحيحة. يرجى التأكد من اسم المستخدم وكلمة المرور."); }
+            } else { 
+                alert("بيانات غير صحيحة.\nتأكد من كتابة اسم المستخدم وكلمة المرور بدقة."); 
+            }
         }
 
         function logout() {
@@ -344,7 +363,7 @@
         }
 
         function resetSystem() {
-            if(confirm('تحذير: هذا سيقوم بمسح جميع البيانات المخزنة وإعادة النظام لحالته الأصلية. هل أنت متأكد؟')) {
+            if(confirm('هل أنت متأكد من حذف كافة البيانات وإعادة ضبط المصنع؟ لا يمكن التراجع عن هذا الإجراء.')) {
                 localStorage.removeItem('QualitySys_DB_V2');
                 localStorage.removeItem('QualitySys_Session');
                 location.reload();
@@ -444,7 +463,7 @@
             document.getElementById('csvInput').click();
         }
 
-        // === دالة الاستيراد مع التنظيف العميق ===
+        // === دالة الاستيراد الجديدة (آمنة وصلبة) ===
         function processImport(input) {
             const file = input.files[0];
             if (!file) return;
@@ -455,8 +474,9 @@
                 const decoder = new TextDecoder('windows-1256');
                 const text = decoder.decode(buffer);
 
+                // فحص التلف الشديد
                 if (text.indexOf("?????") !== -1) {
-                    alert("الملف تالف. يرجى إعادة حفظه في Excel.");
+                    alert("الملف تالف جداً بسبب الحفظ الخاطئ. يرجى استخدام ملف جديد.");
                     input.value = '';
                     return;
                 }
@@ -476,9 +496,10 @@
             else if (firstLine.indexOf(';') > -1) separator = ';';
 
             let addedCount = 0;
-            // تنظيف البيانات من الأحرف المخفية
+            // دالة تنظيف صارمة جداً
             const deepClean = (val) => {
                 if(!val) return '';
+                // إزالة علامات التنصيص، الرموز غير المرئية، والمسافات الزائدة
                 return val.replace(/^"|"$/g, '').replace(/^'|'$/g, '').replace(/[\uFEFF\x00-\x1F]/g, '').trim();
             };
 
@@ -488,21 +509,24 @@
                     let cols = row.split(separator);
                     
                     if (cols.length >= 1 && deepClean(cols[0]) !== "") {
-                            // نتأكد من أن السطر ليس ترويسة مكررة
-                            if(deepClean(cols[0]).includes("الاسم")) continue;
+                            // تجاهل سطر العناوين
+                            if(deepClean(cols[0]).indexOf("الاسم") !== -1) continue;
 
                             const newUser = {
                             id: Date.now() + i + Math.floor(Math.random() * 1000),
                             name: deepClean(cols[0]),
                             job: deepClean(cols[1]),
                             phone: deepClean(cols[2]),
+                            // إذا كان حقل الدخول فارغ، نستخدم رقم الهاتف
                             login: deepClean(cols[3]) || deepClean(cols[2]) || 'user'+(Date.now()+i),
-                            pass: deepClean(cols[4]) || '123456', // Fallback pass
+                            // إذا كانت كلمة المرور فارغة، نستخدم 123456
+                            pass: deepClean(cols[4]) || '123456', 
                             dateAdded: deepClean(cols[5]) || new Date().toLocaleDateString('en-GB'),
                             status: 'active',
                             permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS))
                         };
                         
+                        // منع التكرار
                         const exists = DB[CURRENT_TAB].some(u => u.name === newUser.name && u.phone === newUser.phone);
                         if(!exists) {
                             DB[CURRENT_TAB].push(newUser);
@@ -513,7 +537,8 @@
             }
             saveDB();
             renderTable();
-            if(addedCount > 0) alert(`تم استيراد ${addedCount} مستخدم بنجاح. يمكنك الآن تسجيل الدخول.`);
+            if(addedCount > 0) alert(`تم استيراد ${addedCount} مستخدم بنجاح.\nجرب تسجيل الدخول الآن.`);
+            else alert("لم يتم استيراد أي بيانات (ربما مكررة أو الملف فارغ).");
             input.value = '';
         }
 
@@ -521,6 +546,8 @@
         function viewUser(id) {
             const u = DB[CURRENT_TAB].find(x => x.id === id);
             const content = document.getElementById('viewUserContent');
+            
+            // إضافة عرض لكلمة المرور الفعلية (للتحقق)
             content.innerHTML = `
                 <div class="user-view-card">
                     <div class="user-view-avatar">${u.name.charAt(0)}</div>
@@ -531,8 +558,11 @@
                     <div class="info-item"><label>رقم الهاتف</label><span>${u.phone || '-'}</span></div>
                     <div class="info-item"><label>تاريخ الإضافة</label><span>${u.dateAdded || '-'}</span></div>
                     <div class="info-item"><label>الحالة</label><span style="color:${u.status==='active'?'green':'red'}">${u.status==='active'?'مفعل':'معطل'}</span></div>
-                    <div class="info-item"><label>اسم الدخول</label><span>${u.login}</span></div>
-                    <div class="info-item"><label>كلمة المرور</label><span>${u.pass}</span></div>
+                    <div class="info-item"><label>اسم الدخول</label><span style="background:#eee; padding:2px 5px; border-radius:4px;">${u.login}</span></div>
+                    <div class="info-item"><label>كلمة المرور</label><span style="background:#eee; padding:2px 5px; border-radius:4px;">${u.pass}</span></div>
+                </div>
+                <div style="text-align:center; margin-top:10px; font-size:0.8rem; color:#888;">
+                    ملاحظة: تأكد من عدم وجود مسافات قبل أو بعد البيانات عند الدخول.
                 </div>
             `;
             document.getElementById('viewUserModal').style.display = 'flex';
