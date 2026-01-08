@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -18,7 +19,7 @@
         .sidebar-header i { font-size: 1.8rem; color: var(--primary); }
         .nav-links { list-style: none; padding: 20px 0; margin: 0; }
         .nav-links li { margin-bottom: 5px; display: none; } /* مخفي افتراضياً */
-        .nav-links a { display: flex; align-items: center; padding: 12px 25px; color: #777; text-decoration: none; transition: 0.3s; font-weight: 600; border-right: 4px solid transparent; cursor: pointer; }
+        .nav-links a { display: flex; align-items: center; padding: 12px 25px; color: #777; text-decoration: none; transition: 0.3s; font-weight: 600; border-right: 4px solid transparent; }
         .nav-links a:hover, .nav-links a.active { color: var(--primary); background: #f0f4f8; border-right-color: var(--primary); }
         .nav-links a i { margin-left: 10px; width: 25px; text-align: center; }
 
@@ -35,8 +36,7 @@
         
         /* Content Sections */
         .section-card { background: white; border-radius: 10px; padding: 25px; margin-bottom: 20px; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
-        .section-card.active { display: block; animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .section-card.active { display: block; }
 
         /* Tables & Tabs */
         .user-tabs { display: flex; gap: 15px; border-bottom: 2px solid #eee; margin-bottom: 20px; }
@@ -44,6 +44,7 @@
         .user-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
         
         .custom-table { width: 100%; border-collapse: collapse; }
+        /* Centered Headers and Cells as requested */
         .custom-table th { background: #2c5aa0; color: white; padding: 12px; text-align: center; font-weight: bold; border: 1px solid #ddd; }
         .custom-table td { padding: 12px; border-bottom: 1px solid #eee; background: white; text-align: center; vertical-align: middle; border: 1px solid #eee; }
         
@@ -55,7 +56,7 @@
         .modal-body { padding: 20px; }
         .modal-footer { padding: 15px 20px; background: #f9f9f9; display: flex; gap: 10px; justify-content: flex-end; }
 
-        /* View User Details Styling */
+        /* View User Details Styling (Restored) */
         .user-view-card { text-align: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
         .user-view-avatar { width: 90px; height: 90px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 15px auto; box-shadow: 0 5px 15px rgba(30, 64, 120, 0.2); }
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: right; background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #eee; }
@@ -110,12 +111,12 @@
                 <div><div style="font-weight:bold;">جودة التعليم</div><small style="color:#888;">وزارة التربية</small></div>
             </div>
             <ul class="nav-links">
-                <li id="nav-dashboard"><a href="#" data-page="dashboard"><i class="fas fa-home"></i> لوحة التحكم</a></li>
-                <li id="nav-user-management"><a href="#" data-page="user-management"><i class="fas fa-users-cog"></i> إدارة المستخدمين</a></li>
-                <li id="nav-visits"><a href="#" data-page="visits"><i class="fas fa-clipboard-check"></i> الزيارات الصفية</a></li>
-                <li id="nav-performance"><a href="#" data-page="performance"><i class="fas fa-chart-line"></i> تقييم الأداء</a></li>
-                <li id="nav-quality-report"><a href="#" data-page="quality-report"><i class="fas fa-file-word"></i> تقرير الجودة</a></li>
-                <li id="nav-settings"><a href="#" data-page="settings"><i class="fas fa-cog"></i> الإعدادات</a></li>
+                <li id="nav-dashboard"><a href="#dashboard" data-page="dashboard"><i class="fas fa-home"></i> لوحة التحكم</a></li>
+                <li id="nav-user-management"><a href="#user-management" data-page="user-management"><i class="fas fa-users-cog"></i> إدارة المستخدمين</a></li>
+                <li id="nav-visits"><a href="#visits" data-page="visits"><i class="fas fa-clipboard-check"></i> الزيارات الصفية</a></li>
+                <li id="nav-performance"><a href="#performance" data-page="performance"><i class="fas fa-chart-line"></i> تقييم الأداء</a></li>
+                <li id="nav-quality-report"><a href="#quality-report" data-page="quality-report"><i class="fas fa-file-word"></i> تقرير الجودة</a></li>
+                <li id="nav-settings"><a href="#settings" data-page="settings"><i class="fas fa-cog"></i> الإعدادات</a></li>
             </ul>
         </aside>
 
@@ -134,9 +135,7 @@
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                     <h3>إدارة المستخدمين</h3>
                     <div style="display:flex; gap:10px;">
-                        <button class="btn" style="background:#2c5aa0; color:white;" onclick="openAddUserModal()">
-                            <i class="fas fa-plus"></i> إضافة اسم جديد
-                        </button>
+                        <button class="btn" style="background:#2c5aa0; color:white;" onclick="openAddUserModal()">إضافة اسم جديد</button>
                     </div>
                 </div>
                 
@@ -391,11 +390,13 @@
             
             const list = DB[CURRENT_TAB] || [];
             list.forEach((u, idx) => {
+                // Building rows based on requested headers: Rank, Name, Job, Phone, Management
                 let row = `<td>${idx+1}</td>`;
                 row += `<td>${u.name}</td>`;
                 row += `<td>${u.job || (CURRENT_TAB === 'teachers' ? u.dept : '-')}</td>`;
                 row += `<td>${u.phone || '-'}</td>`;
                 
+                // Action Buttons
                 row += `<td>
                     <div style="display:flex; justify-content:center; gap:5px;">
                         <button class="btn" style="padding:5px 10px; background:#ffc107; color:black; font-size:0.8rem;" onclick="viewUser(${u.id})">معاينة</button>
@@ -411,11 +412,12 @@
             });
         }
 
-        // === View User Details ===
+        // === View User Function (Updated for Details) ===
         function viewUser(id) {
             const u = DB[CURRENT_TAB].find(x => x.id === id);
             const content = document.getElementById('viewUserContent');
             
+            // Recreating the detailed view: Name, Job, Phone, Date Added, Status
             content.innerHTML = `
                 <div class="user-view-card">
                     <div class="user-view-avatar">${u.name.charAt(0)}</div>
@@ -488,13 +490,14 @@
                 login: document.getElementById('addLogin').value,
                 pass: document.getElementById('addPass').value,
                 status: 'active',
-                dateAdded: new Date().toLocaleDateString('en-GB'),
+                dateAdded: new Date().toLocaleDateString('en-GB'), // Capture current date
                 permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS))
             };
             DB[CURRENT_TAB].push(newUser);
             saveDB();
             renderTable();
             closeModal('addUserModal');
+            // Clear form
             document.getElementById('addUserForm').reset();
         }
         
@@ -522,15 +525,6 @@
             document.querySelectorAll('.settings-nav-item').forEach(i=>i.classList.remove('active')); 
             el.classList.add('active'); 
         }
-
-        // Navigation Fix from Previous Step
-        document.querySelectorAll('.nav-links a').forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                const page = this.getAttribute('data-page');
-                navigate(page);
-            });
-        });
 
         // Start
         document.getElementById('loginForm').addEventListener('submit', login);
