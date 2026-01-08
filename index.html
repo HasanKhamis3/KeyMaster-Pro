@@ -118,7 +118,7 @@
                     <i class="fas fa-eye password-icon" onclick="togglePass('loginPass', this)"></i>
                 </div>
                 <button type="submit" class="btn btn-primary">دخول</button>
-                <p id="loginError" style="color:red; font-size:0.9rem; margin-top:10px; display:none; line-height:1.5;"></p>
+                <p id="loginError" style="color:red; font-size:0.9rem; margin-top:10px; display:none;"></p>
                 <div style="margin-top:30px; border-top:1px solid #eee; padding-top:10px;">
                     <button type="button" class="btn" style="background:#6c757d; color:white; font-size:0.7rem; padding:5px 10px;" onclick="resetSystem()">إعادة ضبط المصنع (Reset)</button>
                 </div>
@@ -161,7 +161,7 @@
                     <h3>إدارة المستخدمين</h3>
                     
                     <div id="userActionButtons" style="display:flex; gap:10px;">
-                        <button class="btn" style="background:#2c5aa0; color:white;" onclick="openAddUserModal()"><i class="fas fa-plus"></i> إضافة جديد</button>
+                        <button id="addBtnMain" class="btn" style="background:#2c5aa0; color:white;" onclick="openAddUserModal()"><i class="fas fa-plus"></i> إضافة جديد</button>
                         <button class="btn" style="background:#17a2b8; color:white;" onclick="exportCSV()"><i class="fas fa-file-export"></i> تصدير CSV</button>
                         <button class="btn" style="background:#dc3545; color:white;" onclick="deleteSelected()"><i class="fas fa-trash"></i> حذف المحدد</button>
                         <button class="btn" style="background:#6c757d; color:white;" onclick="toggleStatusSelected()"><i class="fas fa-toggle-on"></i> تفعيل/إلغاء المحدد</button>
@@ -173,18 +173,13 @@
                     <div class="user-tab active" onclick="setTab('senior', this)">القيادة العليا</div>
                     <div class="user-tab" onclick="setTab('middle', this)">القيادة الوسطى</div>
                     <div class="user-tab" onclick="setTab('teachers', this)">المعلمات</div>
+                    <div class="user-tab" onclick="setTab('departments', this)">الأقسام</div>
                 </div>
 
                 <table class="custom-table">
                     <thead>
                         <tr id="tableHeadRow">
-                            <th width="5%"><input type="checkbox" id="selectAll" class="custom-checkbox" onchange="toggleSelectAll(this)"></th>
-                            <th width="5%">#</th>
-                            <th width="25%">الاسم</th>
-                            <th width="15%">الوظيفة</th>
-                            <th width="15%">الحالة</th>
-                            <th width="35%">الإجراءات</th>
-                        </tr>
+                            </tr>
                     </thead>
                     <tbody id="usersTableBody"></tbody>
                 </table>
@@ -225,14 +220,17 @@
 
     <div id="addUserModal" class="modal-overlay">
         <div class="modal-box">
-            <div class="modal-header">إضافة اسم جديد <span onclick="closeModal('addUserModal')" style="cursor:pointer;">&times;</span></div>
+            <div class="modal-header"><span id="addUserModalTitle">إضافة اسم جديد</span> <span onclick="closeModal('addUserModal')" style="cursor:pointer;">&times;</span></div>
             <div class="modal-body">
                 <form id="addUserForm">
-                    <label>الاسم الكامل</label><input type="text" id="addName" class="form-control" required>
-                    <label>الوظيفة/القسم</label><input type="text" id="addJob" class="form-control" required>
-                    <label>رقم الهاتف</label><input type="text" id="addPhone" class="form-control">
-                    <label>اسم الدخول</label><input type="text" id="addLogin" class="form-control" required>
-                    <label>كلمة المرور</label><input type="password" id="addPass" class="form-control" required>
+                    <label>الاسم الكامل / اسم القسم</label><input type="text" id="addName" class="form-control" required>
+                    
+                    <div id="userFields">
+                        <label>الوظيفة</label><input type="text" id="addJob" class="form-control">
+                        <label>رقم الهاتف</label><input type="text" id="addPhone" class="form-control">
+                        <label>اسم الدخول</label><input type="text" id="addLogin" class="form-control">
+                        <label>كلمة المرور</label><input type="password" id="addPass" class="form-control">
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -244,7 +242,7 @@
 
     <div id="viewUserModal" class="modal-overlay">
         <div class="modal-box">
-            <div class="modal-header">معاينة بيانات المستخدم <span onclick="closeModal('viewUserModal')" style="cursor:pointer;">&times;</span></div>
+            <div class="modal-header">معاينة <span onclick="closeModal('viewUserModal')" style="cursor:pointer;">&times;</span></div>
             <div class="modal-body" id="viewUserContent"></div>
             <div class="modal-footer">
                 <button class="btn" style="background:#28a745; color:white;" onclick="closeModal('viewUserModal')">إغلاق</button>
@@ -284,7 +282,8 @@
             admins: [{id: 999, name: 'مدير النظام', login: 'admin', pass: 'Hasan@12', status: 'active', job: 'مدير النظام', permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS))}],
             senior: [{id: 1, name: 'علياء محمد مبارك الدوسري', job: 'مديرة المدرسة', phone: '39669118', login: '39669118', pass: '39669118', status: 'active', permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS)), dateAdded: '2025/01/01'}],
             middle: [],
-            teachers: []
+            teachers: [],
+            departments: [] // Added Departments Array
         };
 
         let DB = {}; 
@@ -297,17 +296,25 @@
             const storedDB = localStorage.getItem('QualitySys_DB_V2');
             if (storedDB) {
                 DB = JSON.parse(storedDB);
-                ['admins', 'senior', 'middle', 'teachers'].forEach(grp => {
+                
+                // Initialize departments if missing from old DB
+                if(!DB.departments) DB.departments = [];
+
+                // Cleanup and ensure permissions
+                ['admins', 'senior', 'middle', 'teachers', 'departments'].forEach(grp => {
                     if(DB[grp]) {
                         DB[grp].forEach(u => { 
-                            if(!u.permissions) u.permissions = JSON.parse(JSON.stringify(DEFAULT_PERMS));
+                            if(grp !== 'departments') { // Depts don't have login/perms
+                                if(!u.permissions) u.permissions = JSON.parse(JSON.stringify(DEFAULT_PERMS));
+                                u.login = String(u.login).trim().replace(/[\uFEFF\x00-\x1F\s]/g, '');
+                                u.pass = String(u.pass).trim().replace(/[\uFEFF\x00-\x1F\s]/g, '');
+                            }
                             if(!u.status) u.status = 'active'; 
-                            u.login = String(u.login).trim().replace(/[\uFEFF\x00-\x1F\s]/g, '');
-                            u.pass = String(u.pass).trim().replace(/[\uFEFF\x00-\x1F\s]/g, '');
                         });
                     }
                 });
                 
+                // Force Admin
                 if(!DB.admins) DB.admins = JSON.parse(JSON.stringify(INITIAL_DB.admins));
                 const adm = DB.admins.find(u => u.login === 'admin');
                 if(adm) { 
@@ -351,7 +358,7 @@
 
         function saveDB() { localStorage.setItem('QualitySys_DB_V2', JSON.stringify(DB)); }
 
-        // === Login Logic (Strict Check) ===
+        // === STRICT LOGIN ===
         function login(e) {
             e.preventDefault();
             const errBox = document.getElementById('loginError');
@@ -360,36 +367,24 @@
 
             const uInput = document.getElementById('loginUser').value.trim();
             const pInput = document.getElementById('loginPass').value.trim();
-            
-            // Loop through all groups to find a match
-            let foundUser = null;
-            const groups = ['admins', 'senior', 'middle', 'teachers'];
-            
-            for (const grp of groups) {
-                if (DB[grp]) {
-                    // Find user by login AND password
-                    const match = DB[grp].find(x => String(x.login).trim() === uInput && String(x.pass).trim() === pInput);
-                    if (match) {
-                        foundUser = match;
-                        break; // Stop searching once found
-                    }
-                }
-            }
+            let userFound = null;
 
-            if (foundUser) {
-                // Now check status
-                if (foundUser.status === 'active') {
-                    CURRENT_USER = foundUser;
-                    localStorage.setItem('QualitySys_Session', foundUser.id);
+            ['admins', 'senior', 'middle', 'teachers'].forEach(grp => {
+                const match = DB[grp].find(x => String(x.login).trim() === uInput && String(x.pass).trim() === pInput);
+                if(match) userFound = match;
+            });
+
+            if (userFound) {
+                if (userFound.status === 'active') {
+                    CURRENT_USER = userFound;
+                    localStorage.setItem('QualitySys_Session', userFound.id);
                     showApp();
                 } else {
-                    // User found but inactive
-                    errBox.innerText = "عذراً، هذا الحساب معطل.\nيرجى التواصل مع المشرف للمساعدة.";
+                    errBox.innerText = "عذراً، لا يمكنك تسجيل الدخول لأن حسابك معطل.\nيرجى التواصل مع المشرف للمساعدة.";
                     errBox.style.display = 'block';
                 }
             } else {
-                // User not found or wrong password
-                errBox.innerText = "بيانات غير صحيحة.\nيرجى التأكد من اسم المستخدم وكلمة المرور.";
+                errBox.innerText = "بيانات غير صحيحة. يرجى التأكد من اسم المستخدم وكلمة المرور.";
                 errBox.style.display = 'block';
             }
         }
@@ -400,7 +395,7 @@
         }
 
         function resetSystem() {
-            if(confirm('هل أنت متأكد من حذف كافة البيانات وإعادة ضبط المصنع؟ لا يمكن التراجع عن هذا الإجراء.')) {
+            if(confirm('تحذير: سيتم حذف كافة البيانات. هل أنت متأكد؟')) {
                 localStorage.removeItem('QualitySys_DB_V2');
                 localStorage.removeItem('QualitySys_Session');
                 location.reload();
@@ -440,6 +435,7 @@
             });
         }
 
+        // === Tab & Table Management ===
         function setTab(tab, el) {
             CURRENT_TAB = tab;
             document.querySelectorAll('.user-tab').forEach(t => t.classList.remove('active'));
@@ -449,9 +445,13 @@
         }
 
         function renderTable() {
+            const headRow = document.getElementById('tableHeadRow');
             const tbody = document.getElementById('usersTableBody');
+            const addBtn = document.getElementById('addBtnMain');
+            
             tbody.innerHTML = '';
             
+            // Check Permissions
             const userPerms = CURRENT_USER.permissions['user-management'] || {view:true, edit:false};
             const canEdit = userPerms.edit === true;
 
@@ -466,6 +466,30 @@
                 noEditMsg.style.display = 'block';
             }
 
+            // Headers Configuration
+            if (CURRENT_TAB === 'departments') {
+                headRow.innerHTML = `
+                    <th width="5%"><input type="checkbox" id="selectAll" class="custom-checkbox" onchange="toggleSelectAll(this)"></th>
+                    <th width="10%">الترتيب</th>
+                    <th width="40%">اسم القسم</th>
+                    <th width="15%">الحالة</th>
+                    <th width="30%">الإدارة</th>
+                `;
+                addBtn.innerText = "إضافة قسم جديد";
+                addBtn.setAttribute('onclick', 'openAddUserModal()'); // Reuses modal but we will toggle fields
+            } else {
+                headRow.innerHTML = `
+                    <th width="5%"><input type="checkbox" id="selectAll" class="custom-checkbox" onchange="toggleSelectAll(this)"></th>
+                    <th width="5%">#</th>
+                    <th width="25%">الاسم</th>
+                    <th width="15%">الوظيفة</th>
+                    <th width="15%">الحالة</th>
+                    <th width="35%">الإجراءات</th>
+                `;
+                addBtn.innerText = "إضافة اسم جديد";
+                addBtn.setAttribute('onclick', 'openAddUserModal()');
+            }
+
             const list = DB[CURRENT_TAB] || [];
             list.forEach((u, idx) => {
                 const isActive = u.status === 'active';
@@ -475,20 +499,35 @@
 
                 let row = `<td><input type="checkbox" class="custom-checkbox user-select-cb" value="${u.id}" ${canEdit ? '' : 'disabled'}></td>`;
                 row += `<td>${idx+1}</td><td>${u.name}</td>`;
-                row += `<td>${u.job || (CURRENT_TAB === 'teachers' ? u.dept : '-')}</td>`;
-                row += `<td>${statusBadge}</td>`;
                 
-                row += `<td>
-                    <div style="display:flex; justify-content:center; gap:2px;">
-                        <button class="action-btn btn-view" onclick="viewUser(${u.id})" title="معاينة"><i class="fas fa-eye"></i></button>`;
-                if (canEdit) {
-                    row += `
-                        <button class="action-btn btn-toggle ${isActive?'':'off'}" onclick="toggleStatus(${u.id})" title="${isActive?'تعطيل':'تفعيل'}"><i class="fas fa-power-off"></i></button>
-                        <button class="action-btn btn-edit" onclick="editUser(${u.id})" title="تعديل"><i class="fas fa-edit"></i></button>
-                        <button class="action-btn btn-delete" onclick="deleteUser(${u.id})" title="حذف"><i class="fas fa-trash"></i></button>
-                        <button class="action-btn btn-perm" onclick="openPerms(${u.id})" title="الصلاحيات"><i class="fas fa-key"></i></button>
-                    `;
+                if (CURRENT_TAB !== 'departments') {
+                    row += `<td>${u.job || (CURRENT_TAB === 'teachers' ? u.dept : '-')}</td>`;
                 }
+                
+                row += `<td>${statusBadge}</td>`;
+                row += `<td><div style="display:flex; justify-content:center; gap:2px;">`;
+                
+                // --- Buttons ---
+                // For Departments, Actions are Edit, Toggle, Delete only
+                if (CURRENT_TAB === 'departments') {
+                    if(canEdit) {
+                        row += `<button class="action-btn btn-toggle ${isActive?'':'off'}" onclick="toggleStatus(${u.id})" title="${isActive?'تعطيل':'تفعيل'}"><i class="fas fa-power-off"></i></button>
+                                <button class="action-btn btn-edit" onclick="editUser(${u.id})" title="تعديل"><i class="fas fa-edit"></i></button>
+                                <button class="action-btn btn-delete" onclick="deleteUser(${u.id})" title="حذف"><i class="fas fa-trash"></i></button>`;
+                    } else {
+                        row += `<span style="color:#999; font-size:0.8rem;">لا توجد صلاحية</span>`;
+                    }
+                } else {
+                    // For Users
+                    row += `<button class="action-btn btn-view" onclick="viewUser(${u.id})" title="معاينة"><i class="fas fa-eye"></i></button>`;
+                    if (canEdit) {
+                        row += `<button class="action-btn btn-toggle ${isActive?'':'off'}" onclick="toggleStatus(${u.id})" title="${isActive?'تعطيل':'تفعيل'}"><i class="fas fa-power-off"></i></button>
+                                <button class="action-btn btn-edit" onclick="editUser(${u.id})" title="تعديل"><i class="fas fa-edit"></i></button>
+                                <button class="action-btn btn-delete" onclick="deleteUser(${u.id})" title="حذف"><i class="fas fa-trash"></i></button>
+                                <button class="action-btn btn-perm" onclick="openPerms(${u.id})" title="الصلاحيات"><i class="fas fa-key"></i></button>`;
+                    }
+                }
+                
                 row += `</div></td>`;
                 const tr = document.createElement('tr');
                 tr.innerHTML = row;
@@ -496,14 +535,15 @@
             });
         }
 
+        // --- Bulk & Actions ---
         function toggleSelectAll(source) {
             document.querySelectorAll('.user-select-cb').forEach(cb => { if(!cb.disabled) cb.checked = source.checked; });
         }
 
         function deleteSelected() {
             const checkboxes = document.querySelectorAll('.user-select-cb:checked');
-            if(checkboxes.length === 0) { alert('لم يتم تحديد أي مستخدم.'); return; }
-            if(confirm(`هل أنت متأكد من حذف ${checkboxes.length} مستخدم؟`)) {
+            if(checkboxes.length === 0) { alert('لم يتم تحديد أي عنصر.'); return; }
+            if(confirm(`هل أنت متأكد من حذف ${checkboxes.length} عنصر؟`)) {
                 const idsToDelete = Array.from(checkboxes).map(cb => parseInt(cb.value));
                 DB[CURRENT_TAB] = DB[CURRENT_TAB].filter(u => !idsToDelete.includes(u.id));
                 saveDB();
@@ -514,7 +554,7 @@
 
         function toggleStatusSelected() {
             const checkboxes = document.querySelectorAll('.user-select-cb:checked');
-            if(checkboxes.length === 0) { alert('لم يتم تحديد أي مستخدم.'); return; }
+            if(checkboxes.length === 0) { alert('لم يتم تحديد أي عنصر.'); return; }
             const idsToToggle = Array.from(checkboxes).map(cb => parseInt(cb.value));
             DB[CURRENT_TAB].forEach(u => {
                 if(idsToToggle.includes(u.id)) u.status = (u.status === 'active') ? 'inactive' : 'active';
@@ -535,25 +575,83 @@
         function exportCSV() {
             const list = DB[CURRENT_TAB] || [];
             if (list.length === 0) { alert("لا يوجد بيانات للتصدير"); return; }
-            let csvContent = "الاسم الكامل,الوظيفة,رقم الهاتف,اسم المستخدم,كلمة المرور,تاريخ الإضافة,الحالة\n";
-            list.forEach(row => {
-                const clean = (t) => t ? `"${String(t).replace(/"/g, '""').trim()}"` : '""';
-                csvContent += `${clean(row.name)},${clean(row.job || row.dept)},${clean(row.phone)},${clean(row.login)},${clean(row.pass)},${clean(row.dateAdded)},${clean(row.status)}\n`;
-            });
+            let csvContent = "";
+            if (CURRENT_TAB === 'departments') {
+                csvContent = "الترتيب,اسم القسم,الحالة\n";
+                list.forEach((row, idx) => {
+                    csvContent += `${idx+1},"${row.name}","${row.status}"\n`;
+                });
+            } else {
+                csvContent = "الاسم الكامل,الوظيفة,رقم الهاتف,اسم المستخدم,كلمة المرور,تاريخ الإضافة,الحالة\n";
+                list.forEach(row => {
+                    csvContent += `"${row.name}","${row.job||row.dept}","${row.phone}","${row.login}","${row.pass}","${row.dateAdded}","${row.status}"\n`;
+                });
+            }
             const bom = "\uFEFF";
             const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             const url = URL.createObjectURL(blob);
             link.setAttribute("href", url);
-            link.setAttribute("download", `${CURRENT_TAB}_users.csv`);
+            link.setAttribute("download", `${CURRENT_TAB}_export.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
         }
 
+        // === Modal Logic ===
+        function openAddUserModal() { 
+            // Toggle fields visibility based on tab
+            const isDept = (CURRENT_TAB === 'departments');
+            document.getElementById('userFields').style.display = isDept ? 'none' : 'block';
+            document.getElementById('addUserModalTitle').innerText = isDept ? 'إضافة قسم جديد' : 'إضافة مستخدم جديد';
+            
+            // Clear inputs
+            document.getElementById('addUserForm').reset();
+            document.getElementById('addUserModal').style.display = 'flex'; 
+        }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        
+        function saveNewUser() {
+            const name = document.getElementById('addName').value.trim();
+            if(!name) { alert("يرجى إدخال الاسم"); return; }
+
+            const newItem = {
+                id: Date.now(),
+                name: name,
+                status: 'active'
+            };
+
+            if (CURRENT_TAB !== 'departments') {
+                newItem.job = document.getElementById('addJob').value.trim();
+                newItem.phone = document.getElementById('addPhone').value.trim();
+                newItem.login = document.getElementById('addLogin').value.trim();
+                newItem.pass = document.getElementById('addPass').value.trim();
+                newItem.dateAdded = new Date().toLocaleDateString('en-GB');
+                newItem.permissions = JSON.parse(JSON.stringify(DEFAULT_PERMS));
+            }
+
+            DB[CURRENT_TAB].push(newItem);
+            saveDB();
+            renderTable();
+            closeModal('addUserModal');
+        }
+
+        function deleteUser(id) {
+            if(confirm('هل أنت متأكد من الحذف؟')) {
+                DB[CURRENT_TAB] = DB[CURRENT_TAB].filter(u => u.id !== id);
+                saveDB();
+                renderTable();
+            }
+        }
+
+        function editUser(id) {
+            alert("ميزة التعديل السريع قيد التنفيذ، يرجى الحذف والإضافة إذا لزم الأمر حالياً.");
+        }
+
         function viewUser(id) {
             const u = DB[CURRENT_TAB].find(x => x.id === id);
             const content = document.getElementById('viewUserContent');
+            // Hide Password in View
             content.innerHTML = `
                 <div class="user-view-card">
                     <div class="user-view-avatar">${u.name.charAt(0)}</div>
@@ -569,36 +667,8 @@
             document.getElementById('viewUserModal').style.display = 'flex';
         }
 
-        function openAddUserModal() { document.getElementById('addUserModal').style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        
-        function saveNewUser() {
-            const newUser = {
-                id: Date.now(),
-                name: document.getElementById('addName').value.trim(),
-                job: document.getElementById('addJob').value.trim(),
-                phone: document.getElementById('addPhone').value.trim(),
-                login: document.getElementById('addLogin').value.trim(),
-                pass: document.getElementById('addPass').value.trim(),
-                status: 'active',
-                dateAdded: new Date().toLocaleDateString('en-GB'),
-                permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS))
-            };
-            DB[CURRENT_TAB].push(newUser);
-            saveDB();
-            renderTable();
-            closeModal('addUserModal');
-        }
-
-        function deleteUser(id) {
-            if(confirm('هل أنت متأكد من حذف هذا المستخدم؟')) {
-                DB[CURRENT_TAB] = DB[CURRENT_TAB].filter(u => u.id !== id);
-                saveDB();
-                renderTable();
-            }
-        }
-
         function openPerms(id) {
+            if (CURRENT_TAB === 'departments') return;
             EDITING_PERM_ID = id;
             const u = DB[CURRENT_TAB].find(x => x.id === id);
             document.getElementById('permTargetName').innerText = 'صلاحيات: ' + u.name;
