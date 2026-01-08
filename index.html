@@ -33,7 +33,7 @@
         .user-name { font-weight: bold; color: var(--primary); font-size: 1rem; }
         .user-job { font-size: 0.8rem; color: #777; font-weight: normal;}
 
-        /* Login Page Styling Updates */
+        /* Login Page Styling */
         .login-wrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: linear-gradient(135deg, var(--primary), #2b2b2b); display: flex; justify-content: center; align-items: center; z-index: 9999; }
         .login-box { background: white; padding: 40px; border-radius: 12px; width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
         .login-logo-container { margin-bottom: 25px; }
@@ -50,6 +50,29 @@
         /* Content Sections */
         .section-card { background: white; border-radius: 10px; padding: 25px; margin-bottom: 20px; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
         .section-card.active { display: block; }
+
+        /* Dashboard Specific Styles */
+        .dashboard-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.04); border: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: space-between; position: relative; overflow: hidden; transition: transform 0.2s; }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
+        .stat-card::before { content: ''; position: absolute; right: 0; top: 0; height: 100%; width: 5px; background: var(--primary); }
+        .stat-card.blue::before { background: var(--primary); }
+        .stat-card.green::before { background: var(--success); }
+        .stat-card.red::before { background: var(--danger); }
+        .stat-card.orange::before { background: var(--warning); }
+        
+        .stat-info h3 { font-size: 2rem; margin: 0; font-weight: 700; color: #333; }
+        .stat-info p { margin: 0; font-size: 0.9rem; color: #777; font-weight: 600; }
+        .stat-icon-bg { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        .bg-light-blue { background: #eef4ff; color: var(--primary); }
+        .bg-light-green { background: #e8f7ec; color: var(--success); }
+        .bg-light-red { background: #fdeaea; color: var(--danger); }
+        .bg-light-orange { background: #fff8e1; color: var(--warning); }
+
+        .dashboard-charts-row { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px; }
+        @media (max-width: 992px) { .dashboard-charts-row { grid-template-columns: 1fr; } }
+        .chart-box { background: white; padding: 20px; border-radius: 12px; border: 1px solid #f0f0f0; box-shadow: 0 5px 15px rgba(0,0,0,0.04); }
+        .chart-title { font-weight: bold; margin-bottom: 20px; color: #444; border-bottom: 1px solid #eee; padding-bottom: 10px; display: flex; justify-content: space-between; }
 
         /* General Tables & Tabs */
         .custom-tabs { display: flex; gap: 15px; border-bottom: 2px solid #eee; margin-bottom: 20px; overflow-x: auto; }
@@ -95,69 +118,45 @@
         
         .view-footer-info { margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee; font-size: 0.8rem; color: #777; display: flex; justify-content: space-between; background: #fafafa; padding: 10px; border-radius: 5px; }
 
-        /* --- Settings Specific Styles --- */
+        /* Settings Specific */
         .setting-content-pane { display: none; animation: fadeIn 0.3s; }
         .setting-content-pane.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Image Upload Box Style */
-        .upload-container {
-            border: 2px dashed #ccc; border-radius: 8px; padding: 20px; text-align: center; background-color: #fcfcfc; margin-bottom: 20px; position: relative; transition: 0.3s;
-        }
+        .upload-container { border: 2px dashed #ccc; border-radius: 8px; padding: 20px; text-align: center; background-color: #fcfcfc; margin-bottom: 20px; position: relative; transition: 0.3s; }
         .upload-container:hover { border-color: var(--primary); background-color: #f0f4f8; }
         .upload-label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
         .upload-btn-wrapper { margin-top: 10px; }
-        .upload-btn-custom {
-            background-color: #28a745; color: white; border: none; padding: 10px 25px; border-radius: 5px; cursor: pointer; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 8px;
-        }
+        .upload-btn-custom { background-color: #28a745; color: white; border: none; padding: 10px 25px; border-radius: 5px; cursor: pointer; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 8px; }
         .upload-hint { display: block; margin-top: 5px; color: #888; font-size: 0.8rem; }
-        .image-preview-wrapper {
-            margin-top: 15px; position: relative; display: inline-block; border: 1px solid #ddd; padding: 5px; border-radius: 5px; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
+        .image-preview-wrapper { margin-top: 15px; position: relative; display: inline-block; border: 1px solid #ddd; padding: 5px; border-radius: 5px; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .image-preview { max-width: 200px; max-height: 100px; display: block; cursor: pointer; }
-        .remove-img-btn {
-            position: absolute; top: -10px; right: -10px; background: #dc3545; color: white; border: none; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
+        .remove-img-btn { position: absolute; top: -10px; right: -10px; background: #dc3545; color: white; border: none; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
-        /* --- Signature Settings Styles --- */
+        /* Signature Settings */
         .signature-grid { display: flex; flex-direction: column; gap: 20px; }
         .signature-card { border: 1px solid #eee; border-radius: 8px; padding: 20px; background: #fcfcfc; text-align: center; width: 100%; }
         .signature-title { color: var(--primary); font-weight: bold; margin-bottom: 15px; font-size: 1.1rem; }
         
-        /* --- Visitor Order Styles --- */
+        /* Visitor Styles */
         .visitor-section { margin-bottom: 30px; border: 1px solid #eee; padding: 20px; border-radius: 8px; background: white; }
         .visitor-section-title { font-weight: bold; margin-bottom: 15px; color: #444; border-bottom: 2px solid #eee; padding-bottom: 10px; }
         .visitor-list { list-style: none; padding: 0; margin: 0 0 15px 0; }
-        .visitor-list-item { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 10px 15px; border: 1px solid #eee; margin-bottom: 8px; border-radius: 6px; background: #fff;
-            transition: 0.2s;
-        }
+        .visitor-list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; border: 1px solid #eee; margin-bottom: 8px; border-radius: 6px; background: #fff; transition: 0.2s; }
         .visitor-list-item:hover { background-color: #f9fbff; border-color: #cce5ff; }
         .visitor-name { font-weight: bold; color: #333; }
         .visitor-controls { display: flex; gap: 5px; }
         .empty-list-msg { color: #888; font-style: italic; padding: 15px; text-align: center; border: 1px dashed #ddd; border-radius: 6px; background: #fdfdfd; }
         .btn-add-visitor { background-color: var(--primary); color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        .btn-add-visitor:hover { opacity: 0.9; }
 
-        /* --- System Log Styles --- */
+        /* Log & Perms */
         .log-table-wrapper { max-height: 400px; overflow-y: auto; border: 1px solid #eee; border-radius: 6px; }
-        .log-details { font-size: 0.85rem; color: #666; max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        /* Picker Modal List */
         .picker-list { max-height: 300px; overflow-y: auto; border: 1px solid #eee; border-radius: 6px; }
         .picker-item { padding: 10px 15px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
         .picker-item:hover { background-color: #f0f4f8; }
-        .picker-item:last-child { border-bottom: none; }
-        .picker-item-name { font-weight: bold; }
-        .picker-item-job { font-size: 0.8rem; color: #777; }
-
-        /* Password Wrapper */
         .password-wrapper { position: relative; }
         .password-wrapper input { padding-left: 40px; }
         .password-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #777; }
-        
-        /* Permissions List */
         .perm-list { border: 1px solid #eee; border-radius: 6px; padding: 10px; max-height: 300px; overflow-y: auto; }
         .perm-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
         .perm-header { display: flex; justify-content: space-between; padding: 10px; background: #f8f9fa; border: 1px solid #eee; border-radius: 6px; margin-bottom: 10px; font-weight: bold; font-size: 0.9rem; }
@@ -168,8 +167,6 @@
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: right; background: #f9f9f9; padding: 15px; border-radius: 8px; }
         .info-item label { display: block; color: #777; font-size: 0.85rem; margin-bottom: 5px; }
         .info-item span { font-weight: bold; color: #333; }
-
-        /* Table Title */
         .table-section-title { font-weight: bold; color: #555; margin-bottom: 10px; margin-top: 20px; border-right: 4px solid var(--primary); padding-right: 10px; }
 
         @media print { .sidebar, .login-wrapper { display: none; } .main-content { margin: 0; } }
@@ -184,7 +181,6 @@
                 <h1 class="login-title">نظام إتقان</h1>
                 <span class="login-subtitle">لمتابعة جودة التعليم</span>
             </div>
-
             <h2 style="color:#555; margin:0 0 20px 0; font-size:1.2rem;">تسجيل الدخول</h2>
             <form id="loginForm">
                 <input type="text" id="loginUser" class="form-control" placeholder="اسم المستخدم" required>
@@ -193,10 +189,8 @@
                     <i class="fas fa-eye password-icon" onclick="togglePass('loginPass', this)"></i>
                 </div>
                 <button type="submit" class="btn btn-primary">دخول</button>
-                
                 <div id="loginError" style="background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; padding: 10px; border-radius: 6px; margin-top: 15px; font-size: 0.9rem; line-height: 1.5; display: none; text-align: center;"></div>
-                
-                </form>
+            </form>
         </div>
     </div>
 
@@ -230,14 +224,87 @@
                 </div>
             </header>
 
-            <div id="dashboard" class="section-card active"><h3>لوحة التحكم</h3><p>مرحباً بك في النظام</p></div>
+            <div id="dashboard" class="section-card active">
+                <div class="filter-container" style="justify-content: space-between;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <label class="filter-label"><i class="fas fa-calendar-alt"></i> تصفية البيانات حسب الشهر:</label>
+                        <select id="dashMonthFilter" class="filter-select" onchange="renderDashboard()">
+                            <option value="all">كل الأشهر</option>
+                            <option value="01">يناير</option>
+                            <option value="02">فبراير</option>
+                            <option value="03">مارس</option>
+                            <option value="04">أبريل</option>
+                            <option value="05">مايو</option>
+                            <option value="06">يونيو</option>
+                            <option value="07">يوليو</option>
+                            <option value="08">أغسطس</option>
+                            <option value="09">سبتمبر</option>
+                            <option value="10">أكتوبر</option>
+                            <option value="11">نوفمبر</option>
+                            <option value="12">ديسمبر</option>
+                        </select>
+                    </div>
+                    <div style="color: #777; font-weight: bold; font-size: 0.9rem;">
+                        <i class="fas fa-info-circle"></i> يتم عرض الإحصائيات بناءً على الشهر المحدد
+                    </div>
+                </div>
+
+                <div class="dashboard-stats-grid">
+                    <div class="stat-card blue">
+                        <div class="stat-info">
+                            <h3 id="stat_total_visits">0</h3>
+                            <p>إجمالي الزيارات الصفية</p>
+                        </div>
+                        <div class="stat-icon-bg bg-light-blue"><i class="fas fa-clipboard-check"></i></div>
+                    </div>
+                    <div class="stat-card green">
+                        <div class="stat-info">
+                            <h3 id="stat_distinguished">0</h3>
+                            <p>المعلمين المتميزين</p>
+                        </div>
+                        <div class="stat-icon-bg bg-light-green"><i class="fas fa-star"></i></div>
+                    </div>
+                    <div class="stat-card orange">
+                        <div class="stat-info">
+                            <h3 id="stat_qualitative">0</h3>
+                            <p>التقارير النوعية</p>
+                        </div>
+                        <div class="stat-icon-bg bg-light-orange"><i class="fas fa-file-alt"></i></div>
+                    </div>
+                    <div class="stat-card red">
+                        <div class="stat-info">
+                            <h3 id="stat_care">0</h3>
+                            <p>معلمين بحاجة لرعاية</p>
+                        </div>
+                        <div class="stat-icon-bg bg-light-red"><i class="fas fa-hand-holding-heart"></i></div>
+                    </div>
+                </div>
+
+                <div class="dashboard-charts-row">
+                    <div class="chart-box">
+                        <div class="chart-title">
+                            <span>توزيع الزيارات حسب الأقسام</span>
+                            <i class="fas fa-chart-bar" style="color:#aaa;"></i>
+                        </div>
+                        <canvas id="dashBarChart" height="200"></canvas>
+                    </div>
+                    <div class="chart-box">
+                        <div class="chart-title">
+                            <span>نسب التقييم</span>
+                            <i class="fas fa-chart-pie" style="color:#aaa;"></i>
+                        </div>
+                        <div style="height: 200px; display: flex; justify-content: center;">
+                            <canvas id="dashPieChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
             
             <div id="visits" class="section-card">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                     <h3 style="color:var(--primary);">سجل الزيارات الصفية</h3>
                     <button class="btn btn-primary btn-restricted" style="width:auto;" onclick="openAddVisitModal()"><i class="fas fa-plus"></i> إضافة زيارة جديدة</button>
                 </div>
-
                 <div class="filter-container">
                     <label class="filter-label"><i class="fas fa-filter"></i> تصفية حسب الشهر:</label>
                     <select id="visitMonthFilter" class="filter-select" onchange="renderVisitsTable()">
@@ -256,12 +323,10 @@
                         <option value="12">ديسمبر</option>
                     </select>
                 </div>
-
                 <div class="custom-tabs">
                     <div class="custom-tab active" onclick="setVisitTab('senior', this)">زيارات القيادة العليا</div>
                     <div class="custom-tab" onclick="setVisitTab('middle', this)">زيارات القيادة الوسطى</div>
                 </div>
-
                 <table class="custom-table">
                     <thead>
                         <tr>
@@ -273,14 +338,12 @@
                             <th width="15%">وظيفة الزائر</th>
                         </tr>
                     </thead>
-                    <tbody id="visitsTableBody">
-                    </tbody>
+                    <tbody id="visitsTableBody"></tbody>
                 </table>
             </div>
 
             <div id="performance" class="section-card">
                 <h3 style="color:var(--primary); margin-bottom:20px;">تقييم الأداء الصفي</h3>
-                
                 <div class="filter-container">
                     <label class="filter-label"><i class="fas fa-calendar-alt"></i> اختر الشهر:</label>
                     <select id="perfMonthFilter" class="filter-select" onchange="renderPerformanceChart()">
@@ -299,7 +362,6 @@
                         <option value="12">ديسمبر</option>
                     </select>
                 </div>
-
                 <div style="padding:20px; background:#fff; border:1px solid #eee; border-radius:8px;">
                     <canvas id="perfChart" width="400" height="150"></canvas>
                 </div>
@@ -307,7 +369,6 @@
 
             <div id="distinguished" class="section-card">
                 <h3 style="color:var(--primary); margin-bottom:20px;">المعلمين المتميزين والأولى بالرعاية</h3>
-                
                 <div class="filter-container">
                     <label class="filter-label"><i class="fas fa-filter"></i> تصفية حسب الشهر:</label>
                     <select id="distMonthFilter" class="filter-select" onchange="renderDistinguishedTables()">
@@ -326,7 +387,6 @@
                         <option value="12">ديسمبر</option>
                     </select>
                 </div>
-
                 <div class="btn-group-restricted" style="display:flex; gap:15px; margin-bottom:25px;">
                     <button class="btn" style="background:#2c5aa0; color:white;" onclick="openDistinguishedModal('distinguished')">
                         <i class="fas fa-plus-circle"></i> إضافة معلم متميز
@@ -335,7 +395,6 @@
                         <i class="fas fa-plus-circle"></i> إضافة معلم يحتاج رعاية
                     </button>
                 </div>
-
                 <div class="table-section-title">المعلمين المتميزين</div>
                 <table class="custom-table">
                     <thead>
@@ -348,10 +407,8 @@
                             <th width="20%" class="col-actions">الإجراء</th>
                         </tr>
                     </thead>
-                    <tbody id="distinguishedTableBody">
-                    </tbody>
+                    <tbody id="distinguishedTableBody"></tbody>
                 </table>
-
                 <div class="table-section-title" style="margin-top:40px;">المعلمين الأولى بالرعاية</div>
                 <table class="custom-table">
                     <thead>
@@ -364,8 +421,7 @@
                             <th width="20%" class="col-actions">الإجراء</th>
                         </tr>
                     </thead>
-                    <tbody id="careTableBody">
-                    </tbody>
+                    <tbody id="careTableBody"></tbody>
                 </table>
             </div>
 
@@ -374,7 +430,6 @@
                     <h3 style="color:var(--primary);">التقرير النوعي</h3>
                     <button class="btn btn-primary btn-restricted" style="width:auto;" onclick="openQualitativeModal()"><i class="fas fa-plus"></i> إضافة تقرير</button>
                 </div>
-
                 <div class="filter-container">
                     <label class="filter-label"><i class="fas fa-filter"></i> تصفية حسب الشهر:</label>
                     <select id="qualMonthFilter" class="filter-select" onchange="renderQualitativeTable()">
@@ -393,7 +448,6 @@
                         <option value="12">ديسمبر</option>
                     </select>
                 </div>
-
                 <table class="custom-table">
                     <thead>
                         <tr>
@@ -404,8 +458,7 @@
                             <th width="20%" class="col-actions">الإجراء</th>
                         </tr>
                     </thead>
-                    <tbody id="qualitativeTableBody">
-                    </tbody>
+                    <tbody id="qualitativeTableBody"></tbody>
                 </table>
             </div>
 
@@ -414,7 +467,6 @@
             <div id="user-management" class="section-card">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
                     <h3>إدارة المستخدمين</h3>
-                    
                     <div id="userActionButtons" style="display:flex; gap:10px; flex-wrap:wrap;">
                         <button id="addBtnMain" class="btn" style="background:#2c5aa0; color:white;" onclick="openAddUserModal()"><i class="fas fa-plus"></i> إضافة جديد</button>
                         <button class="btn" style="background:#17a2b8; color:white;" onclick="exportCSV()"><i class="fas fa-file-export"></i> تصدير CSV</button>
@@ -424,18 +476,15 @@
                     </div>
                     <div id="noEditPermissionMsg" style="display:none; color:red; font-weight:bold;">(وضع القراءة فقط)</div>
                 </div>
-
                 <div class="custom-tabs">
                     <div class="custom-tab active" onclick="setTab('senior', this)">القيادة العليا</div>
                     <div class="custom-tab" onclick="setTab('middle', this)">القيادة الوسطى</div>
                     <div class="custom-tab" onclick="setTab('teachers', this)">المعلمات</div>
                     <div class="custom-tab" onclick="setTab('departments', this)">الأقسام</div>
                 </div>
-
                 <table class="custom-table">
                     <thead>
-                        <tr id="tableHeadRow">
-                        </tr>
+                        <tr id="tableHeadRow"></tr>
                     </thead>
                     <tbody id="usersTableBody"></tbody>
                 </table>
@@ -443,7 +492,6 @@
             
             <div id="settings" class="section-card">
                 <h3 style="color:var(--primary); margin-bottom:20px;">الإعدادات</h3>
-                
                 <div class="custom-tabs">
                     <div class="custom-tab active" onclick="setSettingTab('gen', this)">الإعدادات العامة</div>
                     <div class="custom-tab" onclick="setSettingTab('sig', this)">إعدادات التوقيعات</div>
@@ -504,38 +552,34 @@
                 </div>
 
                 <div id="sig" class="setting-content-pane">
-                    <p style="margin-bottom:20px; color:#666;">تحديد الأشخاص المسؤولين عن توقيع التقرير من القيادة العليا</p>
                     <div class="signature-grid">
                         <div class="signature-card">
                             <div class="signature-title">مدير/ة المدرسة</div>
                             <div class="form-group">
-                                <label style="display:block; text-align:right; margin-bottom:5px; color:#777;">اختر مدير/ة المدرسة</label>
                                 <select id="sig_director" class="form-control"><option value="">اختر مدير المدرسة</option></select>
                             </div>
                             <div style="display:flex; gap:10px; justify-content:center; margin-top:20px;">
-                                <button class="btn btn-primary setting-edit-btn" style="min-width:100px;" onclick="saveSignatureSettings()">حفظ</button>
-                                <button class="btn setting-edit-btn" style="background:#dc3545; color:white; min-width:100px;" onclick="clearSignature('sig_director')">إزالة</button>
+                                <button class="btn btn-primary setting-edit-btn" onclick="saveSignatureSettings()">حفظ</button>
+                                <button class="btn setting-edit-btn" style="background:#dc3545; color:white;" onclick="clearSignature('sig_director')">إزالة</button>
                             </div>
                         </div>
                         <div class="signature-card">
                             <div class="signature-title">المدير/ة المساعد/ة</div>
                             <div class="form-group">
-                                <label style="display:block; text-align:right; margin-bottom:5px; color:#777;">اختر المدير/ة المساعد/ة</label>
                                 <select id="sig_assistant" class="form-control"><option value="">اختر المدير المساعد</option></select>
                             </div>
                             <div style="display:flex; gap:10px; justify-content:center; margin-top:20px;">
-                                <button class="btn btn-primary setting-edit-btn" style="min-width:100px;" onclick="saveSignatureSettings()">حفظ</button>
-                                <button class="btn setting-edit-btn" style="background:#dc3545; color:white; min-width:100px;" onclick="clearSignature('sig_assistant')">إزالة</button>
+                                <button class="btn btn-primary setting-edit-btn" onclick="saveSignatureSettings()">حفظ</button>
+                                <button class="btn setting-edit-btn" style="background:#dc3545; color:white;" onclick="clearSignature('sig_assistant')">إزالة</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div id="fot" class="setting-content-pane">
-                    <h3 style="color:var(--primary); margin-bottom:20px; font-weight:bold;">إعدادات تذييل التقرير</h3>
                     <div class="form-group" style="margin-bottom:20px;">
-                        <label style="display:block; font-weight:bold; margin-bottom:5px;">النص الذي سيظهر في تذييل كل صفحة من التقرير</label>
-                        <textarea id="footer_text" class="form-control" rows="5" placeholder="أدخل نص التذييل"></textarea>
+                        <label style="display:block; font-weight:bold; margin-bottom:5px;">النص الذي سيظهر في تذييل كل صفحة</label>
+                        <textarea id="footer_text" class="form-control" rows="5"></textarea>
                     </div>
                     <div class="form-group" style="margin-bottom:20px;">
                         <label style="display:block; font-weight:bold; margin-bottom:5px;">محاذاة التذييل</label>
@@ -560,36 +604,26 @@
                 </div>
 
                 <div id="eval" class="setting-content-pane">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                         <h3>الزيارة الصفية</h3>
-                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                            <button class="btn setting-edit-btn" style="background:#2c5aa0; color:white;" onclick="openAddEvalModal()"><i class="fas fa-plus"></i> إضافة تقييم</button>
-                        </div>
+                        <button class="btn setting-edit-btn" style="background:#2c5aa0; color:white;" onclick="openAddEvalModal()"><i class="fas fa-plus"></i> إضافة تقييم</button>
                     </div>
                     <table class="custom-table">
-                        <thead>
-                            <tr>
-                                <th width="10%">#</th>
-                                <th width="55%">اسم المعيار</th>
-                                <th width="10%">الحالة</th>
-                                <th width="25%">الإجراءات</th>
-                            </tr>
-                        </thead>
+                        <thead><tr><th width="10%">#</th><th width="55%">اسم المعيار</th><th width="10%">الحالة</th><th width="25%">الإجراءات</th></tr></thead>
                         <tbody id="evalTableBody"></tbody>
                     </table>
                 </div>
 
                 <div id="vis" class="setting-content-pane">
-                    <p style="margin-bottom:20px; color:#666;">حدد ترتيب ظهور أسماء الزوار في تقرير الزيارات الصفية</p>
                     <div class="visitor-section">
                         <div class="visitor-section-title">القيادة العليا</div>
-                        <ul id="list_visitor_senior" class="visitor-list"><li class="empty-list-msg">لم يتم إضافة زوار بعد</li></ul>
-                        <button class="btn-add-visitor setting-edit-btn" onclick="openVisitorPicker('senior')">+ إضافة زائر من القيادة العليا</button>
+                        <ul id="list_visitor_senior" class="visitor-list"></ul>
+                        <button class="btn-add-visitor setting-edit-btn" onclick="openVisitorPicker('senior')">+ إضافة زائر</button>
                     </div>
                     <div class="visitor-section">
                         <div class="visitor-section-title">القيادة الوسطى</div>
-                        <ul id="list_visitor_middle" class="visitor-list"><li class="empty-list-msg">لم يتم إضافة زوار بعد</li></ul>
-                        <button class="btn-add-visitor setting-edit-btn" onclick="openVisitorPicker('middle')">+ إضافة زائر من القيادة الوسطى</button>
+                        <ul id="list_visitor_middle" class="visitor-list"></ul>
+                        <button class="btn-add-visitor setting-edit-btn" onclick="openVisitorPicker('middle')">+ إضافة زائر</button>
                     </div>
                     <div style="text-align: left; margin-top: 20px;">
                         <button class="btn btn-toggle setting-edit-btn" onclick="saveVisitorOrder()">حفظ الترتيب</button>
@@ -606,14 +640,7 @@
                     </div>
                     <div class="log-table-wrapper">
                         <table class="custom-table" style="font-size:0.9rem;">
-                            <thead>
-                                <tr>
-                                    <th width="20%">التاريخ والوقت</th>
-                                    <th width="20%">المستخدم</th>
-                                    <th width="20%">الحدث</th>
-                                    <th width="40%">التفاصيل</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th width="20%">التاريخ والوقت</th><th width="20%">المستخدم</th><th width="20%">الحدث</th><th width="40%">التفاصيل</th></tr></thead>
                             <tbody id="logTableBody"></tbody>
                         </table>
                     </div>
@@ -630,8 +657,7 @@
                     <input type="hidden" id="editUserId">
                     <label>الاسم الكامل / اسم القسم</label><input type="text" id="addName" class="form-control" required>
                     <div id="deptWrapper" class="form-group" style="display:none;">
-                        <label>القسم</label>
-                        <select id="addDept" class="form-control"></select>
+                        <label>القسم</label><select id="addDept" class="form-control"></select>
                     </div>
                     <div id="userFields">
                         <label>الوظيفة</label><input type="text" id="addJob" class="form-control">
@@ -657,21 +683,15 @@
                     <input type="hidden" id="distEditId">
                     <div class="form-group">
                         <label style="font-weight:bold; display:block; margin-bottom:5px;">القسم</label>
-                        <select id="distDept" class="form-control" onchange="onDistinguishedDeptChange()">
-                            <option value="">اختر القسم...</option>
-                        </select>
+                        <select id="distDept" class="form-control" onchange="onDistinguishedDeptChange()"><option value="">اختر القسم...</option></select>
                     </div>
                     <div class="form-group">
                         <label style="font-weight:bold; display:block; margin-bottom:5px;">اسم المعلم/ة</label>
-                        <select id="distTeacher" class="form-control">
-                            <option value="">اختر المعلم/ة...</option>
-                        </select>
+                        <select id="distTeacher" class="form-control"><option value="">اختر المعلم/ة...</option></select>
                     </div>
                     <div class="form-group">
                         <label style="font-weight:bold; display:block; margin-bottom:5px;">التقدير</label>
-                        <select id="distEval" class="form-control">
-                            <option value="">اختر التقدير...</option>
-                        </select>
+                        <select id="distEval" class="form-control"><option value="">اختر التقدير...</option></select>
                     </div>
                     <div class="form-group">
                         <label style="font-weight:bold; display:block; margin-bottom:5px;">المبررات / ملاحظات</label>
@@ -694,9 +714,7 @@
                     <input type="hidden" id="qualEditId">
                     <div class="form-group">
                         <label style="font-weight:bold; display:block; margin-bottom:5px;">القسم</label>
-                        <select id="qualDept" class="form-control">
-                            <option value="">اختر القسم...</option>
-                        </select>
+                        <select id="qualDept" class="form-control"><option value="">اختر القسم...</option></select>
                     </div>
                     <div class="form-group">
                         <label style="font-weight:bold; display:block; margin-bottom:5px;">جوانب القوة</label>
@@ -722,15 +740,11 @@
                 <form id="addVisitForm">
                     <div class="form-group">
                         <label style="font-weight:bold; display:block; margin-bottom:5px;">القسم</label>
-                        <select id="visitDept" class="form-control" onchange="onVisitDeptChange()">
-                            <option value="">اختر القسم...</option>
-                        </select>
+                        <select id="visitDept" class="form-control" onchange="onVisitDeptChange()"><option value="">اختر القسم...</option></select>
                     </div>
                     <div class="form-group">
                         <label style="font-weight:bold; display:block; margin-bottom:5px;">المعلم/ة</label>
-                        <select id="visitTeacher" class="form-control">
-                            <option value="">اختر المعلم/ة...</option>
-                        </select>
+                        <select id="visitTeacher" class="form-control"><option value="">اختر المعلم/ة...</option></select>
                     </div>
                     <div class="form-group">
                         <label style="font-weight:bold; display:block; margin-bottom:5px;">تاريخ الزيارة</label>
@@ -738,9 +752,7 @@
                     </div>
                     <div class="form-group">
                         <label style="font-weight:bold; display:block; margin-bottom:5px;">التقييم</label>
-                        <select id="visitEval" class="form-control">
-                            <option value="">اختر التقييم...</option>
-                        </select>
+                        <select id="visitEval" class="form-control"><option value="">اختر التقييم...</option></select>
                     </div>
                 </form>
             </div>
@@ -772,9 +784,7 @@
         <div class="modal-box">
             <div class="modal-header">معاينة <span onclick="closeModal('viewUserModal')" style="cursor:pointer;">&times;</span></div>
             <div class="modal-body" id="viewUserContent"></div>
-            <div class="modal-footer">
-                <button class="btn" style="background:#28a745; color:white;" onclick="closeModal('viewUserModal')">إغلاق</button>
-            </div>
+            <div class="modal-footer"><button class="btn" style="background:#28a745; color:white;" onclick="closeModal('viewUserModal')">إغلاق</button></div>
         </div>
     </div>
 
@@ -785,9 +795,7 @@
                 <div id="viewDetailsContent"></div>
                 <div id="viewDetailsFooter" class="view-footer-info"></div>
             </div>
-            <div class="modal-footer">
-                <button class="btn" style="background:#28a745; color:white;" onclick="closeModal('viewDetailsModal')">إغلاق</button>
-            </div>
+            <div class="modal-footer"><button class="btn" style="background:#28a745; color:white;" onclick="closeModal('viewDetailsModal')">إغلاق</button></div>
         </div>
     </div>
 
@@ -826,9 +834,7 @@
                 <input type="text" id="visitorSearch" class="form-control" placeholder="بحث عن اسم..." onkeyup="filterPickerList()">
                 <div id="pickerList" class="picker-list"></div>
             </div>
-            <div class="modal-footer">
-                <button class="btn" style="background:#ddd;" onclick="closeModal('visitorPickerModal')">إغلاق</button>
-            </div>
+            <div class="modal-footer"><button class="btn" style="background:#ddd;" onclick="closeModal('visitorPickerModal')">إغلاق</button></div>
         </div>
     </div>
 
@@ -851,29 +857,10 @@
         const INITIAL_DB = {
             admins: [{id: 999, name: 'مدير النظام', login: 'admin', pass: 'Hasan@12', status: 'active', job: 'مدير النظام', permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS))}],
             senior: [{id: 1, name: 'علياء محمد مبارك الدوسري', job: 'مديرة المدرسة', phone: '39669118', login: '39669118', pass: '39669118', status: 'active', permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS)), dateAdded: '2025/01/01'}],
-            middle: [],
-            teachers: [],
-            departments: [],
-            visits_senior: [], 
-            visits_middle: [],
-            distinguished: [], 
-            care_needed: [],   
-            qualitative_reports: [],
-            settings: {
-                schoolName: 'مدرسة مدينة حمد الابتدائية للبنات',
-                schoolYear: '2025 / 2026م',
-                ministryLogo: '',
-                schoolLogo: '',
-                schoolStamp: '',
-                signature_director_id: '',
-                signature_assistant_id: '',
-                visitor_order_senior: [],
-                visitor_order_middle: [],
-                footer_text: '',
-                footer_align: 'center',
-                footer_fontsize: '12',
-                evaluation_criteria: []
-            },
+            middle: [], teachers: [], departments: [],
+            visits_senior: [], visits_middle: [],
+            distinguished: [], care_needed: [], qualitative_reports: [],
+            settings: { schoolName: 'مدرسة مدينة حمد الابتدائية للبنات', schoolYear: '2025 / 2026م', evaluation_criteria: [], visitor_order_senior: [], visitor_order_middle: [] },
             logs: [] 
         };
 
@@ -885,11 +872,13 @@
         let IS_BULK_PERM_MODE = false;
         let CURRENT_PICKER_TYPE = null;
         let performanceChartInstance = null; 
+        
+        // Dashboard Chart Instances
+        let dashBarChartInst = null;
+        let dashPieChartInst = null;
 
-        // === Helper Logic to enforce Edit Permissions ===
         function canEdit(pageId) {
             if(!CURRENT_USER) return false;
-            // Admin always true or based on perms
             const p = CURRENT_USER.permissions || DEFAULT_PERMS;
             return (p[pageId] && p[pageId].edit === true);
         }
@@ -918,7 +907,7 @@
                                 u.login = String(u.login).trim().replace(/[\uFEFF\x00-\x1F\s]/g, '');
                                 u.pass = String(u.pass).trim().replace(/[\uFEFF\x00-\x1F\s]/g, '');
                             }
-                            if(!u.status) u.status = 'active'; // This defaults legacy users, but we respect existing status
+                            if(!u.status) u.status = 'active';
                         });
                     }
                 });
@@ -944,19 +933,13 @@
             const sessionID = localStorage.getItem('QualitySys_Session');
             if (sessionID) {
                 let found = null;
-                // We must re-fetch from DB to ensure status is fresh
                 ['admins', 'senior', 'middle', 'teachers'].forEach(grp => {
-                    if(DB[grp]) {
-                        const u = DB[grp].find(x => x.id == sessionID);
-                        if(u) found = u;
-                    }
+                    if(DB[grp]) { const u = DB[grp].find(x => x.id == sessionID); if(u) found = u; }
                 });
-                // STRICT CHECK: user must exist and be active
                 if (found && found.status === 'active') { 
                     CURRENT_USER = found; 
                     showApp(); 
                 } else { 
-                    // Kick out if disabled
                     localStorage.removeItem('QualitySys_Session');
                     document.getElementById('loginPage').style.display = 'flex'; 
                 }
@@ -964,69 +947,28 @@
         }
 
         function saveDB() { localStorage.setItem('QualitySys_DB_V2', JSON.stringify(DB)); }
-
         function addSystemLog(action, details) {
-            const logEntry = {
-                id: Date.now(),
-                date: new Date().toLocaleString('en-GB'),
-                user: CURRENT_USER ? CURRENT_USER.name : 'النظام/زائر',
-                action: action,
-                details: details
-            };
-            if(!DB.logs) DB.logs = [];
-            DB.logs.unshift(logEntry);
-            if(DB.logs.length > 500) DB.logs = DB.logs.slice(0, 500);
-            saveDB();
+            const logEntry = { id: Date.now(), date: new Date().toLocaleString('en-GB'), user: CURRENT_USER ? CURRENT_USER.name : 'النظام/زائر', action: action, details: details };
+            if(!DB.logs) DB.logs = []; DB.logs.unshift(logEntry); if(DB.logs.length > 500) DB.logs = DB.logs.slice(0, 500); saveDB();
         }
 
         function login(e) {
             e.preventDefault();
-            const errBox = document.getElementById('loginError');
-            errBox.style.display = 'none';
-            errBox.innerText = '';
-            const uInput = document.getElementById('loginUser').value.trim();
-            const pInput = document.getElementById('loginPass').value.trim();
+            const errBox = document.getElementById('loginError'); errBox.style.display = 'none'; errBox.innerText = '';
+            const uInput = document.getElementById('loginUser').value.trim(); const pInput = document.getElementById('loginPass').value.trim();
             let userFound = null;
             ['admins', 'senior', 'middle', 'teachers'].forEach(grp => {
-                if(DB[grp]) {
-                    const match = DB[grp].find(x => String(x.login).trim() === uInput && String(x.pass).trim() === pInput);
-                    if(match) userFound = match;
-                }
+                if(DB[grp]) { const match = DB[grp].find(x => String(x.login).trim() === uInput && String(x.pass).trim() === pInput); if(match) userFound = match; }
             });
             if (userFound) {
-                // STRICT STATUS CHECK
-                if (userFound.status !== 'active') {
-                    errBox.innerText = "نعتذر منك، هذا الحساب غير نشط حالياً. يُرجى التكرم بالتواصل مع إدارة النظام للمساعدة.";
-                    errBox.style.display = 'block';
-                    return;
-                }
-                CURRENT_USER = userFound;
-                localStorage.setItem('QualitySys_Session', userFound.id);
-                addSystemLog('تسجيل دخول', `المستخدم: ${userFound.name}`);
-                showApp();
-            } else {
-                errBox.innerText = "بيانات غير صحيحة.";
-                errBox.style.display = 'block';
-            }
+                if (userFound.status !== 'active') { errBox.innerText = "نعتذر منك، هذا الحساب غير نشط حالياً."; errBox.style.display = 'block'; return; }
+                CURRENT_USER = userFound; localStorage.setItem('QualitySys_Session', userFound.id); addSystemLog('تسجيل دخول', `المستخدم: ${userFound.name}`); showApp();
+            } else { errBox.innerText = "بيانات غير صحيحة."; errBox.style.display = 'block'; }
         }
 
-        function logout() { 
-            if(CURRENT_USER) addSystemLog('تسجيل خروج', `المستخدم: ${CURRENT_USER.name}`);
-            localStorage.removeItem('QualitySys_Session'); 
-            location.reload(); 
-        }
-
-        function resetSystem() {
-            if(confirm('تحذير: سيتم حذف كافة البيانات. هل أنت متأكد؟')) {
-                localStorage.removeItem('QualitySys_DB_V2');
-                localStorage.removeItem('QualitySys_Session');
-                location.reload();
-            }
-        }
-
+        function logout() { if(CURRENT_USER) addSystemLog('تسجيل خروج', `المستخدم: ${CURRENT_USER.name}`); localStorage.removeItem('QualitySys_Session'); location.reload(); }
         function navigate(pageId) {
             const perms = CURRENT_USER.permissions || DEFAULT_PERMS;
-            // STRICT VIEW CHECK
             if (perms[pageId] && perms[pageId].view === false) { alert("عذراً، ليس لديك صلاحية للوصول إلى هذه الصفحة."); return; }
             document.querySelectorAll('.section-card').forEach(d => d.classList.remove('active'));
             document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
@@ -1035,10 +977,10 @@
             if (target) target.classList.add('active');
             if (link) link.classList.add('active');
             
-            // Dynamic Title Logic
             const activeSection = SECTIONS.find(s => s.id === pageId);
             if(activeSection) document.getElementById('pageTitle').innerText = activeSection.name;
 
+            if(pageId === 'dashboard') renderDashboard();
             if(pageId === 'settings') loadSettings();
             if(pageId === 'visits') renderVisitsTable(); 
             if(pageId === 'performance') renderPerformanceChart();
@@ -1047,16 +989,16 @@
         }
 
         function showApp() {
-            document.getElementById('loginPage').style.display = 'none';
-            document.getElementById('app').style.display = 'flex';
+            document.getElementById('loginPage').style.display = 'none'; document.getElementById('app').style.display = 'flex';
             document.getElementById('headerUserName').innerText = CURRENT_USER.name;
             document.getElementById('headerUserJob').innerText = CURRENT_USER.job || CURRENT_USER.dept || 'مستخدم';
-            
-            // Set Sidebar School Name
             document.getElementById('sidebarSchoolName').innerText = DB.settings.schoolName || 'وزارة التربية';
-
-            applySidebarPermissions();
-            renderTable();
+            applySidebarPermissions(); renderTable();
+            
+            // Set Dashboard Filter to Current Month
+            const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0');
+            document.getElementById('dashMonthFilter').value = currentMonth;
+            
             navigate('dashboard');
         }
 
@@ -1064,9 +1006,102 @@
             const perms = CURRENT_USER.permissions || DEFAULT_PERMS;
             SECTIONS.forEach(sec => {
                 const el = document.getElementById('nav-' + sec.id);
-                // STRICT HIDE IF NO VIEW
                 if(el) el.style.display = (perms[sec.id] && perms[sec.id].view === false) ? 'none' : 'block';
             });
+        }
+
+        // === Dashboard Logic ===
+        function renderDashboard() {
+            const filter = document.getElementById('dashMonthFilter').value;
+            
+            // Collect Data
+            let seniorVisits = DB.visits_senior || [];
+            let middleVisits = DB.visits_middle || [];
+            let allVisits = [...seniorVisits, ...middleVisits];
+            let distinguished = DB.distinguished || [];
+            let care = DB.care_needed || [];
+            let qualitative = DB.qualitative_reports || [];
+
+            // Apply Filter
+            if (filter !== 'all') {
+                allVisits = allVisits.filter(x => x.date.split('-')[1] === filter);
+                distinguished = distinguished.filter(x => x.date && x.date.split('-')[1] === filter);
+                care = care.filter(x => x.date && x.date.split('-')[1] === filter);
+                qualitative = qualitative.filter(x => x.date && x.date.split('-')[1] === filter);
+            }
+
+            // Update Cards with Animation
+            animateValue('stat_total_visits', parseInt(document.getElementById('stat_total_visits').innerText), allVisits.length, 1000);
+            animateValue('stat_distinguished', parseInt(document.getElementById('stat_distinguished').innerText), distinguished.length, 1000);
+            animateValue('stat_qualitative', parseInt(document.getElementById('stat_qualitative').innerText), qualitative.length, 1000);
+            animateValue('stat_care', parseInt(document.getElementById('stat_care').innerText), care.length, 1000);
+
+            // --- Charts ---
+            
+            // 1. Bar Chart: Visits per Department
+            const deptCounts = {};
+            allVisits.forEach(v => { deptCounts[v.dept] = (deptCounts[v.dept] || 0) + 1; });
+            const deptLabels = Object.keys(deptCounts);
+            const deptData = Object.values(deptCounts);
+
+            if (dashBarChartInst) dashBarChartInst.destroy();
+            const barCtx = document.getElementById('dashBarChart').getContext('2d');
+            dashBarChartInst = new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: deptLabels.length ? deptLabels : ['لا يوجد بيانات'],
+                    datasets: [{
+                        label: 'عدد الزيارات',
+                        data: deptData.length ? deptData : [0],
+                        backgroundColor: '#1e4078',
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+                }
+            });
+
+            // 2. Pie Chart: Evaluation Distribution
+            const evalCounts = {};
+            allVisits.forEach(v => { evalCounts[v.eval] = (evalCounts[v.eval] || 0) + 1; });
+            const evalLabels = Object.keys(evalCounts);
+            const evalData = Object.values(evalCounts);
+
+            if (dashPieChartInst) dashPieChartInst.destroy();
+            const pieCtx = document.getElementById('dashPieChart').getContext('2d');
+            dashPieChartInst = new Chart(pieCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: evalLabels.length ? evalLabels : ['لا يوجد'],
+                    datasets: [{
+                        data: evalData.length ? evalData : [1],
+                        backgroundColor: ['#28a745', '#17a2b8', '#ffc107', '#dc3545', '#6610f2'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'right' } }
+                }
+            });
+        }
+
+        function animateValue(id, start, end, duration) {
+            if (start === end) return;
+            const obj = document.getElementById(id);
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerHTML = Math.floor(progress * (end - start) + start);
+                if (progress < 1) { window.requestAnimationFrame(step); }
+            };
+            window.requestAnimationFrame(step);
         }
 
         // --- User Management Logic ---
@@ -1075,33 +1110,27 @@
             document.querySelectorAll('.custom-tab').forEach(t => {
                  if(t.parentElement.previousElementSibling && t.parentElement.previousElementSibling.id === 'userActionButtons') { /*pass*/ } else if (el.parentElement === t.parentElement) { t.classList.remove('active'); }
             });
-            Array.from(el.parentElement.children).forEach(c => c.classList.remove('active'));
-            el.classList.add('active');
+            Array.from(el.parentElement.children).forEach(c => c.classList.remove('active')); el.classList.add('active');
             if(document.getElementById('selectAll')) document.getElementById('selectAll').checked = false;
             renderTable();
         }
 
         function renderTable() {
-            const headRow = document.getElementById('tableHeadRow');
-            const tbody = document.getElementById('usersTableBody');
-            const addBtn = document.getElementById('addBtnMain');
-            const bulkPermBtn = document.getElementById('bulkPermBtn');
+            const headRow = document.getElementById('tableHeadRow'); const tbody = document.getElementById('usersTableBody');
+            const addBtn = document.getElementById('addBtnMain'); const bulkPermBtn = document.getElementById('bulkPermBtn');
             tbody.innerHTML = '';
             
-            // Edit Check
             const canEditUsers = canEdit('user-management');
-            const actionButtons = document.getElementById('userActionButtons');
-            const noEditMsg = document.getElementById('noEditPermissionMsg');
-            
+            const actionButtons = document.getElementById('userActionButtons'); const noEditMsg = document.getElementById('noEditPermissionMsg');
             if(canEditUsers) { actionButtons.style.display = 'flex'; noEditMsg.style.display = 'none'; } 
             else { actionButtons.style.display = 'none'; noEditMsg.style.display = 'block'; }
 
             if (CURRENT_TAB === 'departments') {
                 headRow.innerHTML = `<th width="5%"><input type="checkbox" id="selectAll" class="custom-checkbox" onchange="toggleSelectAll(this)" ${canEditUsers?'':'disabled'}></th><th width="10%">الترتيب</th><th width="40%">اسم القسم</th><th width="15%">الحالة</th><th width="30%">الإدارة</th>`;
-                addBtn.innerText = "إضافة قسم جديد"; addBtn.setAttribute('onclick', 'openAddUserModal()'); if(bulkPermBtn) bulkPermBtn.style.display = 'none'; 
+                addBtn.innerText = "إضافة قسم جديد"; if(bulkPermBtn) bulkPermBtn.style.display = 'none'; 
             } else {
                 headRow.innerHTML = `<th width="5%"><input type="checkbox" id="selectAll" class="custom-checkbox" onchange="toggleSelectAll(this)" ${canEditUsers?'':'disabled'}></th><th width="5%">#</th><th width="25%">الاسم</th><th width="15%">الوظيفة</th><th width="15%">الحالة</th><th width="35%">الإجراءات</th>`;
-                addBtn.innerText = "إضافة اسم جديد"; addBtn.setAttribute('onclick', 'openAddUserModal()'); if(bulkPermBtn) bulkPermBtn.style.display = 'inline-flex';
+                addBtn.innerText = "إضافة اسم جديد"; if(bulkPermBtn) bulkPermBtn.style.display = 'inline-flex';
             }
 
             const list = DB[CURRENT_TAB] || [];
@@ -1112,10 +1141,7 @@
                 if (CURRENT_TAB !== 'departments') row += `<td>${u.job || (CURRENT_TAB === 'teachers' ? u.dept : '-')}</td>`;
                 row += `<td>${statusBadge}</td><td><div style="display:flex; justify-content:center; gap:2px; flex-wrap:wrap;">`;
                 
-                // Only show actions if can edit
-                if(canEditUsers) { 
-                    row += `<button class="action-btn btn-move" onclick="moveUser(${u.id}, 'up')" title="نقل لأعلى"><i class="fas fa-arrow-up"></i></button><button class="action-btn btn-move" onclick="moveUser(${u.id}, 'down')" title="نقل لأسفل"><i class="fas fa-arrow-down"></i></button>`; 
-                }
+                if(canEditUsers) { row += `<button class="action-btn btn-move" onclick="moveUser(${u.id}, 'up')" title="نقل لأعلى"><i class="fas fa-arrow-up"></i></button><button class="action-btn btn-move" onclick="moveUser(${u.id}, 'down')" title="نقل لأسفل"><i class="fas fa-arrow-down"></i></button>`; }
                 
                 if (CURRENT_TAB === 'departments') {
                     if(canEditUsers) { row += `<button class="action-btn btn-toggle ${isActive?'':'off'}" onclick="toggleStatus(${u.id})"><i class="fas fa-power-off"></i> ${isActive?'تعطيل':'تفعيل'}</button><button class="action-btn btn-edit" onclick="editUser(${u.id})"><i class="fas fa-edit"></i> تعديل</button><button class="action-btn btn-delete" onclick="deleteUser(${u.id})"><i class="fas fa-trash"></i> حذف</button>`; }
@@ -1128,7 +1154,6 @@
             });
         }
 
-        // ... [Standard Functions] ...
         function moveUser(id, d) { const l=DB[CURRENT_TAB]; const i=l.findIndex(u=>u.id===id); if(i===-1)return; if(d==='up'&&i>0)[l[i],l[i-1]]=[l[i-1],l[i]]; if(d==='down'&&i<l.length-1)[l[i],l[i+1]]=[l[i+1],l[i]]; saveDB(); renderTable(); }
         function toggleSelectAll(s) { document.querySelectorAll('.user-select-cb').forEach(c=>{if(!c.disabled)c.checked=s.checked}); }
         function deleteSelected() { const c=document.querySelectorAll('.user-select-cb:checked'); if(c.length===0)return alert('حدد عناصر'); if(confirm('حذف؟')){const ids=Array.from(c).map(x=>parseInt(x.value)); DB[CURRENT_TAB]=DB[CURRENT_TAB].filter(u=>!ids.includes(u.id)); addSystemLog('حذف جماعي', `حذف ${ids.length}`); saveDB(); renderTable(); document.getElementById('selectAll').checked=false;} }
@@ -1154,241 +1179,4 @@
                 <div class="info-grid"><div class="info-item"><label>الوظيفة</label><span>${u.job || u.dept || '-'}</span></div><div class="info-item"><label>رقم الهاتف</label><span>${u.phone || '-'}</span></div><div class="info-item"><label>الحالة</label><span style="color:${u.status==='active'?'green':'red'}">${u.status==='active'?'مفعل':'معطل'}</span></div><div class="info-item"><label>اسم الدخول</label><span style="background:#eee; padding:2px 5px; border-radius:4px;">${u.login || '-'}</span></div></div>
                 <div class="view-footer-info"><div>آخر تحديث بواسطة: <strong>${u.lastUpdatedBy || 'N/A'}</strong></div><div>${u.lastUpdated || '-'}</div></div>
             `;
-            document.getElementById('viewUserModal').style.display = 'flex';
-        }
-
-        // ... [Perms] ...
-        function openBulkPerms(){ if(!canEdit('user-management')) return; const chk = document.querySelectorAll('.user-select-cb:checked'); if(chk.length===0){alert('حدد مستخدمين');return;} IS_BULK_PERM_MODE = true; document.getElementById('permTargetName').innerText = `تعديل (${chk.length})`; document.getElementById('permList').innerHTML = ''; SECTIONS.forEach(s => document.getElementById('permList').innerHTML += `<div class="perm-item"><span>${s.name}</span><div><input type="checkbox" id="pv_${s.id}"> معاينة <input type="checkbox" id="pe_${s.id}"> تعديل</div></div>`); document.getElementById('permModal').style.display = 'flex'; }
-        function openPerms(id) { if(!canEdit('user-management')) return; if(CURRENT_TAB==='departments')return; IS_BULK_PERM_MODE=false; EDITING_PERM_ID=id; const u=DB[CURRENT_TAB].find(x=>x.id===id); document.getElementById('permTargetName').innerText=u.name; document.getElementById('permList').innerHTML=''; const p=u.permissions||DEFAULT_PERMS; SECTIONS.forEach(s=>{const up=p[s.id]||{view:true,edit:false}; document.getElementById('permList').innerHTML+=`<div class="perm-item"><span>${s.name}</span><div><input type="checkbox" id="pv_${s.id}" ${up.view?'checked':''}> معاينة <input type="checkbox" id="pe_${s.id}" ${up.edit?'checked':''}> تعديل</div></div>`}); document.getElementById('permModal').style.display='flex'; }
-        function toggleAllPerms(t,s){ document.querySelectorAll(t==='view'?'[id^="pv_"]':'[id^="pe_"]').forEach(c=>c.checked=s.checked); }
-        function submitPermissions() {
-            const newP = {}; SECTIONS.forEach(s => newP[s.id] = {view:document.getElementById(`pv_${s.id}`).checked, edit:document.getElementById(`pe_${s.id}`).checked});
-            if(IS_BULK_PERM_MODE) { const ids = Array.from(document.querySelectorAll('.user-select-cb:checked')).map(c=>parseInt(c.value)); DB[CURRENT_TAB].forEach(u=>{if(ids.includes(u.id)) u.permissions=JSON.parse(JSON.stringify(newP));}); } 
-            else { const u=DB[CURRENT_TAB].find(x=>x.id===EDITING_PERM_ID); u.permissions=newP; if(CURRENT_USER.id===u.id){CURRENT_USER=u; applySidebarPermissions(); renderTable();} }
-            saveDB(); closeModal('permModal'); alert('تم التحديث');
-        }
-        function togglePass(id,icon) { const i=document.getElementById(id); i.type=i.type==='password'?'text':'password'; icon.className=i.type==='password'?'fas fa-eye password-icon':'fas fa-eye-slash password-icon'; }
-        
-        // --- Settings Logic (Protected) ---
-        function setSettingTab(t,el){ 
-            document.querySelectorAll('.setting-content-pane').forEach(p=>p.classList.remove('active')); document.getElementById(t).classList.add('active'); el.parentElement.querySelectorAll('.custom-tab').forEach(c=>c.classList.remove('active')); el.classList.add('active'); 
-            // Disable Inputs if no edit perm
-            const editable = canEdit('settings');
-            const inputs = document.querySelectorAll('#settings input, #settings textarea, #settings select');
-            inputs.forEach(i => i.disabled = !editable);
-            const editBtns = document.querySelectorAll('.setting-edit-btn');
-            editBtns.forEach(b => b.style.display = editable ? 'inline-block' : 'none');
-
-            if(t==='eval')loadEvaluationSettings(); 
-            // ... (other loads) ... 
-            if(t==='sig')loadSignatureSettings(); if(t==='vis')loadVisitorSettings(); if(t==='fot')loadFooterSettings(); if(t==='log')loadSystemLogs();
-        }
-
-        function loadSettings(){ const s=DB.settings; document.getElementById('confSchool').value=s.schoolName||''; document.getElementById('confYear').value=s.schoolYear||''; showImagePreview('preview_ministry','preview_wrap_ministry','btn_wrap_ministry',s.ministryLogo); showImagePreview('preview_school','preview_wrap_school','btn_wrap_school',s.schoolLogo); showImagePreview('preview_stamp','preview_wrap_stamp','btn_wrap_stamp',s.schoolStamp); }
-        function saveGeneralSettings(){ 
-            if(!canEdit('settings')) return;
-            const newName = document.getElementById('confSchool').value;
-            DB.settings.schoolName = newName;
-            DB.settings.schoolYear = document.getElementById('confYear').value;
-            document.getElementById('sidebarSchoolName').innerText = newName; 
-            saveDB(); alert('تم الحفظ'); 
-        }
-        
-        // --- Evaluation Settings (Protected) ---
-        function loadEvaluationSettings(){ 
-            const b=document.getElementById('evalTableBody'); b.innerHTML=''; 
-            const editable = canEdit('settings');
-            (DB.settings.evaluation_criteria||[]).forEach((e,i)=>{
-                const statusText = e.status === 'active' ? 'مفعل' : 'معطل';
-                const statusClass = e.status === 'active' ? 'status-active' : 'status-inactive';
-                let row = `<tr><td>${i+1}</td><td>${e.name}</td><td><span class="status-badge ${statusClass}">${statusText}</span></td>`;
-                row += `<td><div style="display:flex; justify-content:center; gap:2px; flex-wrap:wrap;">`;
-                if(editable) {
-                    row += `<button class="action-btn btn-move" onclick="moveEval(${e.id},'up')"><i class="fas fa-arrow-up"></i></button>
-                            <button class="action-btn btn-move" onclick="moveEval(${e.id},'down')"><i class="fas fa-arrow-down"></i></button>
-                            <button class="action-btn btn-toggle" onclick="toggleEvalStatus(${e.id})"><i class="fas fa-power-off"></i> تبديل</button>
-                            <button class="action-btn btn-edit" onclick="openAddEvalModal(${e.id})"><i class="fas fa-edit"></i> تعديل</button>
-                            <button class="action-btn btn-delete" onclick="deleteEval(${e.id})"><i class="fas fa-trash"></i> حذف</button>`;
-                }
-                row += `</div></td></tr>`;
-                b.innerHTML+=row;
-            }); 
-        }
-        // ... (Eval add/edit/save/delete logic standard) ...
-        function openAddEvalModal(id){ if(!canEdit('settings'))return; document.getElementById('addEvalForm').reset(); document.getElementById('editEvalId').value=''; if(id){const e=DB.settings.evaluation_criteria.find(x=>x.id===id); document.getElementById('editEvalId').value=e.id; document.getElementById('evalName').value=e.name;} document.getElementById('addEvalModal').style.display='flex'; }
-        function saveEvalForm(){ if(!canEdit('settings'))return; const n=document.getElementById('evalName').value; const id=document.getElementById('editEvalId').value; if(!n)return; if(id){const e=DB.settings.evaluation_criteria.find(x=>x.id==id); e.name=n;} else {DB.settings.evaluation_criteria.push({id:Date.now(), name:n, status:'active'});} saveDB(); loadEvaluationSettings(); closeModal('addEvalModal'); }
-        function deleteEval(id){ if(!canEdit('settings'))return; if(confirm('حذف؟')){DB.settings.evaluation_criteria=DB.settings.evaluation_criteria.filter(x=>x.id!==id); saveDB(); loadEvaluationSettings();} }
-        function toggleEvalStatus(id){ if(!canEdit('settings'))return; const e=DB.settings.evaluation_criteria.find(x=>x.id===id); e.status=e.status==='active'?'inactive':'active'; saveDB(); loadEvaluationSettings(); }
-        function moveEval(id,d){ if(!canEdit('settings'))return; const l=DB.settings.evaluation_criteria; const i=l.findIndex(x=>x.id===id); if(d==='up'&&i>0)[l[i],l[i-1]]=[l[i-1],l[i]]; if(d==='down'&&i<l.length-1)[l[i],l[i+1]]=[l[i+1],l[i]]; saveDB(); loadEvaluationSettings(); }
-
-        // --- Distinguished Logic (Protected) ---
-        function renderDistinguishedTables() { 
-            const editable = canEdit('distinguished');
-            
-            // Hide/Show Add Buttons
-            document.querySelectorAll('.btn-group-restricted button').forEach(b => b.style.display = editable ? 'inline-block' : 'none');
-            
-            // Hide/Show Action Columns Header
-            document.querySelectorAll('.col-actions').forEach(c => c.style.display = editable ? 'table-cell' : 'none');
-
-            const filterMonth = document.getElementById('distMonthFilter').value;
-            const renderTableBody = (list, elementId, type) => {
-                const body = document.getElementById(elementId); body.innerHTML = '';
-                let filteredList = list;
-                if(filterMonth !== 'all') { filteredList = list.filter(i => { if(!i.date) return false; const m = i.date.split('-')[1]; return m === filterMonth; }); }
-                if(filteredList.length === 0) { body.innerHTML = '<tr><td colspan="6" style="padding:20px; color:#888;">لا يوجد بيانات</td></tr>'; } 
-                else {
-                    filteredList.forEach((item, idx) => {
-                        const statusClass = type === 'distinguished' ? 'status-active' : 'status-inactive';
-                        let row = `<tr><td>${idx + 1}</td><td>${item.teacherName}</td><td>${item.dept}</td><td><span class="status-badge ${statusClass}">${item.eval}</span></td><td class="reason-cell">${item.reason}</td>`;
-                        if(editable) {
-                            row += `<td><div style="display:flex; justify-content:center; gap:2px; flex-wrap:wrap;"><button class="action-btn btn-view" onclick="viewDistinguished('${type}', ${item.id})"><i class="fas fa-eye"></i> معاينة</button><button class="action-btn btn-edit" onclick="editDistinguished('${type}', ${item.id})"><i class="fas fa-edit"></i> تعديل</button><button class="action-btn btn-delete" onclick="deleteDistinguished('${type}', ${item.id})"><i class="fas fa-trash"></i> حذف</button></div></td>`;
-                        } else {
-                            // If readonly, user might want to View details only? Usually view button is fine, but edit/delete forbidden. 
-                            // Request said "if view only, cannot edit/add". Let's show View button only if permitted, or just hide actions if we treat "Actions" as edit actions.
-                            // The instruction says "If view only... cannot add or edit". 
-                            // I will keep "View" button available if view=true, but inside the Actions column.
-                            // But previous styling hides column. Let's make "Action" column visible but only containing View button if edit=false.
-                            row += `<td><button class="action-btn btn-view" onclick="viewDistinguished('${type}', ${item.id})"><i class="fas fa-eye"></i> معاينة</button></td>`;
-                        }
-                        row += `</tr>`;
-                        body.innerHTML += row;
-                    });
-                }
-            };
-            
-            // Re-enable column header for View button sake
-            document.querySelectorAll('.col-actions').forEach(c => c.style.display = 'table-cell');
-
-            renderTableBody(DB.distinguished || [], 'distinguishedTableBody', 'distinguished');
-            renderTableBody(DB.care_needed || [], 'careTableBody', 'care');
-        }
-
-        function saveDistinguishedEntry() {
-            if(!canEdit('distinguished')) return;
-            const type = document.getElementById('distType').value; const editId = document.getElementById('distEditId').value;
-            const dept = document.getElementById('distDept').value; const teacher = document.getElementById('distTeacher').value;
-            const ev = document.getElementById('distEval').value; const reason = document.getElementById('distReason').value;
-            if(!dept || !teacher || !ev) { alert('اكمل البيانات'); return; }
-
-            let targetList = (type === 'distinguished') ? DB.distinguished : DB.care_needed;
-            if(!targetList) { if(type === 'distinguished') { DB.distinguished=[]; targetList=DB.distinguished; } else { DB.care_needed=[]; targetList=DB.care_needed; } }
-
-            const timestamp = new Date().toLocaleString('en-GB');
-            if (editId) {
-                const item = targetList.find(x => x.id == editId);
-                if(item) { item.dept=dept; item.teacherName=teacher; item.eval=ev; item.reason=reason; item.lastUpdated=timestamp; item.lastUpdatedBy=CURRENT_USER.name; }
-            } else {
-                targetList.push({ id: Date.now(), date: new Date().toISOString().split('T')[0], dept: dept, teacherName: teacher, eval: ev, reason: reason, lastUpdated: timestamp, lastUpdatedBy: CURRENT_USER.name });
-            }
-            saveDB(); renderDistinguishedTables(); closeModal('distinguishedModal');
-        }
-
-        function viewDistinguished(type, id) {
-            const list = type === 'distinguished' ? DB.distinguished : DB.care_needed;
-            const item = list.find(x => x.id === id);
-            if(!item) return;
-            document.getElementById('viewDetailsContent').innerHTML = `<div style="text-align:right;"><div style="margin-bottom:10px;"><strong style="color:var(--primary);">الاسم:</strong> ${item.teacherName}</div><div style="margin-bottom:10px;"><strong style="color:var(--primary);">القسم:</strong> ${item.dept}</div><div style="margin-bottom:10px;"><strong style="color:var(--primary);">التقدير:</strong> <span class="status-badge status-active">${item.eval}</span></div><div style="margin-bottom:5px;"><strong style="color:var(--primary);">المبررات:</strong></div><div style="background:#f9f9f9; padding:15px; border-radius:5px; border:1px solid #eee; white-space:pre-wrap; line-height:1.6;">${item.reason}</div><div style="margin-top:10px; font-size:0.8rem; color:#888;">تاريخ الإضافة: ${item.date || '-'}</div></div>`;
-            document.getElementById('viewDetailsFooter').innerHTML = `<div>آخر تحديث بواسطة: <strong>${item.lastUpdatedBy || 'N/A'}</strong></div><div>${item.lastUpdated || '-'}</div>`;
-            document.getElementById('viewDetailsModal').style.display = 'flex';
-        }
-
-        // --- Qualitative Report Logic (Protected) ---
-        function renderQualitativeTable() { 
-            const editable = canEdit('qualitative');
-            const btn = document.querySelector('#qualitative .btn-restricted');
-            if(btn) btn.style.display = editable ? 'inline-block' : 'none';
-
-            const tbody = document.getElementById('qualitativeTableBody'); tbody.innerHTML=''; const f = document.getElementById('qualMonthFilter').value;
-            let list = DB.qualitative_reports || [];
-            if(f!=='all') list = list.filter(i=> i.date && i.date.split('-')[1]===f);
-            if(list.length===0){tbody.innerHTML='<tr><td colspan="5">لا يوجد</td></tr>';} else {
-                list.forEach((item, idx) => {
-                    let row = `<tr><td>${idx+1}</td><td>${item.dept}</td><td class="reason-cell">${item.strengths}</td><td class="reason-cell">${item.improvements}</td><td><div style="display:flex; justify-content:center; gap:2px; flex-wrap:wrap;">`;
-                    row += `<button class="action-btn btn-view" onclick="viewQualitative(${item.id})"><i class="fas fa-eye"></i> معاينة</button>`;
-                    if(editable) {
-                        row += `<button class="action-btn btn-edit" onclick="editQualitative(${item.id})"><i class="fas fa-edit"></i> تعديل</button><button class="action-btn btn-delete" onclick="deleteQualitative(${item.id})"><i class="fas fa-trash"></i> حذف</button>`;
-                    }
-                    row += `</div></td></tr>`;
-                    tbody.innerHTML += row;
-                });
-            }
-        }
-
-        function saveQualitative() {
-            if(!canEdit('qualitative')) return;
-            const editId = document.getElementById('qualEditId').value;
-            const dept = document.getElementById('qualDept').value;
-            const st = document.getElementById('qualStrength').value;
-            const im = document.getElementById('qualImprove').value;
-            if (!dept) { alert('اختر القسم'); return; }
-            
-            const timestamp = new Date().toLocaleString('en-GB');
-            if (editId) {
-                const item = DB.qualitative_reports.find(i => i.id == editId);
-                if (item) { item.dept=dept; item.strengths=st; item.improvements=im; item.lastUpdated=timestamp; item.lastUpdatedBy=CURRENT_USER.name; }
-            } else {
-                if (!DB.qualitative_reports) DB.qualitative_reports = [];
-                DB.qualitative_reports.push({ id: Date.now(), date: new Date().toISOString().split('T')[0], dept: dept, strengths: st, improvements: im, lastUpdated: timestamp, lastUpdatedBy: CURRENT_USER.name });
-            }
-            saveDB(); renderQualitativeTable(); closeModal('addQualitativeModal');
-        }
-
-        function viewQualitative(id) {
-            const item = DB.qualitative_reports.find(i => i.id === id);
-            if (!item) return;
-            document.getElementById('viewDetailsContent').innerHTML = `<div style="text-align:right;"><div style="margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;"><strong style="color:var(--primary); font-size:1.1rem;">${item.dept}</strong><div style="font-size:0.85rem; color:#777; margin-top:5px;">تاريخ التقرير: ${item.date}</div></div><div style="margin-bottom:5px;"><strong style="color:var(--success);">جوانب القوة:</strong></div><div style="background:#f1fff4; padding:15px; border-radius:5px; border:1px solid #c3e6cb; white-space:pre-wrap; line-height:1.6; margin-bottom:15px;">${item.strengths}</div><div style="margin-bottom:5px;"><strong style="color:var(--danger);">جوانب بحاجة إلى تطوير:</strong></div><div style="background:#fff5f5; padding:15px; border-radius:5px; border:1px solid #f5c6cb; white-space:pre-wrap; line-height:1.6;">${item.improvements}</div></div>`;
-            document.getElementById('viewDetailsFooter').innerHTML = `<div>آخر تحديث بواسطة: <strong>${item.lastUpdatedBy || 'N/A'}</strong></div><div>${item.lastUpdated || '-'}</div>`;
-            document.getElementById('viewDetailsModal').style.display = 'flex';
-        }
-
-        // --- Helper functions for other sections ---
-        function onDistinguishedDeptChange() { const d=document.getElementById('distDept').value; const t=document.getElementById('distTeacher'); t.innerHTML='<option value="">اختر...</option>'; (DB.teachers||[]).filter(x=>x.dept===d).forEach(x=>t.innerHTML+=`<option value="${x.name}">${x.name}</option>`); }
-        function openDistinguishedModal(t){ if(!canEdit('distinguished'))return; document.getElementById('distinguishedForm').reset(); document.getElementById('distEditId').value=''; document.getElementById('distType').value=t; document.getElementById('distinguishedModal').style.display='flex'; const d=document.getElementById('distDept'); d.innerHTML='<option value="">اختر...</option>'; (DB.departments||[]).forEach(x=>d.innerHTML+=`<option value="${x.name}">${x.name}</option>`); document.getElementById('distTeacher').innerHTML='<option value="">اختر...</option>'; const e=document.getElementById('distEval'); e.innerHTML='<option value="">اختر...</option>'; (DB.settings.evaluation_criteria||[]).filter(x=>x.status==='active').forEach(x=>e.innerHTML+=`<option value="${x.name}">${x.name}</option>`); }
-        function editDistinguished(t,id){ if(!canEdit('distinguished'))return; const l=t==='distinguished'?DB.distinguished:DB.care_needed; const i=l.find(x=>x.id===id); if(!i)return; openDistinguishedModal(t); document.getElementById('distEditId').value=id; document.getElementById('distDept').value=i.dept; onDistinguishedDeptChange(); document.getElementById('distTeacher').value=i.teacherName; document.getElementById('distEval').value=i.eval; document.getElementById('distReason').value=i.reason; }
-        function deleteDistinguished(t,id){ if(!canEdit('distinguished'))return; if(confirm('حذف؟')){if(t==='distinguished')DB.distinguished=DB.distinguished.filter(x=>x.id!==id); else DB.care_needed=DB.care_needed.filter(x=>x.id!==id); saveDB(); renderDistinguishedTables();} }
-        function openQualitativeModal(){ if(!canEdit('qualitative'))return; document.getElementById('qualitativeForm').reset(); document.getElementById('qualEditId').value=''; const d=document.getElementById('qualDept'); d.innerHTML='<option value="">اختر...</option>'; (DB.departments||[]).forEach(x=>d.innerHTML+=`<option value="${x.name}">${x.name}</option>`); document.getElementById('addQualitativeModal').style.display='flex'; }
-        function editQualitative(id){ if(!canEdit('qualitative'))return; const i=DB.qualitative_reports.find(x=>x.id===id); if(!i)return; openQualitativeModal(); document.getElementById('qualEditId').value=id; document.getElementById('qualDept').value=i.dept; document.getElementById('qualStrength').value=i.strengths; document.getElementById('qualImprove').value=i.improvements; }
-        function deleteQualitative(id){ if(!canEdit('qualitative'))return; if(confirm('حذف؟')){DB.qualitative_reports=DB.qualitative_reports.filter(x=>x.id!==id); saveDB(); renderQualitativeTable();} }
-
-        // Standard Functions
-        function saveVisit(){ if(!canEdit('visits'))return; const d=document.getElementById('visitDept').value; const t=document.getElementById('visitTeacher').value; const date=document.getElementById('visitDate').value; const ev=document.getElementById('visitEval').value; if(!d||!t||!date||!ev)return alert('اكمل'); const v={id:Date.now(), dept:d, teacher:t, date:date, eval:ev, visitorName:CURRENT_USER.name, visitorId:CURRENT_USER.id, lastUpdated: new Date().toLocaleString('en-GB'), lastUpdatedBy: CURRENT_USER.name}; if(DB.middle.some(u=>u.id===CURRENT_USER.id)) { if(!DB.visits_middle)DB.visits_middle=[]; DB.visits_middle.push(v); } else { if(!DB.visits_senior)DB.visits_senior=[]; DB.visits_senior.push(v); } saveDB(); renderVisitsTable(); closeModal('addVisitModal'); alert('تم'); }
-        function onVisitDeptChange(){ const d=document.getElementById('visitDept').value; const t=document.getElementById('visitTeacher'); t.innerHTML='<option value="">اختر...</option>'; (DB.teachers||[]).filter(x=>x.dept===d&&x.status==='active').forEach(x=>t.innerHTML+=`<option value="${x.name}">${x.name}</option>`); }
-        function renderVisitsTable(){ 
-            const editable = canEdit('visits');
-            const btn = document.querySelector('#visits .btn-restricted');
-            if(btn) btn.style.display = editable ? 'inline-block' : 'none';
-
-            const b=document.getElementById('visitsTableBody'); b.innerHTML=''; const f=document.getElementById('visitMonthFilter').value; let l=CURRENT_VISIT_TAB==='senior'?(DB.visits_senior||[]):(DB.visits_middle||[]); if(f!=='all') l=l.filter(v=>v.date.split('-')[1]===f); if(l.length===0){b.innerHTML='<tr><td colspan="6">لا يوجد</td></tr>';return;} l.sort((x,y)=>y.id-x.id); l.forEach(v=>{b.innerHTML+=`<tr><td>${v.date}</td><td>${v.dept}</td><td>${v.teacher}</td><td>${v.eval}</td><td>${v.visitorName}</td><td>${getLatestJobTitle(v.visitorId)}</td></tr>`;}); 
-        }
-        function getLatestJobTitle(uid){ for(let g of ['admins','senior','middle','teachers']) if(DB[g]){const f=DB[g].find(x=>x.id==uid); if(f)return f.job||f.dept||'-';} return '-'; }
-        function openAddVisitModal(){ if(!canEdit('visits'))return; document.getElementById('addVisitForm').reset(); const d=document.getElementById('visitDept'); d.innerHTML='<option value="">اختر...</option>'; (DB.departments||[]).forEach(x=>d.innerHTML+=`<option value="${x.name}">${x.name}</option>`); const e=document.getElementById('visitEval'); e.innerHTML='<option value="">اختر...</option>'; (DB.settings.evaluation_criteria||[]).filter(x=>x.status==='active').forEach(x=>e.innerHTML+=`<option value="${x.name}">${x.name}</option>`); document.getElementById('visitTeacher').innerHTML='<option value="">اختر...</option>'; document.getElementById('addVisitModal').style.display='flex'; }
-        function renderPerformanceChart(){ const f=document.getElementById('perfMonthFilter').value; const ctx=document.getElementById('perfChart').getContext('2d'); let l=[...(DB.visits_senior||[]), ...(DB.visits_middle||[])]; if(f!=='all') l=l.filter(v=>v.date.split('-')[1]===f); const depts=[...new Set(l.map(x=>x.dept))]; let crits=(DB.settings.evaluation_criteria||[]).filter(x=>x.status==='active').map(x=>x.name); l.forEach(v=>{if(!crits.includes(v.eval))crits.push(v.eval)}); const ds=crits.map((c,i)=>({label:c, data:depts.map(d=>l.filter(x=>x.dept===d&&x.eval===c).length), backgroundColor:['#28a745','#17a2b8','#ffc107','#dc3545'][i%4]})); if(performanceChartInstance)performanceChartInstance.destroy(); performanceChartInstance=new Chart(ctx,{type:'bar',data:{labels:depts.length?depts:['no data'], datasets:ds}}); }
-        
-        function showImagePreview(i,w,b,s){ const img=document.getElementById(i); if(s){img.src=s; document.getElementById(w).style.display='inline-block'; document.getElementById(b).style.display='none';} else {document.getElementById(w).style.display='none'; document.getElementById(b).style.display='block';} }
-        function triggerFileSelect(id){ if(canEdit('settings')) document.getElementById(id).click(); }
-        function handleFileUpload(inp,pId,k){ if(inp.files&&inp.files[0]){const r=new FileReader(); r.onload=function(e){const d=e.target.result; document.getElementById(pId).src=d; document.getElementById(pId.replace('preview_','preview_wrap_')).style.display='inline-block'; document.getElementById(pId.replace('preview_','btn_wrap_')).style.display='none';}; r.readAsDataURL(inp.files[0]);} }
-        function removeImage(pId,k,inpId){ if(!canEdit('settings'))return; if(confirm('حذف؟')){document.getElementById(pId).src=''; document.getElementById(inpId).value=''; document.getElementById(pId.replace('preview_','preview_wrap_')).style.display='none'; document.getElementById(pId.replace('preview_','btn_wrap_')).style.display='block';} }
-        function openImageModal(s){ if(!s)return; document.getElementById('fullImage').src=s; document.getElementById('imageViewModal').style.display='flex'; }
-        function loadSignatureSettings(){ const sel=[document.getElementById('sig_director'), document.getElementById('sig_assistant')]; sel.forEach(s=>{s.innerHTML='<option value="">اختر...</option>'; (DB.senior||[]).forEach(u=>{s.innerHTML+=`<option value="${u.id}">${u.name}</option>`})}); document.getElementById('sig_director').value=DB.settings.signature_director_id; document.getElementById('sig_assistant').value=DB.settings.signature_assistant_id; }
-        function saveSignatureSettings(){ if(!canEdit('settings'))return; DB.settings.signature_director_id=document.getElementById('sig_director').value; DB.settings.signature_assistant_id=document.getElementById('sig_assistant').value; saveDB(); alert('تم الحفظ'); }
-        function clearSignature(id){ if(!canEdit('settings'))return; document.getElementById(id).value=''; saveSignatureSettings(); }
-        function loadVisitorSettings(){ renderVisitorList('senior'); renderVisitorList('middle'); }
-        function renderVisitorList(t){ const l=document.getElementById(`list_visitor_${t}`); const o=t==='senior'?DB.settings.visitor_order_senior:DB.settings.visitor_order_middle; const src=t==='senior'?DB.senior:DB.middle; l.innerHTML=''; if(!o||o.length===0){l.innerHTML='<li class="empty-list-msg">فارغ</li>';return;} o.forEach((id,i)=>{const u=src.find(x=>x.id==id); if(u) l.innerHTML+=`<li class="visitor-list-item"><span class="visitor-name">${u.name}</span><div class="visitor-controls"><button class="action-btn btn-move" onclick="moveVisitorItem('${t}',${i},'up')"><i class="fas fa-arrow-up"></i></button><button class="action-btn btn-move" onclick="moveVisitorItem('${t}',${i},'down')"><i class="fas fa-arrow-down"></i></button><button class="action-btn btn-delete" onclick="removeVisitorItem('${t}',${i})"><i class="fas fa-trash"></i></button></div></li>`;}); }
-        function openVisitorPicker(t){ if(!canEdit('settings'))return; CURRENT_PICKER_TYPE=t; document.getElementById('visitorSearch').value=''; filterPickerList(); document.getElementById('visitorPickerModal').style.display='flex'; }
-        function filterPickerList(){ const q=document.getElementById('visitorSearch').value.toLowerCase(); const l=document.getElementById('pickerList'); l.innerHTML=''; const src=CURRENT_PICKER_TYPE==='senior'?DB.senior:DB.middle; const o=CURRENT_PICKER_TYPE==='senior'?DB.settings.visitor_order_senior:DB.settings.visitor_order_middle; src.filter(u=>!o.includes(u.id)).forEach(u=>{if(u.name.toLowerCase().includes(q)) l.innerHTML+=`<div class="picker-item" onclick="addVisitorToOrder(${u.id})"><div><div class="picker-item-name">${u.name}</div></div><i class="fas fa-plus-circle" style="color:var(--success);"></i></div>`;}); }
-        function addVisitorToOrder(id){ const k=CURRENT_PICKER_TYPE==='senior'?'visitor_order_senior':'visitor_order_middle'; if(!DB.settings[k])DB.settings[k]=[]; DB.settings[k].push(id); closeModal('visitorPickerModal'); renderVisitorList(CURRENT_PICKER_TYPE); }
-        function removeVisitorItem(t,i){ if(!canEdit('settings'))return; const k=t==='senior'?'visitor_order_senior':'visitor_order_middle'; DB.settings[k].splice(i,1); renderVisitorList(t); }
-        function moveVisitorItem(t,i,d){ if(!canEdit('settings'))return; const k=t==='senior'?'visitor_order_senior':'visitor_order_middle'; const a=DB.settings[k]; if(d==='up'&&i>0)[a[i],a[i-1]]=[a[i-1],a[i]]; if(d==='down'&&i<a.length-1)[a[i],a[i+1]]=[a[i+1],a[i]]; renderVisitorList(t); }
-        function saveVisitorOrder(){ if(!canEdit('settings'))return; saveDB(); alert('تم الحفظ'); }
-        function loadFooterSettings(){ document.getElementById('footer_text').value=DB.settings.footer_text||''; document.getElementById('footer_align').value=DB.settings.footer_align||'center'; document.getElementById('footer_fontsize').value=DB.settings.footer_fontsize||'12'; }
-        function saveFooterSettings(){ if(!canEdit('settings'))return; DB.settings.footer_text=document.getElementById('footer_text').value; DB.settings.footer_align=document.getElementById('footer_align').value; DB.settings.footer_fontsize=document.getElementById('footer_fontsize').value; saveDB(); alert('تم الحفظ'); }
-        function loadSystemLogs(){ const b=document.getElementById('logTableBody'); b.innerHTML=''; (DB.logs||[]).forEach(l=>{b.innerHTML+=`<tr><td>${l.date}</td><td>${l.user}</td><td>${l.action}</td><td>${l.details}</td></tr>`;}); }
-        function clearSystemLogs(){ if(!canEdit('settings'))return; if(confirm('مسح؟')){DB.logs=[]; saveDB(); loadSystemLogs();} }
-        function setVisitTab(t,el){ CURRENT_VISIT_TAB=t; el.parentElement.querySelectorAll('.custom-tab').forEach(c=>c.classList.remove('active')); el.classList.add('active'); renderVisitsTable(); }
-
-        document.getElementById('loginForm').addEventListener('submit', login);
-        initSystem();
-    </script>
-</body>
-</html>
+            document.getElementById('viewUserModal').style
