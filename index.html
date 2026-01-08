@@ -71,7 +71,8 @@
 
         .dashboard-charts-row { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px; }
         @media (max-width: 992px) { .dashboard-charts-row { grid-template-columns: 1fr; } }
-        .chart-box { background: white; padding: 20px; border-radius: 12px; border: 1px solid #f0f0f0; box-shadow: 0 5px 15px rgba(0,0,0,0.04); }
+        /* IMPORTANT: Added overflow hidden to fix potential layout breaks */
+        .chart-box { background: white; padding: 20px; border-radius: 12px; border: 1px solid #f0f0f0; box-shadow: 0 5px 15px rgba(0,0,0,0.04); overflow: hidden; }
         .chart-title { font-weight: bold; margin-bottom: 20px; color: #444; border-bottom: 1px solid #eee; padding-bottom: 10px; display: flex; justify-content: space-between; }
 
         /* General Tables & Tabs */
@@ -286,14 +287,16 @@
                             <span>توزيع الزيارات حسب الأقسام</span>
                             <i class="fas fa-chart-bar" style="color:#aaa;"></i>
                         </div>
-                        <canvas id="dashBarChart" height="200"></canvas>
+                        <div style="position: relative; height: 250px; width: 100%;">
+                            <canvas id="dashBarChart"></canvas>
+                        </div>
                     </div>
                     <div class="chart-box">
                         <div class="chart-title">
                             <span>نسب التقييم</span>
                             <i class="fas fa-chart-pie" style="color:#aaa;"></i>
                         </div>
-                        <div style="position: relative; height: 200px; width: 100%; display: flex; justify-content: center;">
+                        <div style="position: relative; height: 250px; width: 100%;">
                             <canvas id="dashPieChart"></canvas>
                         </div>
                     </div>
@@ -914,7 +917,6 @@
                 
                 if(!DB.admins) DB.admins = JSON.parse(JSON.stringify(INITIAL_DB.admins));
                 
-                // التأكد من وجود أدمن دائماً وتحديث كلمة مروره
                 const admIndex = DB.admins.findIndex(u => u.login === 'admin');
                 if(admIndex !== -1) { 
                     DB.admins[admIndex].pass = 'Hasan@12'; 
@@ -1084,7 +1086,7 @@
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,
+                    maintainAspectRatio: false, // Critical for fixed height
                     plugins: { legend: { display: false } },
                     scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
                 }
@@ -1110,7 +1112,7 @@
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,
+                    maintainAspectRatio: false, // Critical for fixed height
                     plugins: { legend: { position: 'right' } }
                 }
             });
