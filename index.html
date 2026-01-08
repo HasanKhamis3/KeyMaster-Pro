@@ -255,8 +255,8 @@
                             <th width="15%">القسم</th>
                             <th width="20%">اسم المعلمة</th>
                             <th width="15%">التقييم</th>
-                            <th width="15%">الزائر</th>
-                            <th width="20%">ملاحظات / إجراءات</th>
+                            <th width="20%">الزائر</th>
+                            <th width="15%">وظيفة الزائر</th>
                         </tr>
                     </thead>
                     <tbody id="visitsTableBody">
@@ -524,10 +524,6 @@
                         <select id="visitEval" class="form-control">
                             <option value="">اختر التقييم...</option>
                         </select>
-                    </div>
-                    <div class="form-group">
-                        <label style="font-weight:bold; display:block; margin-bottom:5px;">الملاحظات</label>
-                        <textarea id="visitNotes" class="form-control" rows="4" placeholder="اكتب ملاحظات الزيارة هنا..."></textarea>
                     </div>
                 </form>
             </div>
@@ -817,7 +813,6 @@
         function setTab(tab, el) {
             CURRENT_TAB = tab;
             document.querySelectorAll('.custom-tab').forEach(t => {
-                // Check if this tab belongs to user-management
                  if(t.parentElement.previousElementSibling && t.parentElement.previousElementSibling.id === 'userActionButtons') {
                      // pass
                  } else if (el.parentElement === t.parentElement) {
@@ -1588,7 +1583,6 @@
             const teacher = document.getElementById('visitTeacher').value;
             const date = document.getElementById('visitDate').value;
             const eval = document.getElementById('visitEval').value;
-            const notes = document.getElementById('visitNotes').value;
 
             if(!dept || !teacher || !date || !eval) {
                 alert('يرجى تعبئة جميع الحقول المطلوبة');
@@ -1601,9 +1595,9 @@
                 teacher: teacher,
                 date: date,
                 eval: eval,
-                notes: notes,
                 visitorName: CURRENT_USER.name,
-                visitorId: CURRENT_USER.id
+                visitorId: CURRENT_USER.id,
+                visitorJob: CURRENT_USER.job || CURRENT_USER.dept // إضافة وظيفة الزائر
             };
 
             // تحديد مكان الحفظ بناءً على تصنيف المستخدم
@@ -1655,7 +1649,7 @@
                     <td style="font-weight:bold;">${v.teacher}</td>
                     <td><span class="status-badge status-active" style="background:#eef; color:var(--primary); border:1px solid #ccf;">${v.eval}</span></td>
                     <td>${v.visitorName}</td>
-                    <td style="font-size:0.85rem; color:#666;">${v.notes || '-'}</td>
+                    <td>${v.visitorJob || '-'}</td>
                 `;
                 tbody.appendChild(tr);
             });
