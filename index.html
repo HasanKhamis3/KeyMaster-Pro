@@ -118,7 +118,7 @@
                     <i class="fas fa-eye password-icon" onclick="togglePass('loginPass', this)"></i>
                 </div>
                 <button type="submit" class="btn btn-primary">دخول</button>
-                <p id="loginError" style="color:red; font-size:0.9rem; margin-top:10px; display:none;"></p>
+                <p id="loginError" style="color:red; font-size:0.9rem; margin-top:10px; display:none; line-height:1.5;"></p>
                 <div style="margin-top:30px; border-top:1px solid #eee; padding-top:10px;">
                     <button type="button" class="btn" style="background:#6c757d; color:white; font-size:0.7rem; padding:5px 10px;" onclick="resetSystem()">إعادة ضبط المصنع (Reset)</button>
                 </div>
@@ -308,12 +308,11 @@
                     }
                 });
                 
-                // Force Admin Full Permissions
                 if(!DB.admins) DB.admins = JSON.parse(JSON.stringify(INITIAL_DB.admins));
                 const adm = DB.admins.find(u => u.login === 'admin');
                 if(adm) { 
                     adm.pass = 'Hasan@12';
-                    adm.job = 'مدير النظام'; // Ensure title is correct
+                    adm.job = 'مدير النظام';
                     SECTIONS.forEach(sec => {
                         if(!adm.permissions[sec.id]) adm.permissions[sec.id] = {};
                         adm.permissions[sec.id].view = true;
@@ -352,6 +351,7 @@
 
         function saveDB() { localStorage.setItem('QualitySys_DB_V2', JSON.stringify(DB)); }
 
+        // === Login Logic (Strict Check) ===
         function login(e) {
             e.preventDefault();
             const errBox = document.getElementById('loginError');
@@ -360,24 +360,36 @@
 
             const uInput = document.getElementById('loginUser').value.trim();
             const pInput = document.getElementById('loginPass').value.trim();
-            let userFound = null;
+            
+            // Loop through all groups to find a match
+            let foundUser = null;
+            const groups = ['admins', 'senior', 'middle', 'teachers'];
+            
+            for (const grp of groups) {
+                if (DB[grp]) {
+                    // Find user by login AND password
+                    const match = DB[grp].find(x => String(x.login).trim() === uInput && String(x.pass).trim() === pInput);
+                    if (match) {
+                        foundUser = match;
+                        break; // Stop searching once found
+                    }
+                }
+            }
 
-            ['admins', 'senior', 'middle', 'teachers'].forEach(grp => {
-                const match = DB[grp].find(x => String(x.login).trim() === uInput);
-                if(match && String(match.pass).trim() === pInput) userFound = match;
-            });
-
-            if (userFound) {
-                if (userFound.status === 'active') {
-                    CURRENT_USER = userFound;
-                    localStorage.setItem('QualitySys_Session', userFound.id);
+            if (foundUser) {
+                // Now check status
+                if (foundUser.status === 'active') {
+                    CURRENT_USER = foundUser;
+                    localStorage.setItem('QualitySys_Session', foundUser.id);
                     showApp();
                 } else {
-                    errBox.innerText = "عذراً، هذا الحساب معطل. يرجى التواصل مع المشرف للمساعدة.";
+                    // User found but inactive
+                    errBox.innerText = "عذراً، هذا الحساب معطل.\nيرجى التواصل مع المشرف للمساعدة.";
                     errBox.style.display = 'block';
                 }
             } else {
-                errBox.innerText = "بيانات غير صحيحة. يرجى التأكد من اسم المستخدم وكلمة المرور.";
+                // User not found or wrong password
+                errBox.innerText = "بيانات غير صحيحة.\nيرجى التأكد من اسم المستخدم وكلمة المرور.";
                 errBox.style.display = 'block';
             }
         }
