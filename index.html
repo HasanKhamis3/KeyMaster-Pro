@@ -236,6 +236,8 @@
             <div class="modal-header"><span id="addUserModalTitle">إضافة اسم جديد</span> <span onclick="closeModal('addUserModal')" style="cursor:pointer;">&times;</span></div>
             <div class="modal-body">
                 <form id="addUserForm">
+                    <input type="hidden" id="editUserId">
+                    
                     <label>الاسم الكامل / اسم القسم</label><input type="text" id="addName" class="form-control" required>
                     
                     <div id="userFields">
@@ -247,7 +249,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-primary" onclick="saveNewUser()">حفظ</button>
+                <button class="btn btn-primary" onclick="saveUserForm()">حفظ</button>
                 <button class="btn" style="background:#ddd;" onclick="closeModal('addUserModal')">إلغاء</button>
             </div>
         </div>
@@ -360,7 +362,6 @@
                     if(u) found = u;
                 });
                 
-                // Strict Session Check
                 if (found && found.status === 'active') {
                     CURRENT_USER = found;
                     showApp();
@@ -374,7 +375,7 @@
 
         function saveDB() { localStorage.setItem('QualitySys_DB_V2', JSON.stringify(DB)); }
 
-        // === STRICT LOGIN LOGIC (Fixed) ===
+        // === STRICT LOGIN LOGIC ===
         function login(e) {
             e.preventDefault();
             const errBox = document.getElementById('loginError');
@@ -385,25 +386,21 @@
             const pInput = document.getElementById('loginPass').value.trim();
             let userFound = null;
 
-            // Search for user with matching credentials
             ['admins', 'senior', 'middle', 'teachers'].forEach(grp => {
                 const match = DB[grp].find(x => String(x.login).trim() === uInput && String(x.pass).trim() === pInput);
                 if(match) userFound = match;
             });
 
             if (userFound) {
-                // FOUND MATCH - NOW CHECK STATUS
                 if (userFound.status === 'active') {
                     CURRENT_USER = userFound;
                     localStorage.setItem('QualitySys_Session', userFound.id);
                     showApp();
                 } else {
-                    // FOUND BUT INACTIVE
                     errBox.innerText = "نعتذر منك، الحساب غير نشط حالياً.\nيرجى مراجعة إدارة النظام للمساعدة.";
                     errBox.style.display = 'block';
                 }
             } else {
-                // NOT FOUND OR WRONG PASSWORD
                 errBox.innerText = "بيانات غير صحيحة. يرجى التأكد من اسم المستخدم وكلمة المرور.";
                 errBox.style.display = 'block';
             }
@@ -472,7 +469,6 @@
             
             tbody.innerHTML = '';
             
-            // Permission Check
             const userPerms = CURRENT_USER.permissions['user-management'] || {view:true, edit:false};
             const canEdit = userPerms.edit === true;
 
@@ -487,7 +483,7 @@
                 noEditMsg.style.display = 'block';
             }
 
-            // Define Columns based on Tab
+            // Headers
             if (CURRENT_TAB === 'departments') {
                 headRow.innerHTML = `
                     <th width="5%"><input type="checkbox" id="selectAll" class="custom-checkbox" onchange="toggleSelectAll(this)"></th>
@@ -526,25 +522,25 @@
                 }
                 
                 row += `<td>${statusBadge}</td>`;
-                row += `<td><div style="display:flex; justify-content:center; gap:2px;">`;
+                row += `<td><div style="display:flex; justify-content:center; gap:5px; flex-wrap:wrap;">`;
                 
                 // Dept Actions
                 if (CURRENT_TAB === 'departments') {
                     if(canEdit) {
-                        row += `<button class="action-btn btn-toggle ${isActive?'':'off'}" onclick="toggleStatus(${u.id})" title="${isActive?'تعطيل':'تفعيل'}"><i class="fas fa-power-off"></i> ${isActive?'تعطيل':'تفعيل'}</button>
-                                <button class="action-btn btn-edit" onclick="editUser(${u.id})" title="تعديل"><i class="fas fa-edit"></i> تعديل</button>
-                                <button class="action-btn btn-delete" onclick="deleteUser(${u.id})" title="حذف"><i class="fas fa-trash"></i> حذف</button>`;
+                        row += `<button class="action-btn btn-toggle ${isActive?'':'off'}" onclick="toggleStatus(${u.id})"><i class="fas fa-power-off"></i> ${isActive?'تعطيل':'تفعيل'}</button>
+                                <button class="action-btn btn-edit" onclick="editUser(${u.id})"><i class="fas fa-edit"></i> تعديل</button>
+                                <button class="action-btn btn-delete" onclick="deleteUser(${u.id})"><i class="fas fa-trash"></i> حذف</button>`;
                     } else {
                         row += `<span style="color:#999; font-size:0.8rem;">لا توجد صلاحية</span>`;
                     }
                 } else {
                     // User Actions
-                    row += `<button class="action-btn btn-view" onclick="viewUser(${u.id})" title="معاينة"><i class="fas fa-eye"></i> معاينة</button>`;
+                    row += `<button class="action-btn btn-view" onclick="viewUser(${u.id})"><i class="fas fa-eye"></i> معاينة</button>`;
                     if (canEdit) {
-                        row += `<button class="action-btn btn-toggle ${isActive?'':'off'}" onclick="toggleStatus(${u.id})" title="${isActive?'تعطيل':'تفعيل'}"><i class="fas fa-power-off"></i></button>
-                                <button class="action-btn btn-edit" onclick="editUser(${u.id})" title="تعديل"><i class="fas fa-edit"></i></button>
-                                <button class="action-btn btn-delete" onclick="deleteUser(${u.id})" title="حذف"><i class="fas fa-trash"></i></button>
-                                <button class="action-btn btn-perm" onclick="openPerms(${u.id})" title="الصلاحيات"><i class="fas fa-key"></i></button>`;
+                        row += `<button class="action-btn btn-toggle ${isActive?'':'off'}" onclick="toggleStatus(${u.id})"><i class="fas fa-power-off"></i></button>
+                                <button class="action-btn btn-edit" onclick="editUser(${u.id})"><i class="fas fa-edit"></i> تعديل</button>
+                                <button class="action-btn btn-delete" onclick="deleteUser(${u.id})"><i class="fas fa-trash"></i> حذف</button>
+                                <button class="action-btn btn-perm" onclick="openPerms(${u.id})"><i class="fas fa-key"></i> صلاحيات</button>`;
                     }
                 }
                 
@@ -618,36 +614,84 @@
             document.body.removeChild(link);
         }
 
-        // === Modal Logic ===
+        // === Modal Logic (Add / Edit) ===
         function openAddUserModal() { 
             const isDept = (CURRENT_TAB === 'departments');
             document.getElementById('userFields').style.display = isDept ? 'none' : 'block';
             document.getElementById('addUserModalTitle').innerText = isDept ? 'إضافة قسم جديد' : 'إضافة مستخدم جديد';
+            
+            // Clear input for new add
+            document.getElementById('editUserId').value = ''; 
             document.getElementById('addUserForm').reset();
+            
             document.getElementById('addUserModal').style.display = 'flex'; 
         }
+
+        function editUser(id) {
+            const u = DB[CURRENT_TAB].find(x => x.id === id);
+            if(!u) return;
+
+            // Pre-fill data
+            document.getElementById('editUserId').value = u.id;
+            document.getElementById('addName').value = u.name;
+            
+            const isDept = (CURRENT_TAB === 'departments');
+            document.getElementById('userFields').style.display = isDept ? 'none' : 'block';
+            
+            if(!isDept) {
+                document.getElementById('addJob').value = u.job || u.dept || '';
+                document.getElementById('addPhone').value = u.phone || '';
+                document.getElementById('addLogin').value = u.login || '';
+                document.getElementById('addPass').value = u.pass || '';
+            }
+
+            document.getElementById('addUserModalTitle').innerText = 'تعديل البيانات';
+            document.getElementById('addUserModal').style.display = 'flex'; 
+        }
+
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
         
-        function saveNewUser() {
+        // Combined Save/Update Function
+        function saveUserForm() {
             const name = document.getElementById('addName').value.trim();
             if(!name) { alert("يرجى إدخال الاسم"); return; }
 
-            const newItem = {
-                id: Date.now(),
-                name: name,
-                status: 'active'
-            };
+            const editId = document.getElementById('editUserId').value;
+            const isEdit = editId !== '';
 
-            if (CURRENT_TAB !== 'departments') {
-                newItem.job = document.getElementById('addJob').value.trim();
-                newItem.phone = document.getElementById('addPhone').value.trim();
-                newItem.login = document.getElementById('addLogin').value.trim();
-                newItem.pass = document.getElementById('addPass').value.trim();
-                newItem.dateAdded = new Date().toLocaleDateString('en-GB');
-                newItem.permissions = JSON.parse(JSON.stringify(DEFAULT_PERMS));
+            // Identify object to update or create new
+            let targetUser;
+            
+            if (isEdit) {
+                targetUser = DB[CURRENT_TAB].find(u => u.id == editId);
+                // If editing, update existing properties
+                targetUser.name = name;
+            } else {
+                // If adding, create new
+                targetUser = {
+                    id: Date.now(),
+                    name: name,
+                    status: 'active'
+                };
+                if (CURRENT_TAB !== 'departments') {
+                    targetUser.dateAdded = new Date().toLocaleDateString('en-GB');
+                    targetUser.permissions = JSON.parse(JSON.stringify(DEFAULT_PERMS));
+                }
             }
 
-            DB[CURRENT_TAB].push(newItem);
+            // Update user-specific fields
+            if (CURRENT_TAB !== 'departments') {
+                targetUser.job = document.getElementById('addJob').value.trim();
+                targetUser.phone = document.getElementById('addPhone').value.trim();
+                targetUser.login = document.getElementById('addLogin').value.trim();
+                targetUser.pass = document.getElementById('addPass').value.trim();
+            }
+
+            // If new, push to array
+            if (!isEdit) {
+                DB[CURRENT_TAB].push(targetUser);
+            }
+
             saveDB();
             renderTable();
             closeModal('addUserModal');
@@ -661,14 +705,9 @@
             }
         }
 
-        function editUser(id) {
-            alert("ميزة التعديل السريع قيد التنفيذ، يرجى الحذف والإضافة إذا لزم الأمر حالياً.");
-        }
-
         function viewUser(id) {
             const u = DB[CURRENT_TAB].find(x => x.id === id);
             const content = document.getElementById('viewUserContent');
-            // Hide password in view modal
             content.innerHTML = `
                 <div class="user-view-card">
                     <div class="user-view-avatar">${u.name.charAt(0)}</div>
