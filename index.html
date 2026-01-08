@@ -263,10 +263,10 @@
                 
                 <div class="custom-tabs">
                     <div class="custom-tab active" onclick="setSettingTab('gen', this)">الإعدادات العامة</div>
-                    <div class="custom-tab" onclick="setSettingTab('eval', this)">إعدادات التقييم</div>
-                    <div class="custom-tab" onclick="setSettingTab('sig', this)">إعدادات التوقيع</div>
-                    <div class="custom-tab" onclick="setSettingTab('vis', this)">ترتيب الزوار</div>
+                    <div class="custom-tab" onclick="setSettingTab('sig', this)">إعدادات التوقيعات</div>
                     <div class="custom-tab" onclick="setSettingTab('fot', this)">إعدادات التذييل</div>
+                    <div class="custom-tab" onclick="setSettingTab('eval', this)">إعدادات التقييم</div>
+                    <div class="custom-tab" onclick="setSettingTab('vis', this)">ترتيب الزوار</div>
                     <div class="custom-tab" onclick="setSettingTab('log', this)">سجل النظام</div>
                 </div>
 
@@ -331,28 +331,6 @@
                     </div>
                 </div>
 
-                <div id="eval" class="setting-content-pane">
-                    <h3 style="color:var(--primary); border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:20px;">الزيارة الصفية</h3>
-                    
-                    <div style="margin-bottom:15px; text-align:left;">
-                        <button class="btn btn-primary" onclick="openAddEvalModal()">+ إضافة تقييم</button>
-                    </div>
-
-                    <table class="custom-table">
-                        <thead>
-                            <tr>
-                                <th width="10%">#</th>
-                                <th width="40%">اسم المعيار</th>
-                                <th width="15%">الدرجة القصوى</th>
-                                <th width="10%">الحالة</th>
-                                <th width="25%">الإجراءات</th>
-                            </tr>
-                        </thead>
-                        <tbody id="evalTableBody">
-                            </tbody>
-                    </table>
-                </div>
-
                 <div id="sig" class="setting-content-pane">
                     <p style="margin-bottom:20px; color:#666;">تحديد الأشخاص المسؤولين عن توقيع التقرير من القيادة العليا</p>
                     <div class="signature-grid">
@@ -379,23 +357,6 @@
                                 <button class="btn" style="background:#dc3545; color:white; min-width:100px;" onclick="clearSignature('sig_assistant')">إزالة</button>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <div id="vis" class="setting-content-pane">
-                    <p style="margin-bottom:20px; color:#666;">حدد ترتيب ظهور أسماء الزوار في تقرير الزيارات الصفية</p>
-                    <div class="visitor-section">
-                        <div class="visitor-section-title">القيادة العليا</div>
-                        <ul id="list_visitor_senior" class="visitor-list"><li class="empty-list-msg">لم يتم إضافة زوار بعد</li></ul>
-                        <button class="btn-add-visitor" onclick="openVisitorPicker('senior')">+ إضافة زائر من القيادة العليا</button>
-                    </div>
-                    <div class="visitor-section">
-                        <div class="visitor-section-title">القيادة الوسطى</div>
-                        <ul id="list_visitor_middle" class="visitor-list"><li class="empty-list-msg">لم يتم إضافة زوار بعد</li></ul>
-                        <button class="btn-add-visitor" onclick="openVisitorPicker('middle')">+ إضافة زائر من القيادة الوسطى</button>
-                    </div>
-                    <div style="text-align: left; margin-top: 20px;">
-                        <button class="btn btn-toggle" onclick="saveVisitorOrder()">حفظ الترتيب</button>
                     </div>
                 </div>
 
@@ -429,6 +390,46 @@
 
                     <div style="text-align:left; margin-top:20px;">
                         <button class="btn" style="background:#28a745; color:white; font-weight:bold;" onclick="saveFooterSettings()">حفظ إعدادات التذييل</button>
+                    </div>
+                </div>
+
+                <div id="eval" class="setting-content-pane">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
+                        <h3>الزيارة الصفية</h3>
+                        
+                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                            <button class="btn" style="background:#2c5aa0; color:white;" onclick="openAddEvalModal()"><i class="fas fa-plus"></i> إضافة تقييم</button>
+                        </div>
+                    </div>
+
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th width="10%">#</th>
+                                <th width="55%">اسم المعيار</th>
+                                <th width="10%">الحالة</th>
+                                <th width="25%">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="evalTableBody">
+                            </tbody>
+                    </table>
+                </div>
+
+                <div id="vis" class="setting-content-pane">
+                    <p style="margin-bottom:20px; color:#666;">حدد ترتيب ظهور أسماء الزوار في تقرير الزيارات الصفية</p>
+                    <div class="visitor-section">
+                        <div class="visitor-section-title">القيادة العليا</div>
+                        <ul id="list_visitor_senior" class="visitor-list"><li class="empty-list-msg">لم يتم إضافة زوار بعد</li></ul>
+                        <button class="btn-add-visitor" onclick="openVisitorPicker('senior')">+ إضافة زائر من القيادة العليا</button>
+                    </div>
+                    <div class="visitor-section">
+                        <div class="visitor-section-title">القيادة الوسطى</div>
+                        <ul id="list_visitor_middle" class="visitor-list"><li class="empty-list-msg">لم يتم إضافة زوار بعد</li></ul>
+                        <button class="btn-add-visitor" onclick="openVisitorPicker('middle')">+ إضافة زائر من القيادة الوسطى</button>
+                    </div>
+                    <div style="text-align: left; margin-top: 20px;">
+                        <button class="btn btn-toggle" onclick="saveVisitorOrder()">حفظ الترتيب</button>
                     </div>
                 </div>
 
@@ -496,8 +497,6 @@
                     <input type="hidden" id="editEvalId">
                     <label>اسم المعيار</label>
                     <input type="text" id="evalName" class="form-control" required placeholder="مثال: التخطيط الفعال">
-                    <label>الدرجة القصوى</label>
-                    <input type="number" id="evalMaxScore" class="form-control" required placeholder="مثال: 10">
                 </form>
             </div>
             <div class="modal-footer">
@@ -1328,7 +1327,7 @@
             const list = DB.settings.evaluation_criteria || [];
             
             if(list.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="padding:20px; color:#888;">لم يتم إضافة معايير بعد</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="4" style="padding:20px; color:#888;">لم يتم إضافة معايير بعد</td></tr>';
                 return;
             }
 
@@ -1338,7 +1337,6 @@
                 tr.innerHTML = `
                     <td>${idx + 1}</td>
                     <td>${item.name}</td>
-                    <td>${item.max_score}</td>
                     <td><span class="status-badge ${isActive ? 'status-active' : 'status-inactive'}">${isActive ? 'مفعل' : 'معطل'}</span></td>
                     <td>
                         <div style="display:flex; justify-content:center; gap:2px; flex-wrap:wrap;">
@@ -1362,7 +1360,6 @@
                 if(item) {
                     document.getElementById('editEvalId').value = item.id;
                     document.getElementById('evalName').value = item.name;
-                    document.getElementById('evalMaxScore').value = item.max_score;
                 }
             }
             document.getElementById('addEvalModal').style.display = 'flex';
@@ -1370,8 +1367,7 @@
 
         function saveEvalForm() {
             const name = document.getElementById('evalName').value.trim();
-            const score = document.getElementById('evalMaxScore').value.trim();
-            if(!name || !score) { alert('يرجى تعبئة كافة الحقول'); return; }
+            if(!name) { alert('يرجى تعبئة اسم المعيار'); return; }
 
             const editId = document.getElementById('editEvalId').value;
             let list = DB.settings.evaluation_criteria;
@@ -1380,13 +1376,11 @@
                 const item = list.find(x => x.id == editId);
                 if(item) {
                     item.name = name;
-                    item.max_score = score;
                 }
             } else {
                 list.push({
                     id: Date.now(),
                     name: name,
-                    max_score: score,
                     status: 'active'
                 });
             }
