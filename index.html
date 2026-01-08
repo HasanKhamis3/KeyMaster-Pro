@@ -293,7 +293,7 @@
                             <span>نسب التقييم</span>
                             <i class="fas fa-chart-pie" style="color:#aaa;"></i>
                         </div>
-                        <div style="height: 200px; display: flex; justify-content: center;">
+                        <div style="position: relative; height: 200px; width: 100%; display: flex; justify-content: center;">
                             <canvas id="dashPieChart"></canvas>
                         </div>
                     </div>
@@ -975,7 +975,6 @@
             } else { errBox.innerText = "بيانات غير صحيحة."; errBox.style.display = 'block'; }
         }
         
-        // دالة إظهار كلمة المرور (تمت إضافتها)
         function togglePass(fieldId, icon) {
             const input = document.getElementById(fieldId);
             if (input.type === "password") {
@@ -1018,9 +1017,11 @@
             document.getElementById('sidebarSchoolName').innerText = DB.settings.schoolName || 'وزارة التربية';
             applySidebarPermissions(); renderTable();
             
-            // Set Dashboard Filter to Current Month
-            const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0');
-            document.getElementById('dashMonthFilter').value = currentMonth;
+            // حساب الشهر الحالي وتحديده في الفلتر
+            const now = new Date();
+            const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
+            const dashFilter = document.getElementById('dashMonthFilter');
+            if(dashFilter) dashFilter.value = currentMonth;
             
             navigate('dashboard');
         }
@@ -1060,6 +1061,7 @@
             animateValue('stat_care', parseInt(document.getElementById('stat_care').innerText), care.length, 1000);
 
             // --- Charts ---
+            const hasData = allVisits.length > 0;
             
             // 1. Bar Chart: Visits per Department
             const deptCounts = {};
@@ -1072,11 +1074,11 @@
             dashBarChartInst = new Chart(barCtx, {
                 type: 'bar',
                 data: {
-                    labels: deptLabels.length ? deptLabels : ['لا يوجد بيانات'],
+                    labels: hasData ? deptLabels : ['لا توجد زيارات'],
                     datasets: [{
                         label: 'عدد الزيارات',
-                        data: deptData.length ? deptData : [0],
-                        backgroundColor: '#1e4078',
+                        data: hasData ? deptData : [0],
+                        backgroundColor: hasData ? '#1e4078' : '#e9ecef',
                         borderRadius: 5
                     }]
                 },
@@ -1099,10 +1101,10 @@
             dashPieChartInst = new Chart(pieCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: evalLabels.length ? evalLabels : ['لا يوجد'],
+                    labels: hasData ? evalLabels : ['لا توجد زيارات'],
                     datasets: [{
-                        data: evalData.length ? evalData : [1],
-                        backgroundColor: ['#28a745', '#17a2b8', '#ffc107', '#dc3545', '#6610f2'],
+                        data: hasData ? evalData : [1],
+                        backgroundColor: hasData ? ['#28a745', '#17a2b8', '#ffc107', '#dc3545', '#6610f2'] : ['#e9ecef'],
                         borderWidth: 1
                     }]
                 },
