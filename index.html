@@ -55,6 +55,14 @@
         .custom-table th { background: #2c5aa0; color: white; padding: 12px; text-align: center; font-weight: bold; }
         .custom-table td { padding: 8px; border-bottom: 1px solid #eee; background: white; text-align: center; vertical-align: middle; }
         
+        /* Specific Style for Reason Cell to allow multiline */
+        .reason-cell {
+            white-space: pre-wrap; /* Allows text to wrap and preserves newlines */
+            text-align: right;
+            line-height: 1.6;
+            min-width: 250px;
+        }
+
         .custom-checkbox { width: 18px; height: 18px; cursor: pointer; }
 
         /* Status Badge */
@@ -251,6 +259,25 @@
             <div id="distinguished" class="section-card">
                 <h3 style="color:var(--primary); margin-bottom:20px;">المعلمين المتميزين والأولى بالرعاية</h3>
                 
+                <div class="filter-container">
+                    <label class="filter-label"><i class="fas fa-filter"></i> تصفية حسب الشهر:</label>
+                    <select id="distMonthFilter" class="filter-select" onchange="renderDistinguishedTables()">
+                        <option value="all">كل الأشهر</option>
+                        <option value="01">يناير</option>
+                        <option value="02">فبراير</option>
+                        <option value="03">مارس</option>
+                        <option value="04">أبريل</option>
+                        <option value="05">مايو</option>
+                        <option value="06">يونيو</option>
+                        <option value="07">يوليو</option>
+                        <option value="08">أغسطس</option>
+                        <option value="09">سبتمبر</option>
+                        <option value="10">أكتوبر</option>
+                        <option value="11">نوفمبر</option>
+                        <option value="12">ديسمبر</option>
+                    </select>
+                </div>
+
                 <div style="display:flex; gap:15px; margin-bottom:25px;">
                     <button class="btn" style="background:#2c5aa0; color:white;" onclick="openDistinguishedModal('distinguished')">
                         <i class="fas fa-plus-circle"></i> إضافة معلم متميز
@@ -265,11 +292,11 @@
                     <thead>
                         <tr>
                             <th width="5%">#</th>
-                            <th width="25%">اسم المعلم/ة</th>
+                            <th width="20%">اسم المعلم/ة</th>
                             <th width="15%">القسم</th>
-                            <th width="15%">التقدير</th>
+                            <th width="10%">التقدير</th>
                             <th width="30%">المبررات</th>
-                            <th width="10%">الإجراء</th>
+                            <th width="20%">الإجراء</th>
                         </tr>
                     </thead>
                     <tbody id="distinguishedTableBody">
@@ -281,11 +308,11 @@
                     <thead>
                         <tr>
                             <th width="5%">#</th>
-                            <th width="25%">اسم المعلم/ة</th>
+                            <th width="20%">اسم المعلم/ة</th>
                             <th width="15%">القسم</th>
-                            <th width="15%">التقدير</th>
+                            <th width="10%">التقدير</th>
                             <th width="30%">المبررات</th>
-                            <th width="10%">الإجراء</th>
+                            <th width="20%">الإجراء</th>
                         </tr>
                     </thead>
                     <tbody id="careTableBody">
@@ -605,6 +632,7 @@
             <div class="modal-body">
                 <form id="distinguishedForm">
                     <input type="hidden" id="distType">
+                    <input type="hidden" id="distEditId">
                     <div class="form-group">
                         <label style="font-weight:bold; display:block; margin-bottom:5px;">القسم</label>
                         <select id="distDept" class="form-control" onchange="onDistinguishedDeptChange()">
@@ -699,6 +727,16 @@
         </div>
     </div>
 
+    <div id="viewDetailsModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">معاينة التفاصيل <span onclick="closeModal('viewDetailsModal')" style="cursor:pointer;">&times;</span></div>
+            <div class="modal-body" id="viewDetailsContent"></div>
+            <div class="modal-footer">
+                <button class="btn" style="background:#28a745; color:white;" onclick="closeModal('viewDetailsModal')">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
     <div id="permModal" class="modal-overlay">
         <div class="modal-box">
             <div class="modal-header">إدارة الصلاحيات <span onclick="closeModal('permModal')" style="cursor:pointer;">&times;</span></div>
@@ -763,8 +801,8 @@
             departments: [],
             visits_senior: [], 
             visits_middle: [],
-            distinguished: [], // New Array
-            care_needed: [],   // New Array
+            distinguished: [], 
+            care_needed: [],   
             settings: {
                 schoolName: 'مدرسة مدينة حمد الابتدائية للبنات',
                 schoolYear: '2025 / 2026م',
@@ -1754,7 +1792,6 @@
         }
 
         function getLatestJobTitle(userId) {
-            // Helper function to find user in any list and return current job
             const groups = ['admins', 'senior', 'middle', 'teachers'];
             for(let g of groups) {
                 if(DB[g]) {
@@ -1774,11 +1811,9 @@
             if(CURRENT_VISIT_TAB === 'senior') list = DB.visits_senior || [];
             else list = DB.visits_middle || [];
             
-            // Filter by Month if selected
             if (monthFilter !== 'all') {
                 list = list.filter(v => {
                     const visitDate = new Date(v.date);
-                    // getMonth() returns 0-11, so we add 1 and padStart to match "01", "02"
                     const m = String(visitDate.getMonth() + 1).padStart(2, '0');
                     return m === monthFilter;
                 });
@@ -1792,9 +1827,7 @@
             list.sort((a,b) => b.id - a.id);
 
             list.forEach(v => {
-                // Fetch latest job title dynamically
                 const currentJob = getLatestJobTitle(v.visitorId);
-                
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${v.date}</td>
@@ -1816,10 +1849,8 @@
             const monthFilter = document.getElementById('perfMonthFilter').value;
             const ctx = document.getElementById('perfChart').getContext('2d');
             
-            // 1. Collect Data (Combine Senior & Middle visits)
             let allVisits = [...(DB.visits_senior || []), ...(DB.visits_middle || [])];
             
-            // 2. Filter by Month
             if (monthFilter !== 'all') {
                 allVisits = allVisits.filter(v => {
                     const m = String(new Date(v.date).getMonth() + 1).padStart(2, '0');
@@ -1827,24 +1858,17 @@
                 });
             }
             
-            // 3. Extract Unique Departments & Criteria
             const departments = [...new Set(allVisits.map(v => v.dept))];
-            // Get evaluation names from Settings to ensure order/color consistency, 
-            // fallback to what's in visits if settings changed.
             let criteriaNames = DB.settings.evaluation_criteria 
                                 ? DB.settings.evaluation_criteria.filter(c => c.status === 'active').map(c => c.name)
                                 : [];
-            // Add any criteria found in visits that might have been deleted/inactive but exist in history
             allVisits.forEach(v => { if(!criteriaNames.includes(v.eval)) criteriaNames.push(v.eval); });
 
-            // 4. Prepare Datasets
-            // Structure: datasets = [{label: 'Excellent', data: [countDept1, countDept2]}, ...]
             const datasets = criteriaNames.map((crit, index) => {
                 const data = departments.map(dept => {
                     return allVisits.filter(v => v.dept === dept && v.eval === crit).length;
                 });
                 
-                // Generate colors
                 const colors = ['#28a745', '#17a2b8', '#ffc107', '#dc3545', '#6610f2', '#fd7e14'];
                 const color = colors[index % colors.length];
                 
@@ -1856,12 +1880,10 @@
                 };
             });
 
-            // 5. Destroy old chart if exists
             if (performanceChartInstance) {
                 performanceChartInstance.destroy();
             }
 
-            // 6. Create New Chart
             performanceChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -1887,53 +1909,54 @@
         // ============================================
 
         function renderDistinguishedTables() {
-            // Render Distinguished
-            const dBody = document.getElementById('distinguishedTableBody');
-            dBody.innerHTML = '';
-            const dList = DB.distinguished || [];
+            const filterMonth = document.getElementById('distMonthFilter').value;
             
-            if(dList.length === 0) {
-                dBody.innerHTML = '<tr><td colspan="6" style="padding:20px; color:#888;">لا يوجد بيانات مدخلة</td></tr>';
-            } else {
-                dList.forEach((item, idx) => {
-                    dBody.innerHTML += `
-                        <tr>
-                            <td>${idx + 1}</td>
-                            <td>${item.teacherName}</td>
-                            <td>${item.dept}</td>
-                            <td><span class="status-badge status-active">${item.eval}</span></td>
-                            <td><div class="log-details">${item.reason}</div></td>
-                            <td><button class="action-btn btn-delete" onclick="deleteDistinguished('distinguished', ${item.id})"><i class="fas fa-trash"></i></button></td>
-                        </tr>
-                    `;
-                });
-            }
+            const renderTableBody = (list, elementId, type) => {
+                const body = document.getElementById(elementId);
+                body.innerHTML = '';
+                
+                // Filter List
+                let filteredList = list;
+                if(filterMonth !== 'all') {
+                    filteredList = list.filter(i => {
+                        if(!i.date) return false; 
+                        const m = i.date.split('-')[1]; // YYYY-MM-DD
+                        return m === filterMonth;
+                    });
+                }
 
-            // Render Care Needed
-            const cBody = document.getElementById('careTableBody');
-            cBody.innerHTML = '';
-            const cList = DB.care_needed || [];
-            
-            if(cList.length === 0) {
-                cBody.innerHTML = '<tr><td colspan="6" style="padding:20px; color:#888;">لا يوجد بيانات مدخلة</td></tr>';
-            } else {
-                cList.forEach((item, idx) => {
-                    cBody.innerHTML += `
-                        <tr>
-                            <td>${idx + 1}</td>
-                            <td>${item.teacherName}</td>
-                            <td>${item.dept}</td>
-                            <td><span class="status-badge status-inactive">${item.eval}</span></td>
-                            <td><div class="log-details">${item.reason}</div></td>
-                            <td><button class="action-btn btn-delete" onclick="deleteDistinguished('care', ${item.id})"><i class="fas fa-trash"></i></button></td>
-                        </tr>
-                    `;
-                });
-            }
+                if(filteredList.length === 0) {
+                    body.innerHTML = '<tr><td colspan="6" style="padding:20px; color:#888;">لا يوجد بيانات مدخلة لهذا الشهر</td></tr>';
+                } else {
+                    filteredList.forEach((item, idx) => {
+                        const statusClass = type === 'distinguished' ? 'status-active' : 'status-inactive';
+                        body.innerHTML += `
+                            <tr>
+                                <td>${idx + 1}</td>
+                                <td>${item.teacherName}</td>
+                                <td>${item.dept}</td>
+                                <td><span class="status-badge ${statusClass}">${item.eval}</span></td>
+                                <td class="reason-cell">${item.reason}</td>
+                                <td>
+                                    <div style="display:flex; justify-content:center; gap:2px; flex-wrap:wrap;">
+                                        <button class="action-btn btn-view" onclick="viewDistinguished('${type}', ${item.id})" title="معاينة"><i class="fas fa-eye"></i></button>
+                                        <button class="action-btn btn-edit" onclick="editDistinguished('${type}', ${item.id})" title="تعديل"><i class="fas fa-edit"></i></button>
+                                        <button class="action-btn btn-delete" onclick="deleteDistinguished('${type}', ${item.id})" title="حذف"><i class="fas fa-trash"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                }
+            };
+
+            renderTableBody(DB.distinguished || [], 'distinguishedTableBody', 'distinguished');
+            renderTableBody(DB.care_needed || [], 'careTableBody', 'care');
         }
 
         function openDistinguishedModal(type) {
             document.getElementById('distinguishedForm').reset();
+            document.getElementById('distEditId').value = ''; 
             document.getElementById('distType').value = type;
             document.getElementById('distinguishedModalTitle').innerText = (type === 'distinguished') ? 'إضافة معلم متميز' : 'إضافة معلم يحتاج رعاية';
             
@@ -1971,6 +1994,49 @@
             document.getElementById('distinguishedModal').style.display = 'flex';
         }
 
+        function editDistinguished(type, id) {
+            const list = type === 'distinguished' ? DB.distinguished : DB.care_needed;
+            const item = list.find(x => x.id === id);
+            if(!item) return;
+
+            openDistinguishedModal(type); // Opens and resets modal
+            document.getElementById('distinguishedModalTitle').innerText = 'تعديل البيانات';
+            document.getElementById('distEditId').value = item.id;
+            
+            // Set Department
+            const deptSel = document.getElementById('distDept');
+            deptSel.value = item.dept;
+
+            // Trigger Teacher Population Manually
+            onDistinguishedDeptChange();
+            
+            // Set Teacher
+            document.getElementById('distTeacher').value = item.teacherName;
+            
+            // Set Eval & Reason
+            document.getElementById('distEval').value = item.eval;
+            document.getElementById('distReason').value = item.reason;
+        }
+
+        function viewDistinguished(type, id) {
+            const list = type === 'distinguished' ? DB.distinguished : DB.care_needed;
+            const item = list.find(x => x.id === id);
+            if(!item) return;
+
+            const content = document.getElementById('viewDetailsContent');
+            content.innerHTML = `
+                <div style="text-align:right;">
+                    <div style="margin-bottom:10px;"><strong style="color:var(--primary);">الاسم:</strong> ${item.teacherName}</div>
+                    <div style="margin-bottom:10px;"><strong style="color:var(--primary);">القسم:</strong> ${item.dept}</div>
+                    <div style="margin-bottom:10px;"><strong style="color:var(--primary);">التقدير:</strong> <span class="status-badge status-active">${item.eval}</span></div>
+                    <div style="margin-bottom:5px;"><strong style="color:var(--primary);">المبررات:</strong></div>
+                    <div style="background:#f9f9f9; padding:15px; border-radius:5px; border:1px solid #eee; white-space:pre-wrap; line-height:1.6;">${item.reason}</div>
+                    <div style="margin-top:10px; font-size:0.8rem; color:#888;">تاريخ الإضافة: ${item.date || '-'}</div>
+                </div>
+            `;
+            document.getElementById('viewDetailsModal').style.display = 'flex';
+        }
+
         function onDistinguishedDeptChange() {
             const selectedDept = document.getElementById('distDept').value;
             const teacherSel = document.getElementById('distTeacher');
@@ -1993,6 +2059,7 @@
 
         function saveDistinguishedEntry() {
             const type = document.getElementById('distType').value;
+            const editId = document.getElementById('distEditId').value;
             const dept = document.getElementById('distDept').value;
             const teacher = document.getElementById('distTeacher').value;
             const eval = document.getElementById('distEval').value;
@@ -2003,22 +2070,35 @@
                 return;
             }
 
-            const entry = {
-                id: Date.now(),
-                dept: dept,
-                teacherName: teacher,
-                eval: eval,
-                reason: reason
-            };
+            // Identify List
+            let targetList = (type === 'distinguished') ? DB.distinguished : DB.care_needed;
+            if(!targetList) {
+                if(type === 'distinguished') { DB.distinguished = []; targetList = DB.distinguished; }
+                else { DB.care_needed = []; targetList = DB.care_needed; }
+            }
 
-            if(type === 'distinguished') {
-                if(!DB.distinguished) DB.distinguished = [];
-                DB.distinguished.push(entry);
-                addSystemLog('المعلمين المتميزين', `إضافة معلم متميز: ${teacher}`);
+            if (editId) {
+                // Edit Existing
+                const item = targetList.find(x => x.id == editId);
+                if(item) {
+                    item.dept = dept;
+                    item.teacherName = teacher;
+                    item.eval = eval;
+                    item.reason = reason;
+                    addSystemLog((type === 'distinguished' ? 'المعلمين المتميزين' : 'الأولى بالرعاية'), `تعديل بيانات: ${teacher}`);
+                }
             } else {
-                if(!DB.care_needed) DB.care_needed = [];
-                DB.care_needed.push(entry);
-                addSystemLog('الأولى بالرعاية', `إضافة معلم يحتاج رعاية: ${teacher}`);
+                // Add New
+                const entry = {
+                    id: Date.now(),
+                    date: new Date().toISOString().split('T')[0], // Save Date YYYY-MM-DD
+                    dept: dept,
+                    teacherName: teacher,
+                    eval: eval,
+                    reason: reason
+                };
+                targetList.push(entry);
+                addSystemLog((type === 'distinguished' ? 'المعلمين المتميزين' : 'الأولى بالرعاية'), `إضافة جديد: ${teacher}`);
             }
 
             saveDB();
