@@ -59,15 +59,28 @@
         .status-active { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .status-inactive { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
 
-        /* Buttons in Table */
-        .action-btn { padding: 6px 10px; border: none; border-radius: 4px; color: white; cursor: pointer; font-size: 0.85rem; margin: 0 2px; transition: 0.2s; }
+        /* Action Buttons with Text */
+        .action-btn { 
+            padding: 6px 12px; 
+            border: none; 
+            border-radius: 6px; 
+            color: white; 
+            cursor: pointer; 
+            font-size: 0.75rem; 
+            margin: 2px; 
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px; /* Space between icon and text */
+            font-weight: 600;
+        }
         .btn-view { background: #ffc107; color: #333; }
         .btn-edit { background: #17a2b8; }
         .btn-delete { background: #dc3545; }
         .btn-perm { background: #343a40; }
         .btn-toggle { background: #28a745; }
         .btn-toggle.off { background: #6c757d; }
-        .action-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .action-btn:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 
         /* Modals */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 5000; }
@@ -166,7 +179,7 @@
                         <button class="btn" style="background:#dc3545; color:white;" onclick="deleteSelected()"><i class="fas fa-trash"></i> حذف المحدد</button>
                         <button class="btn" style="background:#6c757d; color:white;" onclick="toggleStatusSelected()"><i class="fas fa-toggle-on"></i> تفعيل/إلغاء المحدد</button>
                     </div>
-                    <div id="noEditPermissionMsg" style="display:none; color:red; font-weight:bold;">(وضع القراءة فقط - لا توجد صلاحية تعديل)</div>
+                    <div id="noEditPermissionMsg" style="display:none; color:red; font-weight:bold;">(وضع القراءة فقط)</div>
                 </div>
 
                 <div class="user-tabs">
@@ -314,13 +327,13 @@
                     }
                 });
                 
-                // Force Admin Login & Permissions (Restores Admin if deleted or broken)
+                // Force Admin Login & Permissions
                 if(!DB.admins) DB.admins = JSON.parse(JSON.stringify(INITIAL_DB.admins));
                 const adm = DB.admins.find(u => u.login === 'admin');
                 if(adm) { 
                     adm.pass = 'Hasan@12';
                     adm.job = 'مدير النظام';
-                    adm.status = 'active'; // Always active
+                    adm.status = 'active'; 
                     SECTIONS.forEach(sec => {
                         if(!adm.permissions[sec.id]) adm.permissions[sec.id] = {};
                         adm.permissions[sec.id].view = true;
@@ -361,7 +374,7 @@
 
         function saveDB() { localStorage.setItem('QualitySys_DB_V2', JSON.stringify(DB)); }
 
-        // === STRICT LOGIN LOGIC ===
+        // === STRICT LOGIN LOGIC (Fixed) ===
         function login(e) {
             e.preventDefault();
             const errBox = document.getElementById('loginError');
@@ -386,7 +399,7 @@
                     showApp();
                 } else {
                     // FOUND BUT INACTIVE
-                    errBox.innerText = "عذراً، لا يمكنك تسجيل الدخول لأن حسابك معطل.\nيرجى التواصل مع المشرف للمساعدة.";
+                    errBox.innerText = "نعتذر منك، الحساب غير نشط حالياً.\nيرجى مراجعة إدارة النظام للمساعدة.";
                     errBox.style.display = 'block';
                 }
             } else {
@@ -518,15 +531,15 @@
                 // Dept Actions
                 if (CURRENT_TAB === 'departments') {
                     if(canEdit) {
-                        row += `<button class="action-btn btn-toggle ${isActive?'':'off'}" onclick="toggleStatus(${u.id})" title="${isActive?'تعطيل':'تفعيل'}"><i class="fas fa-power-off"></i></button>
-                                <button class="action-btn btn-edit" onclick="editUser(${u.id})" title="تعديل"><i class="fas fa-edit"></i></button>
-                                <button class="action-btn btn-delete" onclick="deleteUser(${u.id})" title="حذف"><i class="fas fa-trash"></i></button>`;
+                        row += `<button class="action-btn btn-toggle ${isActive?'':'off'}" onclick="toggleStatus(${u.id})" title="${isActive?'تعطيل':'تفعيل'}"><i class="fas fa-power-off"></i> ${isActive?'تعطيل':'تفعيل'}</button>
+                                <button class="action-btn btn-edit" onclick="editUser(${u.id})" title="تعديل"><i class="fas fa-edit"></i> تعديل</button>
+                                <button class="action-btn btn-delete" onclick="deleteUser(${u.id})" title="حذف"><i class="fas fa-trash"></i> حذف</button>`;
                     } else {
                         row += `<span style="color:#999; font-size:0.8rem;">لا توجد صلاحية</span>`;
                     }
                 } else {
                     // User Actions
-                    row += `<button class="action-btn btn-view" onclick="viewUser(${u.id})" title="معاينة"><i class="fas fa-eye"></i></button>`;
+                    row += `<button class="action-btn btn-view" onclick="viewUser(${u.id})" title="معاينة"><i class="fas fa-eye"></i> معاينة</button>`;
                     if (canEdit) {
                         row += `<button class="action-btn btn-toggle ${isActive?'':'off'}" onclick="toggleStatus(${u.id})" title="${isActive?'تعطيل':'تفعيل'}"><i class="fas fa-power-off"></i></button>
                                 <button class="action-btn btn-edit" onclick="editUser(${u.id})" title="تعديل"><i class="fas fa-edit"></i></button>
