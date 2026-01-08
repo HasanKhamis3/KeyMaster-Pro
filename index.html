@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -49,6 +48,9 @@
         .custom-table th { background: #2c5aa0; color: white; padding: 12px; text-align: center; font-weight: bold; }
         .custom-table td { padding: 12px; border-bottom: 1px solid #eee; background: white; text-align: center; vertical-align: middle; }
         
+        /* Checkbox Style */
+        .custom-checkbox { width: 18px; height: 18px; cursor: pointer; }
+
         /* Modals */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 5000; }
         .modal-box { background: white; width: 600px; border-radius: 8px; overflow: hidden; animation: slideDown 0.3s; max-height: 90vh; overflow-y: auto; }
@@ -134,10 +136,13 @@
             <div id="dashboard" class="section-card active"><h3>لوحة التحكم</h3><p>مرحباً بك في النظام</p></div>
             
             <div id="user-management" class="section-card">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
                     <h3>إدارة المستخدمين</h3>
                     <div style="display:flex; gap:10px;">
-                        <button class="btn" style="background:#2c5aa0; color:white;" onclick="openAddUserModal()">إضافة اسم جديد</button>
+                        <button class="btn" style="background:#2c5aa0; color:white;" onclick="openAddUserModal()"><i class="fas fa-plus"></i> إضافة جديد</button>
+                        <button class="btn" style="background:#17a2b8; color:white;" onclick="exportCSV()"><i class="fas fa-file-export"></i> تصدير CSV</button>
+                        <button class="btn" style="background:#6f42c1; color:white;" onclick="document.getElementById('csvInput').click()"><i class="fas fa-file-import"></i> استيراد CSV</button>
+                        <input type="file" id="csvInput" style="display:none" accept=".csv" onchange="importCSV(this)">
                     </div>
                 </div>
                 
@@ -150,11 +155,12 @@
                 <table class="custom-table">
                     <thead>
                         <tr id="tableHeadRow">
+                            <th width="5%"><input type="checkbox" id="selectAll" class="custom-checkbox" onchange="toggleSelectAll(this)"></th>
                             <th width="5%">الترتيب</th>
                             <th width="25%">الاسم</th>
                             <th width="20%">الوظيفة</th>
                             <th width="15%">رقم الهاتف</th>
-                            <th width="35%">إدارة المستخدمين</th>
+                            <th width="30%">إدارة المستخدمين</th>
                         </tr>
                     </thead>
                     <tbody id="usersTableBody"></tbody>
@@ -354,9 +360,9 @@
                 const el = document.getElementById('nav-' + sec.id);
                 if (el) {
                     if (perms[sec.id] && perms[sec.id].view === false) {
-                        el.style.display = 'none'; // Hide
+                        el.style.display = 'none';
                     } else {
-                        el.style.display = 'block'; // Show
+                        el.style.display = 'block';
                     }
                 }
             });
@@ -375,7 +381,6 @@
             if (target) target.classList.add('active');
             if (link) link.classList.add('active');
             
-            // Special handling for settings layout
             if(pageId === 'settings') {
                 document.getElementById('settings').style.display = 'block';
             }
@@ -387,6 +392,9 @@
             CURRENT_TAB = tab;
             document.querySelectorAll('.user-tab').forEach(t => t.classList.remove('active'));
             el.classList.add('active');
+            // Reset Select All
+            const selectAll = document.getElementById('selectAll');
+            if(selectAll) selectAll.checked = false;
             renderTable();
         }
 
@@ -396,7 +404,9 @@
             
             const list = DB[CURRENT_TAB] || [];
             list.forEach((u, idx) => {
-                let row = `<td>${idx+1}</td><td>${u.name}</td>`;
+                // إضافة مربع الاختيار (Checkbox) في كل صف
+                let row = `<td><input type="checkbox" class="custom-checkbox user-select-cb" value="${u.id}"></td>`;
+                row += `<td>${idx+1}</td><td>${u.name}</td>`;
                 row += `<td>${u.job || (CURRENT_TAB === 'teachers' ? u.dept : '-')}</td>`;
                 row += `<td>${u.phone || '-'}</td>`;
                 
@@ -415,6 +425,99 @@
             });
         }
 
+        // --- ميزات التحديد والاستيراد والتصدير الجديدة ---
+
+        // 1. تحديد الكل
+        function toggleSelectAll(source) {
+            const checkboxes = document.querySelectorAll('.user-select-cb');
+            checkboxes.forEach(cb => cb.checked = source.checked);
+        }
+
+        // 2. تصدير CSV (يدعم العربية)
+        function exportCSV() {
+            const list = DB[CURRENT_TAB] || [];
+            if (list.length === 0) {
+                alert("لا يوجد بيانات للتصدير");
+                return;
+            }
+
+            // العناوين
+            let csvContent = "الاسم الكامل,الوظيفة,رقم الهاتف,اسم المستخدم,كلمة المرور,تاريخ الإضافة\n";
+
+            list.forEach(row => {
+                const name = `"${row.name || ''}"`;
+                const job = `"${row.job || row.dept || ''}"`;
+                const phone = `"${row.phone || ''}"`;
+                const login = `"${row.login || ''}"`;
+                const pass = `"${row.pass || ''}"`;
+                const date = `"${row.dateAdded || ''}"`;
+                
+                csvContent += `${name},${job},${phone},${login},${pass},${date}\n`;
+            });
+
+            // إضافة BOM (Byte Order Mark) لدعم اللغة العربية في Excel
+            const bom = "\uFEFF";
+            const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
+            
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `${CURRENT_TAB}_users_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // 3. استيراد CSV
+        function importCSV(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const rows = text.split('\n');
+                
+                let addedCount = 0;
+
+                // تجاوز الصف الأول (العناوين)
+                for (let i = 1; i < rows.length; i++) {
+                    const row = rows[i].trim();
+                    if (row) {
+                        // تقسيم النص مع مراعاة الفواصل داخل علامات التنصيص (بسيط)
+                        // ملاحظة: هذا تقسيم بسيط، للملفات المعقدة يفضل استخدام مكتبة CSV Parser
+                        const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                        
+                        // تنظيف علامات التنصيص
+                        const clean = (val) => val ? val.replace(/^"|"$/g, '').trim() : '';
+
+                        if (cols.length >= 2) { // تأكد من وجود اسم على الأقل
+                             const newUser = {
+                                id: Date.now() + i, // معرف فريد
+                                name: clean(cols[0]),
+                                job: clean(cols[1]),
+                                phone: clean(cols[2]),
+                                login: clean(cols[3]) || clean(cols[2]) || 'user'+(Date.now()+i), // Login fallback
+                                pass: clean(cols[4]) || '123456', // Pass fallback
+                                status: 'active',
+                                dateAdded: clean(cols[5]) || new Date().toLocaleDateString('en-GB'),
+                                permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS))
+                            };
+                            
+                            DB[CURRENT_TAB].push(newUser);
+                            addedCount++;
+                        }
+                    }
+                }
+
+                saveDB();
+                renderTable();
+                alert(`تم استيراد ${addedCount} مستخدم بنجاح.`);
+                input.value = ''; // Reset input
+            };
+            reader.readAsText(file);
+        }
+
         // === Restore View Modal Logic ===
         function viewUser(id) {
             const u = DB[CURRENT_TAB].find(x => x.id === id);
@@ -430,6 +533,8 @@
                     <div class="info-item"><label>رقم الهاتف</label><span>${u.phone || '-'}</span></div>
                     <div class="info-item"><label>تاريخ الإضافة</label><span>${u.dateAdded || '-'}</span></div>
                     <div class="info-item"><label>الحالة</label><span style="color:${u.status==='active'?'green':'red'}">${u.status==='active'?'مفعل':'معطل'}</span></div>
+                    <div class="info-item"><label>اسم الدخول</label><span>${u.login}</span></div>
+                    <div class="info-item"><label>كلمة المرور</label><span>${u.pass}</span></div>
                 </div>
             `;
             document.getElementById('viewUserModal').style.display = 'flex';
@@ -470,7 +575,6 @@
 
             saveDB();
 
-            // Force update if editing self
             if (CURRENT_USER.id === u.id) {
                 CURRENT_USER = u;
                 applySidebarPermissions();
@@ -501,6 +605,14 @@
             closeModal('addUserModal');
         }
         
+        function deleteUser(id) {
+            if(confirm('هل أنت متأكد من حذف هذا المستخدم؟')) {
+                DB[CURRENT_TAB] = DB[CURRENT_TAB].filter(u => u.id !== id);
+                saveDB();
+                renderTable();
+            }
+        }
+
         function togglePass(id, icon) {
             const input = document.getElementById(id);
             if(input.type === 'password') { input.type = 'text'; icon.classList.replace('fa-eye', 'fa-eye-slash'); }
