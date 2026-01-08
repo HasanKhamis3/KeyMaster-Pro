@@ -276,11 +276,6 @@
             teachers: []
         };
 
-        // Fix Admin Permissions to allow everything by default for new installs
-        Object.keys(INITIAL_DB.admins[0].permissions).forEach(k => {
-            INITIAL_DB.admins[0].permissions[k].edit = true;
-        });
-
         let DB = {}; 
         let CURRENT_USER = null;
         let CURRENT_TAB = 'senior';
@@ -303,14 +298,35 @@
                     }
                 });
                 
+                // === Force Admin Permissions (The Fix) ===
                 if(!DB.admins) DB.admins = JSON.parse(JSON.stringify(INITIAL_DB.admins));
                 const adm = DB.admins.find(u => u.login === 'admin');
-                if(adm) { adm.pass = 'Hasan@12'; } else { DB.admins.push(INITIAL_DB.admins[0]); }
+                if(adm) { 
+                    adm.pass = 'Hasan@12';
+                    // Force Full Permissions for Admin
+                    SECTIONS.forEach(sec => {
+                        if(!adm.permissions[sec.id]) adm.permissions[sec.id] = {};
+                        adm.permissions[sec.id].view = true;
+                        adm.permissions[sec.id].edit = true;
+                    });
+                } else { 
+                    // If admin missing, re-add from initial with full perms
+                    const newAdmin = JSON.parse(JSON.stringify(INITIAL_DB.admins[0]));
+                    SECTIONS.forEach(sec => {
+                        newAdmin.permissions[sec.id] = {view: true, edit: true};
+                    });
+                    DB.admins.push(newAdmin); 
+                }
                 
                 saveDB();
 
             } else {
                 DB = JSON.parse(JSON.stringify(INITIAL_DB));
+                // Set initial admin permissions explicitly
+                const adm = DB.admins[0];
+                SECTIONS.forEach(sec => {
+                    adm.permissions[sec.id] = {view: true, edit: true};
+                });
                 saveDB();
             }
 
@@ -334,7 +350,7 @@
 
         function saveDB() { localStorage.setItem('QualitySys_DB_V2', JSON.stringify(DB)); }
 
-        // === دالة تسجيل الدخول ===
+        // === Login ===
         function login(e) {
             e.preventDefault();
             const errBox = document.getElementById('loginError');
@@ -383,12 +399,10 @@
             }
         }
 
-        // === نظام الصلاحيات الصارم ===
-        
+        // === Strict Permissions & Navigation ===
         function navigate(pageId) {
             const perms = CURRENT_USER.permissions || DEFAULT_PERMS;
             
-            // تحقق صارم من صلاحية المعاينة (View)
             if (perms[pageId] && perms[pageId].view === false) {
                 alert("عذراً، ليس لديك صلاحية للوصول إلى هذه الصفحة.");
                 return;
@@ -410,7 +424,6 @@
             document.getElementById('loginPage').style.display = 'none';
             document.getElementById('app').style.display = 'flex';
             
-            // تحديث الهيدر بالاسم والوظيفة
             document.getElementById('headerUserName').innerText = CURRENT_USER.name;
             document.getElementById('headerUserJob').innerText = CURRENT_USER.job || CURRENT_USER.dept || 'مستخدم';
             
@@ -424,14 +437,12 @@
             SECTIONS.forEach(sec => {
                 const el = document.getElementById('nav-' + sec.id);
                 if(el) {
-                    // إخفاء الرابط تماماً إذا لم تكن هناك صلاحية معاينة
                     el.style.display = (perms[sec.id] && perms[sec.id].view === false) ? 'none' : 'block';
                 }
             });
         }
 
         // === User Management ===
-
         function setTab(tab, el) {
             CURRENT_TAB = tab;
             document.querySelectorAll('.user-tab').forEach(t => t.classList.remove('active'));
@@ -444,11 +455,9 @@
             const tbody = document.getElementById('usersTableBody');
             tbody.innerHTML = '';
             
-            // التحقق من صلاحية التعديل للمستخدم الحالي في قسم إدارة المستخدمين
             const userPerms = CURRENT_USER.permissions['user-management'] || {view:true, edit:false};
             const canEdit = userPerms.edit === true;
 
-            // إظهار/إخفاء أزرار التحكم العلوية بناءً على الصلاحية
             const actionButtons = document.getElementById('userActionButtons');
             const noEditMsg = document.getElementById('noEditPermissionMsg');
             
@@ -473,12 +482,10 @@
                 row += `<td>${u.job || (CURRENT_TAB === 'teachers' ? u.dept : '-')}</td>`;
                 row += `<td>${statusBadge}</td>`;
                 
-                // أزرار الإجراءات الفردية
                 row += `<td>
                     <div style="display:flex; justify-content:center; gap:5px;">
                         <button class="btn" style="padding:5px; background:#ffc107; color:black; font-size:0.8rem;" onclick="viewUser(${u.id})" title="معاينة"><i class="fas fa-eye"></i></button>`;
                 
-                // إضافة الأزرار فقط إذا كان يملك صلاحية التعديل
                 if (canEdit) {
                     row += `
                         <button class="btn" style="padding:5px; background:${isActive ? '#6c757d' : '#28a745'}; color:white; font-size:0.8rem;" onclick="toggleStatus(${u.id})" title="${isActive ? 'تعطيل' : 'تفعيل'}"><i class="fas fa-power-off"></i></button>
@@ -496,7 +503,6 @@
         }
 
         // --- Bulk Actions & Logic ---
-
         function toggleSelectAll(source) {
             document.querySelectorAll('.user-select-cb').forEach(cb => {
                 if(!cb.disabled) cb.checked = source.checked;
@@ -637,11 +643,10 @@
                 u.permissions[sec.id].edit = document.getElementById(`pe_${sec.id}`).checked;
             });
             saveDB();
-            // تحديث الصلاحيات فورياً إذا كان المستخدم يعدل صلاحياته بنفسه
             if (CURRENT_USER.id === u.id) { 
                 CURRENT_USER = u; 
                 applySidebarPermissions(); 
-                renderTable(); // لإعادة رسم الجدول بناءً على صلاحية التعديل الجديدة
+                renderTable();
             }
             closeModal('permModal');
         }
