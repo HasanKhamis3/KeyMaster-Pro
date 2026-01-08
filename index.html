@@ -26,11 +26,11 @@
         .main-content { margin-right: 260px; flex: 1; padding: 30px; }
         .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         
-        /* Updated Profile Header Style */
+        /* User Profile Header */
         .user-profile { display: flex; align-items: center; gap: 15px; background: white; padding: 8px 20px; border-radius: 50px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         .user-info-text { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.2; }
         .user-name { font-weight: bold; color: var(--primary); font-size: 1rem; }
-        .user-job { font-size: 0.75rem; color: #777; }
+        .user-job { font-size: 0.8rem; color: #777; font-weight: normal;}
 
         /* Login */
         .login-wrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: linear-gradient(135deg, var(--primary), #2b2b2b); display: flex; justify-content: center; align-items: center; z-index: 9999; }
@@ -50,18 +50,24 @@
         
         .custom-table { width: 100%; border-collapse: collapse; }
         .custom-table th { background: #2c5aa0; color: white; padding: 12px; text-align: center; font-weight: bold; }
-        .custom-table td { padding: 12px; border-bottom: 1px solid #eee; background: white; text-align: center; vertical-align: middle; }
+        .custom-table td { padding: 8px; border-bottom: 1px solid #eee; background: white; text-align: center; vertical-align: middle; }
         
         .custom-checkbox { width: 18px; height: 18px; cursor: pointer; }
 
         /* Status Badge */
-        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; display: inline-block; min-width: 60px;}
         .status-active { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .status-inactive { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
 
-        /* Action Buttons Container */
-        .top-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-        .action-hidden { display: none !important; }
+        /* Buttons in Table */
+        .action-btn { padding: 6px 10px; border: none; border-radius: 4px; color: white; cursor: pointer; font-size: 0.85rem; margin: 0 2px; transition: 0.2s; }
+        .btn-view { background: #ffc107; color: #333; }
+        .btn-edit { background: #17a2b8; }
+        .btn-delete { background: #dc3545; }
+        .btn-perm { background: #343a40; }
+        .btn-toggle { background: #28a745; }
+        .btn-toggle.off { background: #6c757d; }
+        .action-btn:hover { opacity: 0.9; transform: translateY(-1px); }
 
         /* Modals */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 5000; }
@@ -90,6 +96,12 @@
         .perm-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
         .image-upload-container { border: 2px dashed #ccc; border-radius: 8px; padding: 20px; text-align: center; background-color: #fcfcfc; margin-bottom: 20px; position: relative; min-height: 150px; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
 
+        .user-view-card { text-align: center; margin-bottom: 20px; }
+        .user-view-avatar { width: 80px; height: 80px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 15px auto; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: right; background: #f9f9f9; padding: 15px; border-radius: 8px; }
+        .info-item label { display: block; color: #777; font-size: 0.85rem; margin-bottom: 5px; }
+        .info-item span { font-weight: bold; color: #333; }
+
         @media print { .sidebar, .login-wrapper { display: none; } .main-content { margin: 0; } }
     </style>
 </head>
@@ -107,7 +119,6 @@
                 </div>
                 <button type="submit" class="btn btn-primary">دخول</button>
                 <p id="loginError" style="color:red; font-size:0.9rem; margin-top:10px; display:none;"></p>
-                
                 <div style="margin-top:30px; border-top:1px solid #eee; padding-top:10px;">
                     <button type="button" class="btn" style="background:#6c757d; color:white; font-size:0.7rem; padding:5px 10px;" onclick="resetSystem()">إعادة ضبط المصنع (Reset)</button>
                 </div>
@@ -149,7 +160,7 @@
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
                     <h3>إدارة المستخدمين</h3>
                     
-                    <div id="userActionButtons" class="top-actions">
+                    <div id="userActionButtons" style="display:flex; gap:10px;">
                         <button class="btn" style="background:#2c5aa0; color:white;" onclick="openAddUserModal()"><i class="fas fa-plus"></i> إضافة جديد</button>
                         <button class="btn" style="background:#17a2b8; color:white;" onclick="exportCSV()"><i class="fas fa-file-export"></i> تصدير CSV</button>
                         <button class="btn" style="background:#dc3545; color:white;" onclick="deleteSelected()"><i class="fas fa-trash"></i> حذف المحدد</button>
@@ -270,7 +281,7 @@
         SECTIONS.forEach(s => DEFAULT_PERMS[s.id] = {view: true, edit: false});
 
         const INITIAL_DB = {
-            admins: [{id: 999, name: 'مدير النظام', login: 'admin', pass: 'Hasan@12', status: 'active', job: 'مسؤول النظام', permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS))}],
+            admins: [{id: 999, name: 'مدير النظام', login: 'admin', pass: 'Hasan@12', status: 'active', job: 'مدير النظام', permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS))}],
             senior: [{id: 1, name: 'علياء محمد مبارك الدوسري', job: 'مديرة المدرسة', phone: '39669118', login: '39669118', pass: '39669118', status: 'active', permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS)), dateAdded: '2025/01/01'}],
             middle: [],
             teachers: []
@@ -291,42 +302,33 @@
                         DB[grp].forEach(u => { 
                             if(!u.permissions) u.permissions = JSON.parse(JSON.stringify(DEFAULT_PERMS));
                             if(!u.status) u.status = 'active'; 
-
                             u.login = String(u.login).trim().replace(/[\uFEFF\x00-\x1F\s]/g, '');
                             u.pass = String(u.pass).trim().replace(/[\uFEFF\x00-\x1F\s]/g, '');
                         });
                     }
                 });
                 
-                // === Force Admin Permissions (The Fix) ===
+                // Force Admin Full Permissions
                 if(!DB.admins) DB.admins = JSON.parse(JSON.stringify(INITIAL_DB.admins));
                 const adm = DB.admins.find(u => u.login === 'admin');
                 if(adm) { 
                     adm.pass = 'Hasan@12';
-                    // Force Full Permissions for Admin
+                    adm.job = 'مدير النظام'; // Ensure title is correct
                     SECTIONS.forEach(sec => {
                         if(!adm.permissions[sec.id]) adm.permissions[sec.id] = {};
                         adm.permissions[sec.id].view = true;
                         adm.permissions[sec.id].edit = true;
                     });
                 } else { 
-                    // If admin missing, re-add from initial with full perms
                     const newAdmin = JSON.parse(JSON.stringify(INITIAL_DB.admins[0]));
-                    SECTIONS.forEach(sec => {
-                        newAdmin.permissions[sec.id] = {view: true, edit: true};
-                    });
+                    SECTIONS.forEach(sec => { newAdmin.permissions[sec.id] = {view: true, edit: true}; });
                     DB.admins.push(newAdmin); 
                 }
-                
                 saveDB();
-
             } else {
                 DB = JSON.parse(JSON.stringify(INITIAL_DB));
-                // Set initial admin permissions explicitly
                 const adm = DB.admins[0];
-                SECTIONS.forEach(sec => {
-                    adm.permissions[sec.id] = {view: true, edit: true};
-                });
+                SECTIONS.forEach(sec => { adm.permissions[sec.id] = {view: true, edit: true}; });
                 saveDB();
             }
 
@@ -350,7 +352,6 @@
 
         function saveDB() { localStorage.setItem('QualitySys_DB_V2', JSON.stringify(DB)); }
 
-        // === Login ===
         function login(e) {
             e.preventDefault();
             const errBox = document.getElementById('loginError');
@@ -359,16 +360,11 @@
 
             const uInput = document.getElementById('loginUser').value.trim();
             const pInput = document.getElementById('loginPass').value.trim();
-            
             let userFound = null;
 
             ['admins', 'senior', 'middle', 'teachers'].forEach(grp => {
                 const match = DB[grp].find(x => String(x.login).trim() === uInput);
-                if(match) {
-                    if(String(match.pass).trim() === pInput) {
-                        userFound = match;
-                    }
-                }
+                if(match && String(match.pass).trim() === pInput) userFound = match;
             });
 
             if (userFound) {
@@ -399,34 +395,26 @@
             }
         }
 
-        // === Strict Permissions & Navigation ===
         function navigate(pageId) {
             const perms = CURRENT_USER.permissions || DEFAULT_PERMS;
-            
             if (perms[pageId] && perms[pageId].view === false) {
                 alert("عذراً، ليس لديك صلاحية للوصول إلى هذه الصفحة.");
                 return;
             }
-
             document.querySelectorAll('.section-card').forEach(d => d.classList.remove('active'));
             document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
-            
             const target = document.getElementById(pageId);
             const link = document.querySelector(`a[data-page="${pageId}"]`);
-            
             if (target) target.classList.add('active');
             if (link) link.classList.add('active');
-            
             if(pageId === 'settings') document.getElementById('settings').style.display = 'block';
         }
 
         function showApp() {
             document.getElementById('loginPage').style.display = 'none';
             document.getElementById('app').style.display = 'flex';
-            
             document.getElementById('headerUserName').innerText = CURRENT_USER.name;
             document.getElementById('headerUserJob').innerText = CURRENT_USER.job || CURRENT_USER.dept || 'مستخدم';
-            
             applySidebarPermissions();
             renderTable();
             navigate('dashboard');
@@ -436,13 +424,10 @@
             const perms = CURRENT_USER.permissions || DEFAULT_PERMS;
             SECTIONS.forEach(sec => {
                 const el = document.getElementById('nav-' + sec.id);
-                if(el) {
-                    el.style.display = (perms[sec.id] && perms[sec.id].view === false) ? 'none' : 'block';
-                }
+                if(el) el.style.display = (perms[sec.id] && perms[sec.id].view === false) ? 'none' : 'block';
             });
         }
 
-        // === User Management ===
         function setTab(tab, el) {
             CURRENT_TAB = tab;
             document.querySelectorAll('.user-tab').forEach(t => t.classList.remove('active'));
@@ -462,15 +447,14 @@
             const noEditMsg = document.getElementById('noEditPermissionMsg');
             
             if(canEdit) {
-                actionButtons.classList.remove('action-hidden');
+                actionButtons.style.display = 'flex';
                 noEditMsg.style.display = 'none';
             } else {
-                actionButtons.classList.add('action-hidden');
+                actionButtons.style.display = 'none';
                 noEditMsg.style.display = 'block';
             }
 
             const list = DB[CURRENT_TAB] || [];
-            
             list.forEach((u, idx) => {
                 const isActive = u.status === 'active';
                 const statusBadge = isActive 
@@ -483,18 +467,16 @@
                 row += `<td>${statusBadge}</td>`;
                 
                 row += `<td>
-                    <div style="display:flex; justify-content:center; gap:5px;">
-                        <button class="btn" style="padding:5px; background:#ffc107; color:black; font-size:0.8rem;" onclick="viewUser(${u.id})" title="معاينة"><i class="fas fa-eye"></i></button>`;
-                
+                    <div style="display:flex; justify-content:center; gap:2px;">
+                        <button class="action-btn btn-view" onclick="viewUser(${u.id})" title="معاينة"><i class="fas fa-eye"></i></button>`;
                 if (canEdit) {
                     row += `
-                        <button class="btn" style="padding:5px; background:${isActive ? '#6c757d' : '#28a745'}; color:white; font-size:0.8rem;" onclick="toggleStatus(${u.id})" title="${isActive ? 'تعطيل' : 'تفعيل'}"><i class="fas fa-power-off"></i></button>
-                        <button class="btn" style="padding:5px; background:#17a2b8; color:white; font-size:0.8rem;" onclick="editUser(${u.id})" title="تعديل"><i class="fas fa-edit"></i></button>
-                        <button class="btn" style="padding:5px; background:#dc3545; color:white; font-size:0.8rem;" onclick="deleteUser(${u.id})" title="حذف"><i class="fas fa-trash"></i></button>
-                        <button class="btn" style="padding:5px; background:#343a40; color:white; font-size:0.8rem;" onclick="openPerms(${u.id})" title="الصلاحيات"><i class="fas fa-key"></i></button>
+                        <button class="action-btn btn-toggle ${isActive?'':'off'}" onclick="toggleStatus(${u.id})" title="${isActive?'تعطيل':'تفعيل'}"><i class="fas fa-power-off"></i></button>
+                        <button class="action-btn btn-edit" onclick="editUser(${u.id})" title="تعديل"><i class="fas fa-edit"></i></button>
+                        <button class="action-btn btn-delete" onclick="deleteUser(${u.id})" title="حذف"><i class="fas fa-trash"></i></button>
+                        <button class="action-btn btn-perm" onclick="openPerms(${u.id})" title="الصلاحيات"><i class="fas fa-key"></i></button>
                     `;
                 }
-
                 row += `</div></td>`;
                 const tr = document.createElement('tr');
                 tr.innerHTML = row;
@@ -502,17 +484,13 @@
             });
         }
 
-        // --- Bulk Actions & Logic ---
         function toggleSelectAll(source) {
-            document.querySelectorAll('.user-select-cb').forEach(cb => {
-                if(!cb.disabled) cb.checked = source.checked;
-            });
+            document.querySelectorAll('.user-select-cb').forEach(cb => { if(!cb.disabled) cb.checked = source.checked; });
         }
 
         function deleteSelected() {
             const checkboxes = document.querySelectorAll('.user-select-cb:checked');
             if(checkboxes.length === 0) { alert('لم يتم تحديد أي مستخدم.'); return; }
-            
             if(confirm(`هل أنت متأكد من حذف ${checkboxes.length} مستخدم؟`)) {
                 const idsToDelete = Array.from(checkboxes).map(cb => parseInt(cb.value));
                 DB[CURRENT_TAB] = DB[CURRENT_TAB].filter(u => !idsToDelete.includes(u.id));
@@ -525,12 +503,9 @@
         function toggleStatusSelected() {
             const checkboxes = document.querySelectorAll('.user-select-cb:checked');
             if(checkboxes.length === 0) { alert('لم يتم تحديد أي مستخدم.'); return; }
-            
             const idsToToggle = Array.from(checkboxes).map(cb => parseInt(cb.value));
             DB[CURRENT_TAB].forEach(u => {
-                if(idsToToggle.includes(u.id)) {
-                    u.status = (u.status === 'active') ? 'inactive' : 'active';
-                }
+                if(idsToToggle.includes(u.id)) u.status = (u.status === 'active') ? 'inactive' : 'active';
             });
             saveDB();
             renderTable();
@@ -564,11 +539,9 @@
             document.body.removeChild(link);
         }
 
-        // === Misc Logic (Modals, etc) ===
         function viewUser(id) {
             const u = DB[CURRENT_TAB].find(x => x.id === id);
             const content = document.getElementById('viewUserContent');
-            
             content.innerHTML = `
                 <div class="user-view-card">
                     <div class="user-view-avatar">${u.name.charAt(0)}</div>
@@ -579,7 +552,6 @@
                     <div class="info-item"><label>رقم الهاتف</label><span>${u.phone || '-'}</span></div>
                     <div class="info-item"><label>الحالة</label><span style="color:${u.status==='active'?'green':'red'}">${u.status==='active'?'مفعل':'معطل'}</span></div>
                     <div class="info-item"><label>اسم الدخول</label><span style="background:#eee; padding:2px 5px; border-radius:4px;">${u.login}</span></div>
-                    <div class="info-item"><label>كلمة المرور</label><span style="background:#eee; padding:2px 5px; border-radius:4px;">${u.pass}</span></div>
                 </div>
             `;
             document.getElementById('viewUserModal').style.display = 'flex';
