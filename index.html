@@ -142,9 +142,10 @@
                     </div>
                 </div>
                 
-                <div style="background:#d4edda; color:#155724; padding:15px; margin-bottom:15px; border-radius:6px; font-size:0.95rem; border:1px solid #c3e6cb;">
-                    <i class="fas fa-check-circle" style="margin-left:5px;"></i> <b>تم تحديث النظام:</b><br>
-                    يمكنك الآن استيراد ملفات CSV المحفوظة من نسخ Excel القديمة (التي لا تدعم UTF-8) مباشرة، سيقوم النظام بمعالجة اللغة العربية تلقائياً.
+                <div style="background:#e2e6ea; color:#333; padding:15px; margin-bottom:15px; border-radius:6px; font-size:0.9rem; border:1px solid #ccc; line-height:1.6;">
+                    <i class="fas fa-info-circle" style="color:var(--primary);"></i> <b>معلومات الاستيراد:</b><br>
+                    تم تحديث النظام لدعم ملفات CSV المحفوظة بترميز Windows-1256 (النسخ القديمة من Excel).<br>
+                    <span style="color:#dc3545; font-weight:bold;">ملاحظة هامة:</span> إذا ظهرت رسالة خطأ بأن الملف تالف (؟؟؟؟)، فهذا يعني أن البيانات فُقدت أثناء الحفظ في Excel ولا يمكن استرجاعها إلا بإعادة حفظ الملف الأصلي عن طريق برنامج المفكرة (Notepad) بترميز UTF-8.
                 </div>
 
                 <div class="user-tabs">
@@ -427,35 +428,33 @@
             document.getElementById('csvInput').click();
         }
 
-        // === دالة الاستيراد الذكية الجديدة ===
-        // 1. تقرأ الملف.
-        // 2. إذا وجدت علامات استفهام، تعيد القراءة بترميز Windows-1256 (الخاص بـ Excel القديم).
+        // === دالة الاستيراد الجذرية ===
+        // تستخدم القراءة الثنائية (ArrayBuffer) وتفك التشفير بترميز Windows-1256
         function processImport(input) {
             const file = input.files[0];
             if (!file) return;
 
-            // المحاولة الأولى: قراءة كـ UTF-8 (الافتراضي)
+            // استخدام FileReader لقراءة الملف كبيانات خام (Bytes)
             const reader = new FileReader();
-            reader.readAsText(file, "UTF-8");
-            
             reader.onload = function(e) {
-                const text = e.target.result;
-                
-                // فحص إذا كان النص يحتوي على علامات استفهام كثيرة (دليل على تلف الترميز)
-                if (text.includes('?????') || text.includes('')) {
-                    // المحاولة الثانية: إعادة القراءة بترميز اللغة العربية الخاص بـ Windows (Excel القديم)
-                    const retryReader = new FileReader();
-                    retryReader.readAsText(file, "windows-1256");
-                    
-                    retryReader.onload = function(evt) {
-                        // الآن النص يجب أن يكون سليماً
-                        tryParseCSV(evt.target.result, input);
-                    };
-                } else {
-                    // النص سليم من البداية (UTF-8)
-                    tryParseCSV(text, input);
+                const buffer = e.target.result;
+                // استخدام TextDecoder مع ترميز windows-1256 (الخاص بـ Excel العربي القديم)
+                const decoder = new TextDecoder('windows-1256');
+                const text = decoder.decode(buffer);
+
+                // فحص ما إذا كان الملف يحتوي على علامات استفهام حقيقية (تالف تماماً)
+                // إذا كان Excel قد حول الأحرف فعلياً إلى علامة استفهام (ASCII 63)، فلا يوجد كود في العالم يمكنه استرجاعها.
+                if (text.indexOf("?????") !== -1) {
+                    alert("خطأ: الملف تالف ولا يمكن قراءته.\n\nالسبب: قام Excel باستبدال الأحرف العربية بعلامات استفهام عند الحفظ.\n\nالحل الوحيد:\n1. افتح الملف الأصلي في Excel.\n2. اختر 'حفظ باسم' -> CSV.\n3. افتح ملف CSV الناتج باستخدام 'المفكرة' (Notepad).\n4. اختر 'حفظ باسم' من المفكرة وغير الترميز (Encoding) إلى UTF-8.");
+                    input.value = '';
+                    return;
                 }
+
+                tryParseCSV(text, input);
             };
+            
+            // القراءة كـ ArrayBuffer لمنع المتصفح من محاولة التخمين الخاطئ للترميز
+            reader.readAsArrayBuffer(file);
         }
 
         function tryParseCSV(text, input) {
