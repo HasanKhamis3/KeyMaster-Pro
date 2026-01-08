@@ -118,7 +118,7 @@
                     <i class="fas fa-eye password-icon" onclick="togglePass('loginPass', this)"></i>
                 </div>
                 <button type="submit" class="btn btn-primary">دخول</button>
-                <p id="loginError" style="color:red; font-size:0.9rem; margin-top:10px; display:none;"></p>
+                <p id="loginError" style="color:red; font-size:0.9rem; margin-top:10px; display:none; line-height:1.6; font-weight:bold;"></p>
                 <div style="margin-top:30px; border-top:1px solid #eee; padding-top:10px;">
                     <button type="button" class="btn" style="background:#6c757d; color:white; font-size:0.7rem; padding:5px 10px;" onclick="resetSystem()">إعادة ضبط المصنع (Reset)</button>
                 </div>
@@ -166,7 +166,7 @@
                         <button class="btn" style="background:#dc3545; color:white;" onclick="deleteSelected()"><i class="fas fa-trash"></i> حذف المحدد</button>
                         <button class="btn" style="background:#6c757d; color:white;" onclick="toggleStatusSelected()"><i class="fas fa-toggle-on"></i> تفعيل/إلغاء المحدد</button>
                     </div>
-                    <div id="noEditPermissionMsg" style="display:none; color:red; font-weight:bold;">(وضع القراءة فقط)</div>
+                    <div id="noEditPermissionMsg" style="display:none; color:red; font-weight:bold;">(وضع القراءة فقط - لا توجد صلاحية تعديل)</div>
                 </div>
 
                 <div class="user-tabs">
@@ -283,7 +283,7 @@
             senior: [{id: 1, name: 'علياء محمد مبارك الدوسري', job: 'مديرة المدرسة', phone: '39669118', login: '39669118', pass: '39669118', status: 'active', permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS)), dateAdded: '2025/01/01'}],
             middle: [],
             teachers: [],
-            departments: [] // Added Departments Array
+            departments: []
         };
 
         let DB = {}; 
@@ -297,14 +297,14 @@
             if (storedDB) {
                 DB = JSON.parse(storedDB);
                 
-                // Initialize departments if missing from old DB
+                // Ensure departments array exists
                 if(!DB.departments) DB.departments = [];
 
                 // Cleanup and ensure permissions
                 ['admins', 'senior', 'middle', 'teachers', 'departments'].forEach(grp => {
                     if(DB[grp]) {
                         DB[grp].forEach(u => { 
-                            if(grp !== 'departments') { // Depts don't have login/perms
+                            if(grp !== 'departments') { 
                                 if(!u.permissions) u.permissions = JSON.parse(JSON.stringify(DEFAULT_PERMS));
                                 u.login = String(u.login).trim().replace(/[\uFEFF\x00-\x1F\s]/g, '');
                                 u.pass = String(u.pass).trim().replace(/[\uFEFF\x00-\x1F\s]/g, '');
@@ -314,12 +314,13 @@
                     }
                 });
                 
-                // Force Admin
+                // Force Admin Login & Permissions (Restores Admin if deleted or broken)
                 if(!DB.admins) DB.admins = JSON.parse(JSON.stringify(INITIAL_DB.admins));
                 const adm = DB.admins.find(u => u.login === 'admin');
                 if(adm) { 
                     adm.pass = 'Hasan@12';
                     adm.job = 'مدير النظام';
+                    adm.status = 'active'; // Always active
                     SECTIONS.forEach(sec => {
                         if(!adm.permissions[sec.id]) adm.permissions[sec.id] = {};
                         adm.permissions[sec.id].view = true;
@@ -345,6 +346,8 @@
                     const u = DB[grp].find(x => x.id == sessionID);
                     if(u) found = u;
                 });
+                
+                // Strict Session Check
                 if (found && found.status === 'active') {
                     CURRENT_USER = found;
                     showApp();
@@ -358,7 +361,7 @@
 
         function saveDB() { localStorage.setItem('QualitySys_DB_V2', JSON.stringify(DB)); }
 
-        // === STRICT LOGIN ===
+        // === STRICT LOGIN LOGIC ===
         function login(e) {
             e.preventDefault();
             const errBox = document.getElementById('loginError');
@@ -369,21 +372,25 @@
             const pInput = document.getElementById('loginPass').value.trim();
             let userFound = null;
 
+            // Search for user with matching credentials
             ['admins', 'senior', 'middle', 'teachers'].forEach(grp => {
                 const match = DB[grp].find(x => String(x.login).trim() === uInput && String(x.pass).trim() === pInput);
                 if(match) userFound = match;
             });
 
             if (userFound) {
+                // FOUND MATCH - NOW CHECK STATUS
                 if (userFound.status === 'active') {
                     CURRENT_USER = userFound;
                     localStorage.setItem('QualitySys_Session', userFound.id);
                     showApp();
                 } else {
+                    // FOUND BUT INACTIVE
                     errBox.innerText = "عذراً، لا يمكنك تسجيل الدخول لأن حسابك معطل.\nيرجى التواصل مع المشرف للمساعدة.";
                     errBox.style.display = 'block';
                 }
             } else {
+                // NOT FOUND OR WRONG PASSWORD
                 errBox.innerText = "بيانات غير صحيحة. يرجى التأكد من اسم المستخدم وكلمة المرور.";
                 errBox.style.display = 'block';
             }
@@ -402,6 +409,7 @@
             }
         }
 
+        // === Permissions System ===
         function navigate(pageId) {
             const perms = CURRENT_USER.permissions || DEFAULT_PERMS;
             if (perms[pageId] && perms[pageId].view === false) {
@@ -435,7 +443,7 @@
             });
         }
 
-        // === Tab & Table Management ===
+        // === Tabs & Table ===
         function setTab(tab, el) {
             CURRENT_TAB = tab;
             document.querySelectorAll('.user-tab').forEach(t => t.classList.remove('active'));
@@ -451,7 +459,7 @@
             
             tbody.innerHTML = '';
             
-            // Check Permissions
+            // Permission Check
             const userPerms = CURRENT_USER.permissions['user-management'] || {view:true, edit:false};
             const canEdit = userPerms.edit === true;
 
@@ -466,7 +474,7 @@
                 noEditMsg.style.display = 'block';
             }
 
-            // Headers Configuration
+            // Define Columns based on Tab
             if (CURRENT_TAB === 'departments') {
                 headRow.innerHTML = `
                     <th width="5%"><input type="checkbox" id="selectAll" class="custom-checkbox" onchange="toggleSelectAll(this)"></th>
@@ -476,7 +484,7 @@
                     <th width="30%">الإدارة</th>
                 `;
                 addBtn.innerText = "إضافة قسم جديد";
-                addBtn.setAttribute('onclick', 'openAddUserModal()'); // Reuses modal but we will toggle fields
+                addBtn.setAttribute('onclick', 'openAddUserModal()'); 
             } else {
                 headRow.innerHTML = `
                     <th width="5%"><input type="checkbox" id="selectAll" class="custom-checkbox" onchange="toggleSelectAll(this)"></th>
@@ -507,8 +515,7 @@
                 row += `<td>${statusBadge}</td>`;
                 row += `<td><div style="display:flex; justify-content:center; gap:2px;">`;
                 
-                // --- Buttons ---
-                // For Departments, Actions are Edit, Toggle, Delete only
+                // Dept Actions
                 if (CURRENT_TAB === 'departments') {
                     if(canEdit) {
                         row += `<button class="action-btn btn-toggle ${isActive?'':'off'}" onclick="toggleStatus(${u.id})" title="${isActive?'تعطيل':'تفعيل'}"><i class="fas fa-power-off"></i></button>
@@ -518,7 +525,7 @@
                         row += `<span style="color:#999; font-size:0.8rem;">لا توجد صلاحية</span>`;
                     }
                 } else {
-                    // For Users
+                    // User Actions
                     row += `<button class="action-btn btn-view" onclick="viewUser(${u.id})" title="معاينة"><i class="fas fa-eye"></i></button>`;
                     if (canEdit) {
                         row += `<button class="action-btn btn-toggle ${isActive?'':'off'}" onclick="toggleStatus(${u.id})" title="${isActive?'تعطيل':'تفعيل'}"><i class="fas fa-power-off"></i></button>
@@ -535,7 +542,7 @@
             });
         }
 
-        // --- Bulk & Actions ---
+        // --- Bulk Actions ---
         function toggleSelectAll(source) {
             document.querySelectorAll('.user-select-cb').forEach(cb => { if(!cb.disabled) cb.checked = source.checked; });
         }
@@ -600,12 +607,9 @@
 
         // === Modal Logic ===
         function openAddUserModal() { 
-            // Toggle fields visibility based on tab
             const isDept = (CURRENT_TAB === 'departments');
             document.getElementById('userFields').style.display = isDept ? 'none' : 'block';
             document.getElementById('addUserModalTitle').innerText = isDept ? 'إضافة قسم جديد' : 'إضافة مستخدم جديد';
-            
-            // Clear inputs
             document.getElementById('addUserForm').reset();
             document.getElementById('addUserModal').style.display = 'flex'; 
         }
@@ -651,7 +655,7 @@
         function viewUser(id) {
             const u = DB[CURRENT_TAB].find(x => x.id === id);
             const content = document.getElementById('viewUserContent');
-            // Hide Password in View
+            // Hide password in view modal
             content.innerHTML = `
                 <div class="user-view-card">
                     <div class="user-view-avatar">${u.name.charAt(0)}</div>
