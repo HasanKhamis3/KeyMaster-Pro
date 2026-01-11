@@ -917,6 +917,9 @@
         const DEFAULT_PERMS = {};
         SECTIONS.forEach(s => DEFAULT_PERMS[s.id] = {view: true, edit: false});
 
+        // Use a new key to ensure clean data start for the user
+        const DB_KEY = 'Etqan_System_DB_Final';
+
         const INITIAL_DB = {
             admins: [{id: 999, name: 'مدير النظام', login: 'admin', pass: 'Hasan@12', status: 'active', job: 'مدير النظام', permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS))}],
             senior: [{id: 1, name: 'علياء محمد مبارك الدوسري', job: 'مديرة المدرسة', phone: '39669118', login: '39669118', pass: '39669118', status: 'active', permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS)), dateAdded: '2025/01/01'}],
@@ -927,6 +930,9 @@
             logs: [] 
         };
 
+        // Fix Admin Perms in Initial
+        SECTIONS.forEach(sec => { INITIAL_DB.admins[0].permissions[sec.id] = {view: true, edit: true}; });
+
         let DB = {}; 
         let CURRENT_USER = null;
         let CURRENT_TAB = 'senior';
@@ -935,7 +941,6 @@
         let IS_BULK_PERM_MODE = false;
         let CURRENT_PICKER_TYPE = null;
         let performanceChartInstance = null; 
-        
         let dashBarChartInst = null;
         let dashPieChartInst = null;
 
@@ -946,52 +951,43 @@
         }
 
         function initSystem() {
-            const storedDB = localStorage.getItem('QualitySys_DB_V2');
+            // Load from LocalStorage
+            const storedDB = localStorage.getItem(DB_KEY);
+            
             if (storedDB) {
-                DB = JSON.parse(storedDB);
-                if(!DB.departments) DB.departments = [];
-                if(!DB.saved_reports) DB.saved_reports = [];
-                if(!DB.distinguished) DB.distinguished = []; 
-                if(!DB.care_needed) DB.care_needed = []; 
-                if(!DB.qualitative_reports) DB.qualitative_reports = [];
-                if(!DB.settings) DB.settings = {};
-                DB.settings = {...INITIAL_DB.settings, ...DB.settings};
-                if(!DB.settings.evaluation_criteria) DB.settings.evaluation_criteria = [];
-                if(!DB.logs) DB.logs = [];
-                if(!DB.visits_senior) DB.visits_senior = [];
-                if(!DB.visits_middle) DB.visits_middle = [];
+                try {
+                    DB = JSON.parse(storedDB);
+                    // Ensure structure integrity without wiping data
+                    if(!DB.admins) DB.admins = JSON.parse(JSON.stringify(INITIAL_DB.admins));
+                    if(!DB.senior) DB.senior = [];
+                    if(!DB.middle) DB.middle = [];
+                    if(!DB.teachers) DB.teachers = [];
+                    if(!DB.departments) DB.departments = [];
+                    if(!DB.visits_senior) DB.visits_senior = [];
+                    if(!DB.visits_middle) DB.visits_middle = [];
+                    if(!DB.distinguished) DB.distinguished = [];
+                    if(!DB.care_needed) DB.care_needed = [];
+                    if(!DB.qualitative_reports) DB.qualitative_reports = [];
+                    if(!DB.saved_reports) DB.saved_reports = [];
+                    if(!DB.logs) DB.logs = [];
+                    if(!DB.settings) DB.settings = {};
+                    // Merge Settings defaults
+                    DB.settings = {...INITIAL_DB.settings, ...DB.settings};
 
-                ['admins', 'senior', 'middle', 'teachers', 'departments'].forEach(grp => {
-                    if(DB[grp] && Array.isArray(DB[grp])) {
-                        DB[grp].forEach(u => { 
-                            if(grp !== 'departments') { 
-                                if(!u.permissions) u.permissions = JSON.parse(JSON.stringify(DEFAULT_PERMS));
-                            }
-                            if(!u.status) u.status = 'active';
-                        });
-                    }
-                });
-                
-                if(!DB.admins) DB.admins = JSON.parse(JSON.stringify(INITIAL_DB.admins));
-                const admIndex = DB.admins.findIndex(u => u.login === 'admin');
-                if(admIndex !== -1) { 
-                    DB.admins[admIndex].pass = 'Hasan@12'; 
-                    DB.admins[admIndex].status = 'active'; 
-                    SECTIONS.forEach(sec => { if(!DB.admins[admIndex].permissions[sec.id]) DB.admins[admIndex].permissions[sec.id] = {}; DB.admins[admIndex].permissions[sec.id].view = true; DB.admins[admIndex].permissions[sec.id].edit = true; });
-                } else { 
-                    const newAdmin = JSON.parse(JSON.stringify(INITIAL_DB.admins[0]));
-                    SECTIONS.forEach(sec => { newAdmin.permissions[sec.id] = {view: true, edit: true}; });
-                    DB.admins.push(newAdmin); 
+                    // Note: We DO NOT reset admin password here. Data persists.
+                    saveDB(); 
+                } catch (e) {
+                    console.error("Error loading DB, resetting:", e);
+                    DB = JSON.parse(JSON.stringify(INITIAL_DB));
+                    saveDB();
                 }
-                saveDB();
             } else {
                 DB = JSON.parse(JSON.stringify(INITIAL_DB));
-                const adm = DB.admins[0];
-                SECTIONS.forEach(sec => { adm.permissions[sec.id] = {view: true, edit: true}; });
                 saveDB();
             }
 
-            const sessionID = localStorage.getItem('QualitySys_Session');
+            // Check Session
+            const sessionID = localStorage.getItem('Etqan_Session');
             if (sessionID) {
                 let found = null;
                 ['admins', 'senior', 'middle', 'teachers'].forEach(grp => {
@@ -1001,13 +997,19 @@
                     CURRENT_USER = found; 
                     showApp(); 
                 } else { 
-                    localStorage.removeItem('QualitySys_Session');
+                    localStorage.removeItem('Etqan_Session');
                     document.getElementById('loginPage').style.display = 'flex'; 
                 }
             } else { document.getElementById('loginPage').style.display = 'flex'; }
         }
 
-        function saveDB() { localStorage.setItem('QualitySys_DB_V2', JSON.stringify(DB)); }
+        function saveDB() { 
+            // Safety check: Don't save empty objects if we have data structure
+            if(DB && DB.admins) {
+                localStorage.setItem(DB_KEY, JSON.stringify(DB)); 
+            }
+        }
+        
         function addSystemLog(action, details) {
             const logEntry = { id: Date.now(), date: new Date().toLocaleString('en-GB'), user: CURRENT_USER ? CURRENT_USER.name : 'النظام/زائر', action: action, details: details };
             if(!DB.logs) DB.logs = []; DB.logs.unshift(logEntry); if(DB.logs.length > 500) DB.logs = DB.logs.slice(0, 500); saveDB();
@@ -1029,7 +1031,7 @@
             
             if (userFound) {
                 if (userFound.status !== 'active') { errBox.innerText = "نعتذر منك، هذا الحساب غير نشط حالياً."; errBox.style.display = 'block'; return; }
-                CURRENT_USER = userFound; localStorage.setItem('QualitySys_Session', userFound.id); addSystemLog('تسجيل دخول', `المستخدم: ${userFound.name}`); showApp();
+                CURRENT_USER = userFound; localStorage.setItem('Etqan_Session', userFound.id); addSystemLog('تسجيل دخول', `المستخدم: ${userFound.name}`); showApp();
             } else { errBox.innerText = "بيانات غير صحيحة."; errBox.style.display = 'block'; }
         }
         
@@ -1042,7 +1044,12 @@
             }
         }
 
-        function logout() { if(CURRENT_USER) addSystemLog('تسجيل خروج', `المستخدم: ${CURRENT_USER.name}`); localStorage.removeItem('QualitySys_Session'); location.reload(); }
+        function logout() { 
+            if(CURRENT_USER) addSystemLog('تسجيل خروج', `المستخدم: ${CURRENT_USER.name}`); 
+            localStorage.removeItem('Etqan_Session'); 
+            saveDB(); // Ensure save before reload
+            location.reload(); 
+        }
         
         function navigate(pageId) {
             const perms = CURRENT_USER.permissions || DEFAULT_PERMS;
@@ -1239,8 +1246,8 @@
         // === Settings ===
         function setSettingTab(t, el) { document.querySelectorAll('.setting-content-pane').forEach(p=>p.classList.remove('active')); document.getElementById(t).classList.add('active'); document.querySelectorAll('#settings .custom-tab').forEach(x=>x.classList.remove('active')); el.classList.add('active'); }
         function triggerFileSelect(id) { document.getElementById(id).click(); }
-        function handleFileUpload(input, imgId, key) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = function(e) { DB.settings[key] = e.target.result; loadSettings(); }; reader.readAsDataURL(input.files[0]); } }
-        function removeImage(imgId, key, inputId) { DB.settings[key] = null; document.getElementById(inputId).value = ""; loadSettings(); }
+        function handleFileUpload(input, imgId, key) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = function(e) { DB.settings[key] = e.target.result; saveDB(); loadSettings(); }; reader.readAsDataURL(input.files[0]); } }
+        function removeImage(imgId, key, inputId) { DB.settings[key] = null; document.getElementById(inputId).value = ""; saveDB(); loadSettings(); }
         function openImageModal(src) { document.getElementById('fullImage').src = src; document.getElementById('imageViewModal').style.display = 'flex'; }
         function loadSettings() {
             document.getElementById('confSchool').value = DB.settings.schoolName || ''; document.getElementById('confYear').value = DB.settings.schoolYear || '';
