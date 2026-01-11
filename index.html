@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
     <style>
         :root { --primary: #1e4078; --text: #333; --bg: #f7f9fc; --danger: #da291c; --success: #28a745; --warning: #ffc107; --disabled: #e9ecef; }
@@ -544,9 +545,11 @@
                     <div id="userActionButtons" style="display:flex; gap:10px; flex-wrap:wrap;">
                         <button id="addBtnMain" class="btn" style="background:#2c5aa0; color:white;" onclick="openAddUserModal()"><i class="fas fa-plus"></i> إضافة جديد</button>
                         <button class="btn" style="background:#17a2b8; color:white;" onclick="exportCSV()"><i class="fas fa-file-export"></i> تصدير CSV</button>
+                        <button class="btn" style="background:#28a745; color:white;" onclick="triggerImportExcel()"><i class="fas fa-file-excel"></i> استيراد إكسل</button>
                         <button class="btn" style="background:#dc3545; color:white;" onclick="deleteSelected()"><i class="fas fa-trash"></i> حذف المحدد</button>
                         <button class="btn" style="background:#6c757d; color:white;" onclick="toggleStatusSelected()"><i class="fas fa-toggle-on"></i> تفعيل/إلغاء المحدد</button>
                         <button id="bulkPermBtn" class="btn" style="background:#343a40; color:white;" onclick="openBulkPerms()"><i class="fas fa-key"></i> صلاحيات المحدد</button>
+                        <input type="file" id="importExcelInput" hidden accept=".xlsx, .xls, .csv" onchange="handleExcelImport(this)">
                     </div>
                     <div id="noEditPermissionMsg" style="display:none; color:red; font-weight:bold;">(وضع القراءة فقط)</div>
                 </div>
@@ -1241,6 +1244,84 @@
                 DB[CURRENT_TAB].forEach(u => { if(ids.includes(u.id)) u.permissions = JSON.parse(JSON.stringify(newPerms)); }); addSystemLog('تعديل صلاحيات جماعي', `لـ ${ids.length} مستخدمين`);
             } else { const u = DB[CURRENT_TAB].find(x => x.id === EDITING_PERM_ID); if(u) { u.permissions = newPerms; addSystemLog('تعديل صلاحيات', u.name); } }
             saveDB(); closeModal('permModal');
+        }
+
+        // === Import Excel Functionality ===
+        function triggerImportExcel() {
+            document.getElementById('importExcelInput').click();
+        }
+
+        function handleExcelImport(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet, {defval: ""});
+                    
+                    if (jsonData.length === 0) {
+                        alert('الملف فارغ!');
+                        return;
+                    }
+
+                    // Map Arabic Headers to System Keys
+                    let count = 0;
+                    const timestamp = Date.now();
+                    const dateAdded = new Date().toLocaleDateString('en-GB');
+
+                    jsonData.forEach((row, index) => {
+                        // Attempt to read data based on possible Arabic headers
+                        const name = row['الاسم'] || row['Name'] || '';
+                        
+                        if (name) {
+                            const newUser = {
+                                id: timestamp + index,
+                                name: name,
+                                status: 'active',
+                                permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS)),
+                                dateAdded: dateAdded,
+                                lastUpdated: new Date().toLocaleString('en-GB'),
+                                lastUpdatedBy: CURRENT_USER ? CURRENT_USER.name : 'Import'
+                            };
+
+                            if (CURRENT_TAB === 'departments') {
+                                // For Departments
+                                if(!DB[CURRENT_TAB].find(d => d.name === name)) {
+                                    DB[CURRENT_TAB].push(newUser);
+                                    count++;
+                                }
+                            } else if (CURRENT_TAB === 'teachers') {
+                                // For Teachers
+                                newUser.dept = row['القسم'] || row['Department'] || '';
+                                DB[CURRENT_TAB].push(newUser);
+                                count++;
+                            } else {
+                                // For Senior/Middle Leadership
+                                newUser.job = row['الوظيفة'] || row['Job'] || '';
+                                newUser.phone = row['رقم الهاتف'] || row['Phone'] || '';
+                                newUser.login = row['اسم المستخدم'] || row['User'] || '';
+                                newUser.pass = row['كلمة المرور'] || row['Pass'] || '';
+                                DB[CURRENT_TAB].push(newUser);
+                                count++;
+                            }
+                        }
+                    });
+
+                    if (count > 0) {
+                        saveDB();
+                        renderTable();
+                        addSystemLog('استيراد إكسل', `تم استيراد ${count} سجل في ${CURRENT_TAB}`);
+                        alert(`تم استيراد ${count} سجل بنجاح.`);
+                    } else {
+                        alert('لم يتم استيراد أي سجل. تأكد من تطابق عناوين الأعمدة (الاسم، الوظيفة، ...).');
+                    }
+                    
+                    // Reset input
+                    input.value = "";
+                };
+                reader.readAsArrayBuffer(input.files[0]);
+            }
         }
 
         // === Settings ===
