@@ -633,7 +633,7 @@
                         <div class="signature-card">
                             <div class="signature-title">مدير/ة المدرسة</div>
                             <div class="form-group">
-                                <select id="sig_director" class="form-control"><option value="">اختر مدير المدرسة</option></select>
+                                <select id="sig_director" class="form-control" onchange="onSigChange()"><option value="">اختر مدير المدرسة</option></select>
                             </div>
                             <div style="display:flex; gap:10px; justify-content:center; margin-top:20px;">
                                 <button class="btn btn-primary setting-edit-btn" onclick="saveSignatureSettings()">حفظ</button>
@@ -643,7 +643,7 @@
                         <div class="signature-card">
                             <div class="signature-title">المدير/ة المساعد/ة</div>
                             <div class="form-group">
-                                <select id="sig_assistant" class="form-control"><option value="">اختر المدير المساعد</option></select>
+                                <select id="sig_assistant" class="form-control" onchange="onSigChange()"><option value="">اختر المدير المساعد</option></select>
                             </div>
                             <div style="display:flex; gap:10px; justify-content:center; margin-top:20px;">
                                 <button class="btn btn-primary setting-edit-btn" onclick="saveSignatureSettings()">حفظ</button>
@@ -686,7 +686,7 @@
                         <button class="btn setting-edit-btn" style="background:#2c5aa0; color:white;" onclick="openAddEvalModal()"><i class="fas fa-plus"></i> إضافة تقييم</button>
                     </div>
                     <table class="custom-table">
-                        <thead><tr><th width="10%">#</th><th width="55%">اسم المعيار</th><th width="10%">الحالة</th><th width="25%">الإجراءات</th></tr></thead>
+                        <thead><tr><th width="10%">#</th><th width="45%">اسم المعيار</th><th width="15%">الحالة</th><th width="30%">الإجراءات</th></tr></thead>
                         <tbody id="evalTableBody"></tbody>
                     </table>
                 </div>
@@ -1409,25 +1409,136 @@
         function handleFileUpload(input, imgId, key) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = function(e) { DB.settings[key] = e.target.result; saveDB(); loadSettings(); }; reader.readAsDataURL(input.files[0]); } }
         function removeImage(imgId, key, inputId) { DB.settings[key] = null; document.getElementById(inputId).value = ""; saveDB(); loadSettings(); }
         function openImageModal(src) { document.getElementById('fullImage').src = src; document.getElementById('imageViewModal').style.display = 'flex'; }
+        
         function loadSettings() {
             document.getElementById('confSchool').value = DB.settings.schoolName || ''; document.getElementById('confYear').value = DB.settings.schoolYear || '';
             const logos = ['ministryLogo', 'schoolLogo', 'schoolStamp']; const prefixes = ['ministry', 'school', 'stamp'];
             logos.forEach((key, i) => { const wrapper = document.getElementById(`preview_wrap_${prefixes[i]}`); const btnWrap = document.getElementById(`btn_wrap_${prefixes[i]}`); const img = document.getElementById(`preview_${prefixes[i]}`); if (DB.settings[key]) { img.src = DB.settings[key]; wrapper.style.display = 'inline-block'; btnWrap.style.display = 'none'; } else { wrapper.style.display = 'none'; btnWrap.style.display = 'block'; } });
-            const evalBody = document.getElementById('evalTableBody'); evalBody.innerHTML = ''; (DB.settings.evaluation_criteria || []).forEach((c, i) => { evalBody.innerHTML += `<tr><td>${i+1}</td><td>${c.name}</td><td><span class="status-badge status-active">نشط</span></td><td><button class="action-btn btn-delete" onclick="deleteEval(${i})">حذف</button></td></tr>`; });
-            const fillSigSelect = (id, val) => { const sel = document.getElementById(id); sel.innerHTML = '<option value="">اختر...</option>'; ['admins', 'senior', 'middle'].forEach(grp => { (DB[grp] || []).forEach(u => { sel.innerHTML += `<option value="${u.name}" ${u.name === val ? 'selected' : ''}>${u.name}</option>`; }); }); }; fillSigSelect('sig_director', DB.settings.sig_director); fillSigSelect('sig_assistant', DB.settings.sig_assistant);
+            
+            // Evaluation Table
+            const evalBody = document.getElementById('evalTableBody'); 
+            evalBody.innerHTML = ''; 
+            (DB.settings.evaluation_criteria || []).forEach((c, i) => { 
+                const isActive = c.status !== 'inactive';
+                const statusBadge = isActive ? '<span class="status-badge status-active">نشط</span>' : '<span class="status-badge status-inactive">معطل</span>';
+                evalBody.innerHTML += `
+                <tr>
+                    <td>${i+1}</td>
+                    <td>${c.name}</td>
+                    <td>${statusBadge}</td>
+                    <td>
+                        <button class="action-btn btn-move" onclick="moveEval(${i}, -1)" title="أعلى">▲</button>
+                        <button class="action-btn btn-move" onclick="moveEval(${i}, 1)" title="أسفل">▼</button>
+                        <button class="action-btn btn-edit" onclick="editEval(${i})">تعديل</button>
+                        <button class="action-btn btn-toggle ${isActive?'':'off'}" onclick="toggleEval(${i})">${isActive?'تعطيل':'تفعيل'}</button>
+                        <button class="action-btn btn-delete" onclick="deleteEval(${i})">حذف</button>
+                    </td>
+                </tr>`; 
+            });
+
+            // Signatures
+            fillSigSelects();
+
             renderVisitorList('senior'); renderVisitorList('middle');
             document.getElementById('footer_text').value = DB.settings.footer_text || ''; document.getElementById('footer_align').value = DB.settings.footer_align || 'center'; document.getElementById('footer_fontsize').value = DB.settings.footer_fontsize || '10';
         }
+
+        // Updated Signature Logic
+        function fillSigSelects() {
+            const dirSel = document.getElementById('sig_director');
+            const asstSel = document.getElementById('sig_assistant');
+            const dirVal = DB.settings.sig_director;
+            const asstVal = DB.settings.sig_assistant;
+
+            const populate = (sel, selectedVal, excludedVal) => {
+                sel.innerHTML = '<option value="">اختر...</option>';
+                // Only Senior Leadership
+                (DB.senior || []).forEach(u => {
+                    // Prevent duplicate display if it's selected in the other box
+                    if (u.name !== excludedVal) {
+                        sel.innerHTML += `<option value="${u.name}" ${u.name === selectedVal ? 'selected' : ''}>${u.name}</option>`;
+                    }
+                });
+            };
+
+            populate(dirSel, dirVal, asstVal);
+            populate(asstSel, asstVal, dirVal);
+        }
+
+        function onSigChange() {
+            // Update DB on change to reflect immediately in other dropdown
+            DB.settings.sig_director = document.getElementById('sig_director').value; 
+            DB.settings.sig_assistant = document.getElementById('sig_assistant').value; 
+            fillSigSelects(); // Re-render to update exclusions
+        }
+
         function saveGeneralSettings() { if(!canEdit('settings')) return alert('لا تملك صلاحية'); DB.settings.schoolName = document.getElementById('confSchool').value; DB.settings.schoolYear = document.getElementById('confYear').value; saveDB(); alert('تم الحفظ'); }
         function saveSignatureSettings() { if(!canEdit('settings')) return; DB.settings.sig_director = document.getElementById('sig_director').value; DB.settings.sig_assistant = document.getElementById('sig_assistant').value; saveDB(); alert('تم حفظ التوقيعات'); }
-        function clearSignature(id) { document.getElementById(id).value = ''; saveSignatureSettings(); }
+        function clearSignature(id) { document.getElementById(id).value = ''; onSigChange(); saveSignatureSettings(); }
         function saveFooterSettings() { if(!canEdit('settings')) return; DB.settings.footer_text = document.getElementById('footer_text').value; DB.settings.footer_align = document.getElementById('footer_align').value; DB.settings.footer_fontsize = document.getElementById('footer_fontsize').value; saveDB(); alert('تم حفظ التذييل'); }
-        function openAddEvalModal() { document.getElementById('addEvalForm').reset(); document.getElementById('addEvalModal').style.display='flex'; }
-        function saveEvalForm() { const n = document.getElementById('evalName').value; if(n){ if(!DB.settings.evaluation_criteria) DB.settings.evaluation_criteria=[]; DB.settings.evaluation_criteria.push({name:n}); saveDB(); loadSettings(); closeModal('addEvalModal'); } }
+        
+        // Evaluation Settings Logic
+        function openAddEvalModal() { document.getElementById('editEvalId').value = ''; document.getElementById('addEvalForm').reset(); document.getElementById('addEvalModal').style.display='flex'; }
+        function editEval(idx) {
+            const item = DB.settings.evaluation_criteria[idx];
+            document.getElementById('editEvalId').value = idx;
+            document.getElementById('evalName').value = item.name;
+            document.getElementById('addEvalModal').style.display='flex';
+        }
+        function saveEvalForm() { 
+            const n = document.getElementById('evalName').value; 
+            const id = document.getElementById('editEvalId').value;
+            if(n){ 
+                if(!DB.settings.evaluation_criteria) DB.settings.evaluation_criteria=[]; 
+                if (id !== '') {
+                    // Edit
+                    DB.settings.evaluation_criteria[id].name = n;
+                } else {
+                    // New
+                    DB.settings.evaluation_criteria.push({name:n, status:'active'}); 
+                }
+                saveDB(); loadSettings(); closeModal('addEvalModal'); 
+            } 
+        }
+        function toggleEval(idx) {
+            const item = DB.settings.evaluation_criteria[idx];
+            item.status = (item.status === 'inactive') ? 'active' : 'inactive';
+            saveDB(); loadSettings();
+        }
+        function moveEval(idx, dir) {
+            const arr = DB.settings.evaluation_criteria;
+            if (dir === -1 && idx > 0) [arr[idx], arr[idx-1]] = [arr[idx-1], arr[idx]];
+            if (dir === 1 && idx < arr.length - 1) [arr[idx], arr[idx+1]] = [arr[idx+1], arr[idx]];
+            saveDB(); loadSettings();
+        }
         function deleteEval(idx) { if(confirm('حذف؟')) { DB.settings.evaluation_criteria.splice(idx, 1); saveDB(); loadSettings(); } }
+        
+        // Visitor Settings Logic
         function renderVisitorList(type) { const list = document.getElementById(`list_visitor_${type}`); list.innerHTML = ''; const order = DB.settings[`visitor_order_${type}`] || []; if(order.length === 0) list.innerHTML = '<li class="empty-list-msg">لا يوجد زوار مضافين للقائمة</li>'; else { order.forEach((name, idx) => { list.innerHTML += `<li class="visitor-list-item"><span class="visitor-name">${idx+1}. ${name}</span><div class="visitor-controls"><button class="action-btn btn-move" onclick="moveVisitor('${type}', ${idx}, -1)">▲</button><button class="action-btn btn-move" onclick="moveVisitor('${type}', ${idx}, 1)">▼</button><button class="action-btn btn-delete" onclick="removeVisitor('${type}', ${idx})">✖</button></div></li>`; }); } }
         function openVisitorPicker(type) { CURRENT_PICKER_TYPE = type; document.getElementById('visitorPickerModal').style.display = 'flex'; filterPickerList(); }
-        function filterPickerList() { const term = document.getElementById('visitorSearch').value.toLowerCase(); const list = document.getElementById('pickerList'); list.innerHTML = ''; ['admins', 'senior', 'middle'].forEach(grp => { (DB[grp] || []).forEach(u => { if (u.name.toLowerCase().includes(term)) { list.innerHTML += `<div class="picker-item" onclick="addVisitor('${u.name}')"><span>${u.name}</span><span style="font-size:0.8rem; color:#777;">${grp}</span></div>`; } }); }); }
+        function filterPickerList() { 
+            const term = document.getElementById('visitorSearch').value.toLowerCase(); 
+            const list = document.getElementById('pickerList'); 
+            list.innerHTML = ''; 
+            const type = CURRENT_PICKER_TYPE;
+            
+            // Determine Source Array based on Type
+            let sourceArray = [];
+            if (type === 'senior') sourceArray = DB.senior || [];
+            else if (type === 'middle') sourceArray = DB.middle || [];
+            
+            // Get existing names to exclude
+            const existingNames = DB.settings[`visitor_order_${type}`] || [];
+
+            sourceArray.forEach(u => { 
+                // Exclude Admin (id 999) and existing names
+                if (u.id !== 999 && !existingNames.includes(u.name)) {
+                    if (u.name.toLowerCase().includes(term)) { 
+                        list.innerHTML += `<div class="picker-item" onclick="addVisitor('${u.name}')"><span>${u.name}</span><span style="font-size:0.8rem; color:#777;">${type === 'senior' ? 'قيادة عليا' : 'قيادة وسطى'}</span></div>`; 
+                    } 
+                }
+            }); 
+        }
         function addVisitor(name) { const type = CURRENT_PICKER_TYPE; if(!DB.settings[`visitor_order_${type}`]) DB.settings[`visitor_order_${type}`] = []; if(!DB.settings[`visitor_order_${type}`].includes(name)) { DB.settings[`visitor_order_${type}`].push(name); saveDB(); loadSettings(); } closeModal('visitorPickerModal'); }
         function removeVisitor(type, idx) { DB.settings[`visitor_order_${type}`].splice(idx, 1); saveDB(); loadSettings(); }
         function moveVisitor(type, idx, dir) { const arr = DB.settings[`visitor_order_${type}`]; if (dir === -1 && idx > 0) [arr[idx], arr[idx-1]] = [arr[idx-1], arr[idx]]; if (dir === 1 && idx < arr.length - 1) [arr[idx], arr[idx+1]] = [arr[idx+1], arr[idx]]; saveDB(); loadSettings(); }
@@ -1445,11 +1556,36 @@
             if(list.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="padding:20px; color:#888;">لا توجد زيارات مسجلة</td></tr>'; return; }
             list.forEach(v => {
                 let badgeClass = 'bg-light-blue';
-                if(v.eval === 'ممتاز') badgeClass = 'bg-light-green'; if(v.eval === 'جيد جداً') badgeClass = 'bg-light-blue'; if(v.eval === 'جيد') badgeClass = 'bg-light-orange'; if(v.eval === 'مقبول' || v.eval === 'ضعيف') badgeClass = 'bg-light-red';
+                // Simple badge logic based on common terms, can be expanded
+                if(v.eval.includes('ممتاز')) badgeClass = 'bg-light-green'; 
+                else if(v.eval.includes('جيد جداً')) badgeClass = 'bg-light-blue'; 
+                else if(v.eval.includes('جيد')) badgeClass = 'bg-light-orange'; 
+                else badgeClass = 'bg-light-red';
+                
                 tbody.innerHTML += `<tr><td>${v.date}</td><td>${v.dept}</td><td>${v.teacher}</td><td><span style="padding:5px 10px; border-radius:15px; font-size:0.8rem;" class="${badgeClass}">${v.eval}</span></td><td>${v.visitor}</td><td>${v.visitorJob}</td></tr>`;
             });
         }
-        function openAddVisitModal() { if(!canEdit('visits')) return alert('عذراً، لا تملك صلاحية إضافة زيارة.'); document.getElementById('addVisitForm').reset(); const dSel = document.getElementById('visitDept'); dSel.innerHTML = '<option value="">اختر القسم...</option>'; (DB.departments || []).forEach(d => dSel.innerHTML += `<option value="${d.name}">${d.name}</option>`); const eSel = document.getElementById('visitEval'); eSel.innerHTML = '<option value="">اختر التقييم...</option>'; ['ممتاز', 'جيد جداً', 'جيد', 'مقبول', 'ضعيف'].forEach(e => eSel.innerHTML += `<option value="${e}">${e}</option>`); document.getElementById('addVisitModal').style.display = 'flex'; }
+        function openAddVisitModal() { 
+            if(!canEdit('visits')) return alert('عذراً، لا تملك صلاحية إضافة زيارة.'); 
+            document.getElementById('addVisitForm').reset(); 
+            
+            // Populate Departments
+            const dSel = document.getElementById('visitDept'); 
+            dSel.innerHTML = '<option value="">اختر القسم...</option>'; 
+            (DB.departments || []).forEach(d => dSel.innerHTML += `<option value="${d.name}">${d.name}</option>`); 
+            
+            // Populate Evaluation Criteria from Settings
+            const eSel = document.getElementById('visitEval'); 
+            eSel.innerHTML = '<option value="">اختر التقييم...</option>'; 
+            (DB.settings.evaluation_criteria || []).forEach(c => {
+                // Only show active items
+                if (c.status !== 'inactive') {
+                    eSel.innerHTML += `<option value="${c.name}">${c.name}</option>`;
+                }
+            });
+
+            document.getElementById('addVisitModal').style.display = 'flex'; 
+        }
         function onVisitDeptChange() { const dept = document.getElementById('visitDept').value; const tSel = document.getElementById('visitTeacher'); tSel.innerHTML = '<option value="">اختر المعلم/ة...</option>'; (DB.teachers || []).filter(t => t.dept === dept).forEach(t => tSel.innerHTML += `<option value="${t.name}">${t.name}</option>`); }
         function saveVisit() {
             const dept = document.getElementById('visitDept').value; const teacher = document.getElementById('visitTeacher').value; const date = document.getElementById('visitDate').value; const ev = document.getElementById('visitEval').value;
@@ -1460,9 +1596,16 @@
         }
         function renderPerformanceChart() {
             const filter = document.getElementById('perfMonthFilter').value; let allVisits = [...(DB.visits_senior||[]), ...(DB.visits_middle||[])]; if(filter !== 'all') allVisits = allVisits.filter(v => v.date.split('-')[1] === filter);
-            const counts = { 'ممتاز': 0, 'جيد جداً': 0, 'جيد': 0, 'مقبول': 0, 'ضعيف': 0 }; allVisits.forEach(v => { if(counts[v.eval] !== undefined) counts[v.eval]++; });
+            // Count based on Evaluation Criteria names
+            const counts = {}; 
+            (DB.settings.evaluation_criteria || []).forEach(c => counts[c.name] = 0);
+            
+            allVisits.forEach(v => { 
+                if(counts[v.eval] !== undefined) counts[v.eval]++; 
+                else counts[v.eval] = (counts[v.eval] || 0) + 1;
+            });
             const ctx = document.getElementById('perfChart').getContext('2d'); if(performanceChartInstance) performanceChartInstance.destroy();
-            performanceChartInstance = new Chart(ctx, { type: 'bar', data: { labels: Object.keys(counts), datasets: [{ label: 'عدد المعلمين', data: Object.values(counts), backgroundColor: ['#28a745', '#17a2b8', '#ffc107', '#dc3545', '#6c757d'], barThickness: 50 }] }, options: { responsive: true, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }, plugins: { legend: { display: false } } } });
+            performanceChartInstance = new Chart(ctx, { type: 'bar', data: { labels: Object.keys(counts), datasets: [{ label: 'عدد المعلمين', data: Object.values(counts), backgroundColor: '#1e4078', barThickness: 50 }] }, options: { responsive: true, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }, plugins: { legend: { display: false } } } });
         }
         function renderDistinguishedTables() {
             const filter = document.getElementById('distMonthFilter').value;
