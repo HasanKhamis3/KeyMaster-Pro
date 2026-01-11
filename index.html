@@ -1215,13 +1215,19 @@
         // Export Excel Function using SheetJS
         function exportExcel() {
             const list = DB[CURRENT_TAB] || [];
-            if (list.length === 0) return alert('لا بيانات للتصدير');
+            
+            let isTemplate = false;
+            if (list.length === 0) {
+                alert('لا توجد بيانات مسجلة حالياً. سيتم تصدير قالب فارغ يمكنك تعبئته واستخدامه للاستيراد.');
+                isTemplate = true;
+            }
 
             let headers = [];
             let data = [];
 
             if (CURRENT_TAB === 'departments') {
                 headers = ['الترتيب', 'اسم القسم'];
+                // Only loop if not template
                 list.forEach((row, index) => {
                     data.push({
                         'الترتيب': index + 1,
@@ -1238,16 +1244,15 @@
                     });
                 });
             } else {
-                headers = ['الاسم', 'الوظيفة', 'رقم الهاتف', 'اسم المستخدم', 'كلمة المرور', 'تاريخ الإضافة', 'الحالة'];
+                // Senior/Middle Leadership
+                headers = ['الاسم', 'الوظيفة', 'رقم الهاتف', 'اسم المستخدم', 'كلمة المرور'];
                 list.forEach(row => {
                     data.push({
                         'الاسم': row.name,
                         'الوظيفة': row.job || '',
                         'رقم الهاتف': row.phone || '',
                         'اسم المستخدم': row.login || '',
-                        'كلمة المرور': row.pass || '',
-                        'تاريخ الإضافة': row.dateAdded || '',
-                        'الحالة': row.status === 'active' ? 'مفعل' : 'معطل'
+                        'كلمة المرور': row.pass || ''
                     });
                 });
             }
@@ -1255,7 +1260,7 @@
             const ws = XLSX.utils.json_to_sheet(data, { header: headers });
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-            XLSX.writeFile(wb, `${CURRENT_TAB}.xlsx`);
+            XLSX.writeFile(wb, `${CURRENT_TAB}${isTemplate ? '_Template' : ''}.xlsx`);
         }
 
         function openAddUserModal() { 
