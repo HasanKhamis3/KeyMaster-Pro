@@ -103,6 +103,7 @@
         .btn-toggle.off { background: #6c757d; }
         .btn-move { background: #6c757d; padding: 6px 8px; } 
         .action-btn:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .action-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
 
         /* Filters */
         .filter-container { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #eee; }
@@ -363,8 +364,8 @@
                             <th width="15%">القسم</th>
                             <th width="20%">اسم المعلمة</th>
                             <th width="15%">التقييم</th>
-                            <th width="20%">الزائر</th>
-                            <th width="15%">وظيفة الزائر</th>
+                            <th width="15%">الزائر</th>
+                            <th width="20%">الإجراءات</th>
                         </tr>
                     </thead>
                     <tbody id="visitsTableBody"></tbody>
@@ -815,7 +816,7 @@
             <div class="modal-header"><span>إضافة زيارة صفية</span> <span onclick="closeModal('addVisitModal')" style="cursor:pointer;">&times;</span></div>
             <div class="modal-body">
                 <form id="addVisitForm">
-                    <div class="form-group">
+                    <input type="hidden" id="visitEditId"> <div class="form-group">
                         <label style="font-weight:bold; display:block; margin-bottom:5px;">القسم</label>
                         <select id="visitDept" class="form-control" onchange="onVisitDeptChange()"><option value="">اختر القسم...</option></select>
                     </div>
@@ -836,6 +837,17 @@
             <div class="modal-footer">
                 <button class="btn btn-primary" onclick="saveVisit()">حفظ</button>
                 <button class="btn" style="background:#ddd;" onclick="closeModal('addVisitModal')">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="viewVisitModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">تفاصيل الزيارة <span onclick="closeModal('viewVisitModal')" style="cursor:pointer;">&times;</span></div>
+            <div class="modal-body" id="viewVisitContent">
+                </div>
+            <div class="modal-footer">
+                <button class="btn" style="background:#28a745; color:white;" onclick="closeModal('viewVisitModal')">إغلاق</button>
             </div>
         </div>
     </div>
@@ -1548,26 +1560,51 @@
 
         // === Visits & Charts ===
         function setVisitTab(type, el) { CURRENT_VISIT_TAB = type; document.querySelectorAll('#visits .custom-tab').forEach(t=>t.classList.remove('active')); el.classList.add('active'); renderVisitsTable(); }
+        
+        // Updated Render Function for Visits Table
         function renderVisitsTable() {
             const tbody = document.getElementById('visitsTableBody'); tbody.innerHTML = '';
             let list = (CURRENT_VISIT_TAB === 'senior') ? (DB.visits_senior || []) : (DB.visits_middle || []);
             const filter = document.getElementById('visitMonthFilter').value;
             if(filter !== 'all') list = list.filter(v => v.date.split('-')[1] === filter);
             if(list.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="padding:20px; color:#888;">لا توجد زيارات مسجلة</td></tr>'; return; }
+            
             list.forEach(v => {
                 let badgeClass = 'bg-light-blue';
-                // Simple badge logic based on common terms, can be expanded
                 if(v.eval.includes('ممتاز')) badgeClass = 'bg-light-green'; 
                 else if(v.eval.includes('جيد جداً')) badgeClass = 'bg-light-blue'; 
                 else if(v.eval.includes('جيد')) badgeClass = 'bg-light-orange'; 
                 else badgeClass = 'bg-light-red';
                 
-                tbody.innerHTML += `<tr><td>${v.date}</td><td>${v.dept}</td><td>${v.teacher}</td><td><span style="padding:5px 10px; border-radius:15px; font-size:0.8rem;" class="${badgeClass}">${v.eval}</span></td><td>${v.visitor}</td><td>${v.visitorJob}</td></tr>`;
+                // Determine if current user is the creator
+                const isCreator = (v.visitor === CURRENT_USER.name);
+                // View is always enabled. Edit/Delete enabled only for creator.
+                const viewBtn = `<button class="action-btn btn-view" onclick="viewVisit(${v.id})" title="معاينة"><i class="fas fa-eye"></i></button>`;
+                const editBtn = `<button class="action-btn btn-edit" onclick="editVisit(${v.id})" title="تعديل" ${isCreator ? '' : 'disabled'}><i class="fas fa-edit"></i></button>`;
+                const delBtn = `<button class="action-btn btn-delete" onclick="deleteVisit(${v.id})" title="حذف" ${isCreator ? '' : 'disabled'}><i class="fas fa-trash"></i></button>`;
+
+                tbody.innerHTML += `
+                <tr>
+                    <td>${v.date}</td>
+                    <td>${v.dept}</td>
+                    <td>${v.teacher}</td>
+                    <td><span style="padding:5px 10px; border-radius:15px; font-size:0.8rem;" class="${badgeClass}">${v.eval}</span></td>
+                    <td>${v.visitor}</td>
+                    <td>
+                        <div style="display:flex; justify-content:center; gap:2px;">
+                            ${viewBtn}
+                            ${editBtn}
+                            ${delBtn}
+                        </div>
+                    </td>
+                </tr>`;
             });
         }
+
         function openAddVisitModal() { 
             if(!canEdit('visits')) return alert('عذراً، لا تملك صلاحية إضافة زيارة.'); 
             document.getElementById('addVisitForm').reset(); 
+            document.getElementById('visitEditId').value = ''; // Clear Edit ID for new entry
             
             // Populate Departments
             const dSel = document.getElementById('visitDept'); 
@@ -1578,7 +1615,6 @@
             const eSel = document.getElementById('visitEval'); 
             eSel.innerHTML = '<option value="">اختر التقييم...</option>'; 
             (DB.settings.evaluation_criteria || []).forEach(c => {
-                // Only show active items
                 if (c.status !== 'inactive') {
                     eSel.innerHTML += `<option value="${c.name}">${c.name}</option>`;
                 }
@@ -1586,14 +1622,119 @@
 
             document.getElementById('addVisitModal').style.display = 'flex'; 
         }
+
         function onVisitDeptChange() { const dept = document.getElementById('visitDept').value; const tSel = document.getElementById('visitTeacher'); tSel.innerHTML = '<option value="">اختر المعلم/ة...</option>'; (DB.teachers || []).filter(t => t.dept === dept).forEach(t => tSel.innerHTML += `<option value="${t.name}">${t.name}</option>`); }
+        
         function saveVisit() {
-            const dept = document.getElementById('visitDept').value; const teacher = document.getElementById('visitTeacher').value; const date = document.getElementById('visitDate').value; const ev = document.getElementById('visitEval').value;
+            const dept = document.getElementById('visitDept').value; 
+            const teacher = document.getElementById('visitTeacher').value; 
+            const date = document.getElementById('visitDate').value; 
+            const ev = document.getElementById('visitEval').value;
+            const editId = document.getElementById('visitEditId').value;
+
             if(!dept || !teacher || !date || !ev) return alert('جميع الحقول مطلوبة');
-            let targetList = 'visits_senior'; if (CURRENT_VISIT_TAB === 'middle') targetList = 'visits_middle';
-            const newVisit = { id: Date.now(), dept: dept, teacher: teacher, date: date, eval: ev, visitor: CURRENT_USER.name, visitorJob: CURRENT_USER.job || 'زائر' };
-            if(!DB[targetList]) DB[targetList] = []; DB[targetList].push(newVisit); addSystemLog('إضافة زيارة', `المعلم: ${teacher} - التاريخ: ${date}`); saveDB(); renderVisitsTable(); closeModal('addVisitModal');
+            
+            let targetListKey = (CURRENT_VISIT_TAB === 'senior') ? 'visits_senior' : 'visits_middle';
+            
+            if (editId) {
+                // Update Existing
+                const idx = DB[targetListKey].findIndex(v => v.id == editId);
+                if (idx !== -1) {
+                    DB[targetListKey][idx].dept = dept;
+                    DB[targetListKey][idx].teacher = teacher;
+                    DB[targetListKey][idx].date = date;
+                    DB[targetListKey][idx].eval = ev;
+                    // Visitor details (creator) remain unchanged usually, or update timestamp
+                    addSystemLog('تعديل زيارة', `المعلم: ${teacher}`);
+                }
+            } else {
+                // Create New
+                const newVisit = { 
+                    id: Date.now(), 
+                    dept: dept, 
+                    teacher: teacher, 
+                    date: date, 
+                    eval: ev, 
+                    visitor: CURRENT_USER.name, 
+                    visitorJob: CURRENT_USER.job || 'زائر' 
+                };
+                if(!DB[targetListKey]) DB[targetListKey] = []; 
+                DB[targetListKey].push(newVisit); 
+                addSystemLog('إضافة زيارة', `المعلم: ${teacher} - التاريخ: ${date}`);
+            }
+            
+            saveDB(); 
+            renderVisitsTable(); 
+            closeModal('addVisitModal');
         }
+
+        function editVisit(id) {
+            let targetListKey = (CURRENT_VISIT_TAB === 'senior') ? 'visits_senior' : 'visits_middle';
+            const visit = DB[targetListKey].find(v => v.id === id);
+            if (!visit) return;
+
+            // Security check client-side (though UI is disabled)
+            if (visit.visitor !== CURRENT_USER.name) return alert('ليس لديك صلاحية تعديل هذه الزيارة');
+
+            // Open Modal
+            openAddVisitModal(); // Resets form
+            
+            // Fill Data
+            document.getElementById('visitEditId').value = visit.id;
+            document.getElementById('visitDept').value = visit.dept;
+            onVisitDeptChange(); // Trigger teacher list population
+            document.getElementById('visitTeacher').value = visit.teacher;
+            document.getElementById('visitDate').value = visit.date;
+            document.getElementById('visitEval').value = visit.eval;
+        }
+
+        function deleteVisit(id) {
+            let targetListKey = (CURRENT_VISIT_TAB === 'senior') ? 'visits_senior' : 'visits_middle';
+            const visit = DB[targetListKey].find(v => v.id === id);
+            
+            if (!visit) return;
+            if (visit.visitor !== CURRENT_USER.name) return alert('ليس لديك صلاحية حذف هذه الزيارة');
+
+            if(confirm('هل أنت متأكد من حذف هذه الزيارة؟')) {
+                DB[targetListKey] = DB[targetListKey].filter(v => v.id !== id);
+                addSystemLog('حذف زيارة', `المعلم: ${visit.teacher}`);
+                saveDB();
+                renderVisitsTable();
+            }
+        }
+
+        function viewVisit(id) {
+            let targetListKey = (CURRENT_VISIT_TAB === 'senior') ? 'visits_senior' : 'visits_middle';
+            const visit = DB[targetListKey].find(v => v.id === id);
+            if (!visit) return;
+
+            let badgeClass = 'bg-light-blue';
+            if(visit.eval.includes('ممتاز')) badgeClass = 'bg-light-green'; 
+            else if(visit.eval.includes('جيد جداً')) badgeClass = 'bg-light-blue'; 
+            else if(visit.eval.includes('جيد')) badgeClass = 'bg-light-orange'; 
+            else badgeClass = 'bg-light-red';
+
+            const html = `
+                <div style="text-align:right;">
+                    <div style="margin-bottom:10px;"><strong style="color:#777;">التاريخ:</strong> <b>${visit.date}</b></div>
+                    <div style="margin-bottom:10px;"><strong style="color:#777;">القسم:</strong> <b>${visit.dept}</b></div>
+                    <div style="margin-bottom:10px;"><strong style="color:#777;">المعلم/ة:</strong> <b>${visit.teacher}</b></div>
+                    <div style="margin-bottom:10px;"><strong style="color:#777;">التقييم:</strong> <span class="${badgeClass}" style="padding:2px 8px; border-radius:10px;">${visit.eval}</span></div>
+                    <hr style="margin:15px 0; border-top:1px solid #eee;">
+                    <div style="margin-bottom:5px;"><strong style="color:#777;">قام بالزيارة:</strong></div>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <div style="width:40px; height:40px; background:#1e4078; color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">${visit.visitor.charAt(0)}</div>
+                        <div>
+                            <div>${visit.visitor}</div>
+                            <small style="color:#777;">${visit.visitorJob}</small>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('viewVisitContent').innerHTML = html;
+            document.getElementById('viewVisitModal').style.display = 'flex';
+        }
+
         function renderPerformanceChart() {
             const filter = document.getElementById('perfMonthFilter').value; let allVisits = [...(DB.visits_senior||[]), ...(DB.visits_middle||[])]; if(filter !== 'all') allVisits = allVisits.filter(v => v.date.split('-')[1] === filter);
             // Count based on Evaluation Criteria names
