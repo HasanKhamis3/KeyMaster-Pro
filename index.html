@@ -544,7 +544,7 @@
                     <h3>إدارة المستخدمين</h3>
                     <div id="userActionButtons" style="display:flex; gap:10px; flex-wrap:wrap;">
                         <button id="addBtnMain" class="btn" style="background:#2c5aa0; color:white;" onclick="openAddUserModal()"><i class="fas fa-plus"></i> إضافة جديد</button>
-                        <button class="btn" style="background:#17a2b8; color:white;" onclick="exportCSV()"><i class="fas fa-file-export"></i> تصدير CSV</button>
+                        <button class="btn" style="background:#17a2b8; color:white;" onclick="exportExcel()"><i class="fas fa-file-excel"></i> تصدير إكسل</button>
                         <button class="btn" style="background:#28a745; color:white;" onclick="triggerImportExcel()"><i class="fas fa-file-excel"></i> استيراد إكسل</button>
                         <button class="btn" style="background:#dc3545; color:white;" onclick="deleteSelected()"><i class="fas fa-trash"></i> حذف المحدد</button>
                         <button class="btn" style="background:#6c757d; color:white;" onclick="toggleStatusSelected()"><i class="fas fa-toggle-on"></i> تفعيل/إلغاء المحدد</button>
@@ -1201,7 +1201,45 @@
         function deleteSelected() { const c=document.querySelectorAll('.user-select-cb:checked'); if(c.length===0)return alert('حدد عناصر'); if(confirm('حذف؟')){const ids=Array.from(c).map(x=>parseInt(x.value)); DB[CURRENT_TAB]=DB[CURRENT_TAB].filter(u=>!ids.includes(u.id)); addSystemLog('حذف جماعي', `حذف ${ids.length}`); saveDB(); renderTable(); document.getElementById('selectAll').checked=false;} }
         function toggleStatusSelected() { const c=document.querySelectorAll('.user-select-cb:checked'); if(c.length===0)return alert('حدد عناصر'); const ids=Array.from(c).map(x=>parseInt(x.value)); DB[CURRENT_TAB].forEach(u=>{if(ids.includes(u.id))u.status=u.status==='active'?'inactive':'active'}); addSystemLog('تغيير حالة جماعي', `تعديل ${ids.length}`); saveDB(); renderTable(); }
         function toggleStatus(id) { const u=DB[CURRENT_TAB].find(x=>x.id===id); if(u){u.status=u.status==='active'?'inactive':'active'; addSystemLog('تغيير حالة', u.name); saveDB(); renderTable();} }
-        function exportCSV() { const l=DB[CURRENT_TAB]||[]; if(l.length===0)return alert('لا بيانات'); let c=(CURRENT_TAB==='departments')?"ترتيب,اسم,حالة\n":"اسم,وظيفة,هاتف,دخول,مرور,تاريخ,حالة\n"; l.forEach((r,i)=>{if(CURRENT_TAB==='departments')c+=`${i+1},"${r.name}","${r.status}"\n`; else c+=`"${r.name}","${r.job||r.dept}","${r.phone}","${r.login}","${r.pass}","${r.dateAdded}","${r.status}"\n`;}); const b=new Blob(["\uFEFF"+c],{type:'text/csv;charset=utf-8;'}); const k=document.createElement("a"); k.href=URL.createObjectURL(b); k.download=`${CURRENT_TAB}.csv`; document.body.appendChild(k); k.click(); document.body.removeChild(k); }
+        
+        // Export Excel Function using SheetJS
+        function exportExcel() {
+            const list = DB[CURRENT_TAB] || [];
+            if (list.length === 0) return alert('لا بيانات للتصدير');
+
+            let headers = [];
+            let data = [];
+
+            if (CURRENT_TAB === 'departments') {
+                headers = ['الترتيب', 'اسم القسم', 'الحالة'];
+                list.forEach((row, index) => {
+                    data.push({
+                        'الترتيب': index + 1,
+                        'اسم القسم': row.name,
+                        'الحالة': row.status === 'active' ? 'مفعل' : 'معطل'
+                    });
+                });
+            } else {
+                headers = ['الاسم', 'الوظيفة/القسم', 'رقم الهاتف', 'اسم المستخدم', 'كلمة المرور', 'تاريخ الإضافة', 'الحالة'];
+                list.forEach(row => {
+                    data.push({
+                        'الاسم': row.name,
+                        'الوظيفة/القسم': row.job || row.dept || '',
+                        'رقم الهاتف': row.phone || '',
+                        'اسم المستخدم': row.login || '',
+                        'كلمة المرور': row.pass || '',
+                        'تاريخ الإضافة': row.dateAdded || '',
+                        'الحالة': row.status === 'active' ? 'مفعل' : 'معطل'
+                    });
+                });
+            }
+
+            const ws = XLSX.utils.json_to_sheet(data, { header: headers });
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+            XLSX.writeFile(wb, `${CURRENT_TAB}.xlsx`);
+        }
+
         function openAddUserModal() { 
             if(!canEdit('user-management')) return alert('ليس لديك صلاحية لإضافة مستخدمين');
             document.getElementById('editUserId').value=''; document.getElementById('addUserForm').reset(); document.getElementById('addUserModal').style.display='flex'; 
@@ -1267,6 +1305,7 @@
 
                     // Map Arabic Headers to System Keys
                     let count = 0;
+                    let skipped = 0;
                     const timestamp = Date.now();
                     const dateAdded = new Date().toLocaleDateString('en-GB');
 
@@ -1275,35 +1314,40 @@
                         const name = row['الاسم'] || row['Name'] || '';
                         
                         if (name) {
-                            const newUser = {
-                                id: timestamp + index,
-                                name: name,
-                                status: 'active',
-                                permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS)),
-                                dateAdded: dateAdded,
-                                lastUpdated: new Date().toLocaleString('en-GB'),
-                                lastUpdatedBy: CURRENT_USER ? CURRENT_USER.name : 'Import'
-                            };
+                            // Check for duplicates
+                            const exists = DB[CURRENT_TAB].some(u => u.name === name);
+                            
+                            if (!exists) {
+                                const newUser = {
+                                    id: timestamp + index,
+                                    name: name,
+                                    status: 'active',
+                                    permissions: JSON.parse(JSON.stringify(DEFAULT_PERMS)),
+                                    dateAdded: dateAdded,
+                                    lastUpdated: new Date().toLocaleString('en-GB'),
+                                    lastUpdatedBy: CURRENT_USER ? CURRENT_USER.name : 'Import'
+                                };
 
-                            if (CURRENT_TAB === 'departments') {
-                                // For Departments
-                                if(!DB[CURRENT_TAB].find(d => d.name === name)) {
+                                if (CURRENT_TAB === 'departments') {
+                                    // For Departments (Duplicate check already done above via name)
+                                    DB[CURRENT_TAB].push(newUser);
+                                    count++;
+                                } else if (CURRENT_TAB === 'teachers') {
+                                    // For Teachers
+                                    newUser.dept = row['القسم'] || row['Department'] || '';
+                                    DB[CURRENT_TAB].push(newUser);
+                                    count++;
+                                } else {
+                                    // For Senior/Middle Leadership
+                                    newUser.job = row['الوظيفة'] || row['Job'] || '';
+                                    newUser.phone = row['رقم الهاتف'] || row['Phone'] || '';
+                                    newUser.login = row['اسم المستخدم'] || row['User'] || '';
+                                    newUser.pass = row['كلمة المرور'] || row['Pass'] || '';
                                     DB[CURRENT_TAB].push(newUser);
                                     count++;
                                 }
-                            } else if (CURRENT_TAB === 'teachers') {
-                                // For Teachers
-                                newUser.dept = row['القسم'] || row['Department'] || '';
-                                DB[CURRENT_TAB].push(newUser);
-                                count++;
                             } else {
-                                // For Senior/Middle Leadership
-                                newUser.job = row['الوظيفة'] || row['Job'] || '';
-                                newUser.phone = row['رقم الهاتف'] || row['Phone'] || '';
-                                newUser.login = row['اسم المستخدم'] || row['User'] || '';
-                                newUser.pass = row['كلمة المرور'] || row['Pass'] || '';
-                                DB[CURRENT_TAB].push(newUser);
-                                count++;
+                                skipped++;
                             }
                         }
                     });
@@ -1312,9 +1356,15 @@
                         saveDB();
                         renderTable();
                         addSystemLog('استيراد إكسل', `تم استيراد ${count} سجل في ${CURRENT_TAB}`);
-                        alert(`تم استيراد ${count} سجل بنجاح.`);
+                        let msg = `تم استيراد ${count} سجل بنجاح.`;
+                        if(skipped > 0) msg += `\nتم تجاهل ${skipped} اسم بسبب التكرار.`;
+                        alert(msg);
                     } else {
-                        alert('لم يتم استيراد أي سجل. تأكد من تطابق عناوين الأعمدة (الاسم، الوظيفة، ...).');
+                        if (skipped > 0) {
+                            alert(`لم يتم إضافة أي سجل جديد. جميع الأسماء (${skipped}) موجودة مسبقاً.`);
+                        } else {
+                            alert('لم يتم استيراد أي سجل. تأكد من تطابق عناوين الأعمدة (الاسم، الوظيفة، ...).');
+                        }
                     }
                     
                     // Reset input
