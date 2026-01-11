@@ -1171,13 +1171,23 @@
             const canEditUsers = canEdit('user-management');
             const actionButtons = document.getElementById('userActionButtons'); const noEditMsg = document.getElementById('noEditPermissionMsg');
             if(canEditUsers) { actionButtons.style.display = 'flex'; noEditMsg.style.display = 'none'; } else { actionButtons.style.display = 'none'; noEditMsg.style.display = 'block'; }
+            
+            // Header Logic
+            let headerHTML = `<th width="5%"><input type="checkbox" id="selectAll" class="custom-checkbox" onchange="toggleSelectAll(this)" ${canEditUsers?'':'disabled'}></th>`;
+            
             if (CURRENT_TAB === 'departments') {
-                headRow.innerHTML = `<th width="5%"><input type="checkbox" id="selectAll" class="custom-checkbox" onchange="toggleSelectAll(this)" ${canEditUsers?'':'disabled'}></th><th width="10%">الترتيب</th><th width="40%">اسم القسم</th><th width="15%">الحالة</th><th width="30%">الإدارة</th>`;
+                headerHTML += `<th width="10%">الترتيب</th><th width="40%">اسم القسم</th><th width="15%">الحالة</th><th width="30%">الإدارة</th>`;
                 addBtn.innerText = "إضافة قسم جديد"; if(bulkPermBtn) bulkPermBtn.style.display = 'none'; 
+            } else if (CURRENT_TAB === 'teachers') {
+                // Modified for Teachers: Job -> Dept
+                headerHTML += `<th width="5%">#</th><th width="25%">الاسم</th><th width="15%">القسم</th><th width="15%">الحالة</th><th width="35%">الإجراءات</th>`;
+                addBtn.innerText = "إضافة اسم جديد"; if(bulkPermBtn) bulkPermBtn.style.display = 'inline-flex';
             } else {
-                headRow.innerHTML = `<th width="5%"><input type="checkbox" id="selectAll" class="custom-checkbox" onchange="toggleSelectAll(this)" ${canEditUsers?'':'disabled'}></th><th width="5%">#</th><th width="25%">الاسم</th><th width="15%">الوظيفة</th><th width="15%">الحالة</th><th width="35%">الإجراءات</th>`;
+                headerHTML += `<th width="5%">#</th><th width="25%">الاسم</th><th width="15%">الوظيفة</th><th width="15%">الحالة</th><th width="35%">الإجراءات</th>`;
                 addBtn.innerText = "إضافة اسم جديد"; if(bulkPermBtn) bulkPermBtn.style.display = 'inline-flex';
             }
+            headRow.innerHTML = headerHTML;
+
             const list = DB[CURRENT_TAB] || [];
             list.forEach((u, idx) => {
                 const isActive = u.status === 'active';
@@ -1211,20 +1221,28 @@
             let data = [];
 
             if (CURRENT_TAB === 'departments') {
-                headers = ['الترتيب', 'اسم القسم', 'الحالة'];
+                headers = ['الترتيب', 'اسم القسم'];
                 list.forEach((row, index) => {
                     data.push({
                         'الترتيب': index + 1,
-                        'اسم القسم': row.name,
-                        'الحالة': row.status === 'active' ? 'مفعل' : 'معطل'
+                        'اسم القسم': row.name
+                    });
+                });
+            } else if (CURRENT_TAB === 'teachers') {
+                headers = ['الترتيب', 'الاسم', 'القسم'];
+                list.forEach((row, index) => {
+                    data.push({
+                        'الترتيب': index + 1,
+                        'الاسم': row.name,
+                        'القسم': row.dept || ''
                     });
                 });
             } else {
-                headers = ['الاسم', 'الوظيفة/القسم', 'رقم الهاتف', 'اسم المستخدم', 'كلمة المرور', 'تاريخ الإضافة', 'الحالة'];
+                headers = ['الاسم', 'الوظيفة', 'رقم الهاتف', 'اسم المستخدم', 'كلمة المرور', 'تاريخ الإضافة', 'الحالة'];
                 list.forEach(row => {
                     data.push({
                         'الاسم': row.name,
-                        'الوظيفة/القسم': row.job || row.dept || '',
+                        'الوظيفة': row.job || '',
                         'رقم الهاتف': row.phone || '',
                         'اسم المستخدم': row.login || '',
                         'كلمة المرور': row.pass || '',
@@ -1311,7 +1329,13 @@
 
                     jsonData.forEach((row, index) => {
                         // Attempt to read data based on possible Arabic headers
-                        const name = row['الاسم'] || row['Name'] || '';
+                        let name = '';
+                        
+                        if (CURRENT_TAB === 'departments') {
+                            name = row['اسم القسم'] || row['الاسم'] || row['Name'] || '';
+                        } else {
+                            name = row['الاسم'] || row['Name'] || '';
+                        }
                         
                         if (name) {
                             // Check for duplicates
@@ -1329,7 +1353,7 @@
                                 };
 
                                 if (CURRENT_TAB === 'departments') {
-                                    // For Departments (Duplicate check already done above via name)
+                                    // For Departments
                                     DB[CURRENT_TAB].push(newUser);
                                     count++;
                                 } else if (CURRENT_TAB === 'teachers') {
@@ -1363,7 +1387,7 @@
                         if (skipped > 0) {
                             alert(`لم يتم إضافة أي سجل جديد. جميع الأسماء (${skipped}) موجودة مسبقاً.`);
                         } else {
-                            alert('لم يتم استيراد أي سجل. تأكد من تطابق عناوين الأعمدة (الاسم، الوظيفة، ...).');
+                            alert('لم يتم استيراد أي سجل. تأكد من تطابق عناوين الأعمدة.');
                         }
                     }
                     
