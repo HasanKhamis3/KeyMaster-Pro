@@ -333,7 +333,7 @@
             <div id="visits" class="section-card">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                     <h3 style="color:var(--primary);">سجل الزيارات الصفية</h3>
-                    <button class="btn btn-primary btn-restricted" style="width:auto;" onclick="openAddVisitModal()"><i class="fas fa-plus"></i> إضافة زيارة جديدة</button>
+                    <button id="btnAddVisit" class="btn btn-primary btn-restricted" style="width:auto;" onclick="openAddVisitModal()"><i class="fas fa-plus"></i> إضافة زيارة جديدة</button>
                 </div>
                 <div class="filter-container">
                     <label class="filter-label"><i class="fas fa-filter"></i> تصفية حسب الشهر:</label>
@@ -365,7 +365,8 @@
                             <th width="20%">اسم المعلمة</th>
                             <th width="15%">التقييم</th>
                             <th width="15%">الزائر</th>
-                            <th width="20%">الإجراءات</th>
+                            <th width="10%">الوظيفة</th>
+                            <th width="10%">الإجراءات</th>
                         </tr>
                     </thead>
                     <tbody id="visitsTableBody"></tbody>
@@ -1559,15 +1560,47 @@
         function clearSystemLogs() { if(confirm('هل أنت متأكد من مسح السجل بالكامل؟')) { DB.logs = []; saveDB(); loadSystemLogs(); } }
 
         // === Visits & Charts ===
-        function setVisitTab(type, el) { CURRENT_VISIT_TAB = type; document.querySelectorAll('#visits .custom-tab').forEach(t=>t.classList.remove('active')); el.classList.add('active'); renderVisitsTable(); }
+        function setVisitTab(type, el) { 
+            CURRENT_VISIT_TAB = type; 
+            document.querySelectorAll('#visits .custom-tab').forEach(t=>t.classList.remove('active')); 
+            el.classList.add('active'); 
+            
+            // Trigger logic for button state and table render
+            updateAddVisitButtonState();
+            renderVisitsTable(); 
+        }
         
+        function updateAddVisitButtonState() {
+            const btn = document.getElementById('btnAddVisit');
+            if (!CURRENT_USER) return;
+
+            // Check if user is Admin
+            const isAdmin = DB.admins.some(a => a.id === CURRENT_USER.id);
+
+            let canAdd = false;
+            if (isAdmin) {
+                canAdd = true;
+            } else if (CURRENT_VISIT_TAB === 'senior') {
+                // Active only if user is Senior Leadership
+                canAdd = DB.senior.some(u => u.id === CURRENT_USER.id);
+            } else if (CURRENT_VISIT_TAB === 'middle') {
+                // Active only if user is Middle Leadership
+                canAdd = DB.middle.some(u => u.id === CURRENT_USER.id);
+            }
+
+            btn.disabled = !canAdd;
+            btn.style.opacity = canAdd ? '1' : '0.5';
+            btn.style.cursor = canAdd ? 'pointer' : 'not-allowed';
+            btn.title = canAdd ? '' : 'ليس لديك صلاحية الإضافة في هذا القسم';
+        }
+
         // Updated Render Function for Visits Table
         function renderVisitsTable() {
             const tbody = document.getElementById('visitsTableBody'); tbody.innerHTML = '';
             let list = (CURRENT_VISIT_TAB === 'senior') ? (DB.visits_senior || []) : (DB.visits_middle || []);
             const filter = document.getElementById('visitMonthFilter').value;
             if(filter !== 'all') list = list.filter(v => v.date.split('-')[1] === filter);
-            if(list.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="padding:20px; color:#888;">لا توجد زيارات مسجلة</td></tr>'; return; }
+            if(list.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="padding:20px; color:#888;">لا توجد زيارات مسجلة</td></tr>'; return; }
             
             list.forEach(v => {
                 let badgeClass = 'bg-light-blue';
@@ -1590,6 +1623,7 @@
                     <td>${v.teacher}</td>
                     <td><span style="padding:5px 10px; border-radius:15px; font-size:0.8rem;" class="${badgeClass}">${v.eval}</span></td>
                     <td>${v.visitor}</td>
+                    <td>${v.visitorJob || '-'}</td>
                     <td>
                         <div style="display:flex; justify-content:center; gap:2px;">
                             ${viewBtn}
@@ -1644,7 +1678,6 @@
                     DB[targetListKey][idx].teacher = teacher;
                     DB[targetListKey][idx].date = date;
                     DB[targetListKey][idx].eval = ev;
-                    // Visitor details (creator) remain unchanged usually, or update timestamp
                     addSystemLog('تعديل زيارة', `المعلم: ${teacher}`);
                 }
             } else {
@@ -1726,7 +1759,7 @@
                         <div style="width:40px; height:40px; background:#1e4078; color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">${visit.visitor.charAt(0)}</div>
                         <div>
                             <div>${visit.visitor}</div>
-                            <small style="color:#777;">${visit.visitorJob}</small>
+                            <small style="color:#777;">${visit.visitorJob || '-'}</small>
                         </div>
                     </div>
                 </div>
